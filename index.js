@@ -43,7 +43,7 @@ function makeDebateId(topic) {
 }
 
 function saveDebateSession(debateId, data) {
-  const dir = join('E:/debate-arena/sessions');
+  const dir = join(__dirname, 'sessions');
   if (!existsSync(dir)) mkdirSync(dir, { recursive: true });
   writeFileSync(join(dir, `web_${debateId}.json`), JSON.stringify(data, null, 2), 'utf-8');
 }
@@ -253,7 +253,7 @@ app.get('/api/debate/:id/status', (req, res) => {
   if (!debate) {
     // 尝试从文件读取
     try {
-      const filePath = join('E:/debate-arena/sessions', `web_${req.params.id}.json`);
+      const filePath = join(__dirname, 'sessions', `web_${req.params.id}.json`);
       const data = JSON.parse(readFileSync(filePath, 'utf-8'));
       return res.json({ id: req.params.id, status: 'completed', summary: data });
     } catch {
@@ -304,7 +304,7 @@ app.post('/api/spectator/question', (req, res) => {
  * 列出最近的辩论
  */
 app.get('/api/debates', (_req, res) => {
-  const dir = 'E:/debate-arena/sessions';
+  const dir = join(__dirname, 'sessions');
   if (!existsSync(dir)) return res.json([]);
 
   try {

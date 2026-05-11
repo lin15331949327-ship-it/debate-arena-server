@@ -1,0 +1,10 @@
+{
+  "$schema": "https://schema.railpack.com",
+  "provider": "node",
+  "packages": {
+    "python": "3"
+  },
+  "deploy": {
+    "startCommand": "node index.js"
+  }
+}

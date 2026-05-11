@@ -149,7 +149,7 @@ def run_debate(debate_id, topic, max_rounds=6, first_speaker=None):
 
     try:
         # 初始化引擎
-        engine = DebateEngine(save_dir="E:/debate-arena/sessions")
+        engine = DebateEngine(save_dir=os.path.join(os.path.dirname(os.path.abspath(__file__)), "sessions"))
         engine.start(topic=topic, max_rounds=max_rounds, first_speaker=first_speaker)
 
         output({

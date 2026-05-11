@@ -1,0 +1,183 @@
+{
+  "total": 22,
+  "passed": 22,
+  "accuracy": 100.0,
+  "details": [
+    {
+      "q": "濠梁之辩 子非鱼",
+      "agent": "zhuangzi",
+      "results": 5,
+      "score": 1.0,
+      "top_method": "BM25+FAISS",
+      "top_text": "作呼，同。許嫁反，又許伯反。司馬云：嚇怒其聲，恐其奪己也。詩箋云：以口拒人曰嚇。\n〔二〕【注】言物嗜好不同，願各有極。疏】鴟以腐鼠爲美，仰嚇鵷鶵；惠以國相爲榮，"
+    },
+    {
+      "q": "庖丁解牛 游刃有余",
+      "agent": "zhuangzi",
+      "results": 5,
+      "score": 1.0,
+      "top_method": "FAISS",
+      "top_text": "經」李云：緣，順也。督，中也。經，常也。郭崔同。○慶藩案文選左太沖魏都賦注引司馬\n云：緣，順也。督，中也。順守道中以爲常也。釋文闕。○李禎曰：素問骨空論，督録)"
+    },
+    {
+      "q": "庄周梦蝶 物化",
+      "agent": "zhuangzi",
+      "results": 5,
+      "score": 1.0,
+      "top_method": "BM25+FAISS",
+      "top_text": "也吾。始乎適而未嘗不適者，忘適之適也六。\n○一疏旋，規也。規，圓也。稽，留也。倕是堯時工人，稟性極巧，蓋用規矩，手隨物化，因物\n施巧，不稽留也。【釋文】[工倕]"
+    },
+    {
+      "q": "混沌开七窍 日凿一窍",
+      "agent": "zhuangzi",
+      "results": 5,
+      "score": 1.0,
+      "top_method": "BM25+FAISS",
+      "top_text": "- 核心意象：不应强求特定命运\n- 辩论关键词：爱命运（尼采Amor Fati）\n## 应帝王\n### 混沌之死\n南海之帝为儵，北海之帝为忽，中央之帝为浑沌。儵"
+    },
+    {
+      "q": "北冥有鱼 鲲鹏",
+      "agent": "zhuangzi",
+      "results": 5,
+      "score": 1.0,
+      "top_method": "BM25+FAISS",
+      "top_text": "# 庄子寓言故事集 — 核心寓言汇编（辩论场引用参考）\n## 逍遥游\n### 鲲鹏之变\n北冥有鱼，其名为鲲。鲲之大不知几千里。化而为鸟，其名为鹏。鹏之背不知几千"
+    },
+    {
+      "q": "相濡以沫 不如相忘于江湖",
+      "agent": "zhuangzi",
+      "results": 5,
+      "score": 1.0,
+      "top_method": "BM25+FAISS",
+      "top_text": "依說文當作種。禾部：釋，特止。徐鍇[曰〕：特止，卓北[立]也。卓趠連踔稀，古同聲通\n用。[敢惡」烏路反。[之竟」音境。\n[四〕【注】夫真者，不假於物而自然也。夫"
+    },
+    {
+      "q": "无用之用 不材之木",
+      "agent": "zhuangzi",
+      "results": 5,
+      "score": 1.0,
+      "top_method": "BM25+FAISS",
+      "top_text": "弟子厭觀之，走及匠石，曰：[自吾執斧斤以隨夫子，未嘗見材如此其美也。先\n生不肯視，行不輟，何邪(？]\n〔一)【疏】門人驚櫟社之盛美，乃住立以視看。自負笈以從師，"
+    },
+    {
+      "q": "上帝已死 我们杀死了他",
+      "agent": "nietzsche",
+      "results": 5,
+      "score": 1.0,
+      "top_method": "BM25+FAISS",
+      "top_text": "# 尼采补充文献 — 后世哲学解读、书信、德文关键段落\n## 海德格尔对尼采的解读\n海德格尔（1889-1976）在1936-1940年间做了大量尼采讲座，后出"
+    },
+    {
+      "q": "不能杀死我的 使我更强大",
+      "agent": "nietzsche",
+      "results": 5,
+      "score": 1.0,
+      "top_method": "BM25+FAISS",
+      "top_text": "# 尼采补充文献 — 后世哲学解读、书信、德文关键段落\n## 海德格尔对尼采的解读\n海德格尔（1889-1976）在1936-1940年间做了大量尼采讲座，后出"
+    },
+    {
+      "q": "当你凝视深渊 深渊也在凝视你",
+      "agent": "nietzsche",
+      "results": 5,
+      "score": 1.0,
+      "top_method": "BM25+FAISS",
+      "top_text": "# 尼采补充文献 — 后世哲学解读、书信、德文关键段落\n## 海德格尔对尼采的解读\n海德格尔（1889-1976）在1936-1940年间做了大量尼采讲座，后出"
+    },
+    {
+      "q": "人是一根绳索 动物与超人之间",
+      "agent": "nietzsche",
+      "results": 5,
+      "score": 1.0,
+      "top_method": "BM25+FAISS",
+      "top_text": "— 《快乐的科学》第125节\n### 权力意志（Wille zur Macht）\n\"Diese Welt ist der Wille zur Macht — u"
+    },
+    {
+      "q": "超人 人是一种应当被超越的东西",
+      "agent": "nietzsche",
+      "results": 5,
+      "score": 1.0,
+      "top_method": "BM25+FAISS",
+      "top_text": "# 尼采补充文献 — 后世哲学解读、书信、德文关键段落\n## 海德格尔对尼采的解读\n海德格尔（1889-1976）在1936-1940年间做了大量尼采讲座，后出"
+    },
+    {
+      "q": "女人不是天生的 而是后天形成的",
+      "agent": "beauvoir",
+      "results": 5,
+      "score": 1.0,
+      "top_method": "BM25+FAISS",
+      "top_text": "- **忽视种族交叉性**：bell hooks 指出波伏娃的\"女人\"隐含中产阶级白人经历\n- **身体维度不足**：Judith Butler 的\"性别操演\""
+    },
+    {
+      "q": "他者 第二性 定义",
+      "agent": "beauvoir",
+      "results": 5,
+      "score": 1.0,
+      "top_method": "BM25+FAISS",
+      "top_text": "第二性Ⅰ 第一章 历史向我们表明，男人总是掌握所有的具体权力；从父权制开始，男人就认为将女人保持在从属的地位是有用的；他们的法典是为了对付女人而设立的；女人就是"
+    },
+    {
+      "q": "存在先于本质 处境先于选择",
+      "agent": "beauvoir",
+      "results": 5,
+      "score": 1.0,
+      "top_method": "BM25+FAISS",
+      "top_text": "# 波伏娃补充文献 — 学术论文、萨特存在与虚无、后世女性主义\n## 萨特《存在与虚无》核心要点（波伏娃对话基础）\n波伏娃与萨特共享存在主义基础，但在\"自由与处"
+    },
+    {
+      "q": "解放 命名就是揭示",
+      "agent": "beauvoir",
+      "results": 5,
+      "score": 1.0,
+      "top_method": "BM25+FAISS",
+      "top_text": "十九世纪，关于女性主义的争论重新带有偏见；工业革命的后果之一，是女性参加生产劳动，当时，女性主义的要求在理论领域产生，女人找到了经济基础；其对手因此变得特别咄咄"
+    },
+    {
+      "q": "自由 逍遥 精神解放",
+      "agent": "zhuangzi",
+      "results": 5,
+      "score": 1.0,
+      "top_method": "BM25+FAISS",
+      "top_text": "# 庄子寓言故事集 — 核心寓言汇编（辩论场引用参考）\n## 逍遥游\n### 鲲鹏之变\n北冥有鱼，其名为鲲。鲲之大不知几千里。化而为鸟，其名为鹏。鹏之背不知几千"
+    },
+    {
+      "q": "自由 权力意志 自我超越",
+      "agent": "nietzsche",
+      "results": 5,
+      "score": 1.0,
+      "top_method": "BM25+FAISS",
+      "top_text": "— 《快乐的科学》第125节\n### 权力意志（Wille zur Macht）\n\"Diese Welt ist der Wille zur Macht — u"
+    },
+    {
+      "q": "自由 处境 具体行动",
+      "agent": "beauvoir",
+      "results": 5,
+      "score": 1.0,
+      "top_method": "BM25+FAISS",
+      "top_text": "======================================================================\n波伏娃区分了两种自"
+    },
+    {
+      "q": "freedom butterfly dream",
+      "agent": "zhuangzi",
+      "results": 5,
+      "score": 1.0,
+      "top_method": "FAISS",
+      "top_text": "# 庄子寓言故事集 — 核心寓言汇编（辩论场引用参考）\n## 逍遥游\n### 鲲鹏之变\n北冥有鱼，其名为鲲。鲲之大不知几千里。化而为鸟，其名为鹏。鹏之背不知几千"
+    },
+    {
+      "q": "ubermensch superman overman",
+      "agent": "nietzsche",
+      "results": 5,
+      "score": 1.0,
+      "top_method": "FAISS",
+      "top_text": "another one must be striven after.\nWe must let ourselves be taught by the evil, "
+    },
+    {
+      "q": "woman becomes one is not born",
+      "agent": "beauvoir",
+      "results": 5,
+      "score": 1.0,
+      "top_method": "BM25+FAISS",
+      "top_text": "- **忽视种族交叉性**：bell hooks 指出波伏娃的\"女人\"隐含中产阶级白人经历\n- **身体维度不足**：Judith Butler 的\"性别操演\""
+    }
+  ]
+}

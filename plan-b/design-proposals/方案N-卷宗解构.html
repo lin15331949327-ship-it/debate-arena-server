@@ -1,0 +1,833 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>方案N：卷宗·解构 · 自由辩论堂</title>
+<style>
+:root {
+  --zhuangzi: #558a68;
+  --zhuangzi-light: #a8d4b8;
+  --zhuangzi-ink: #1a3022;
+  --zhuangzi-paper: #f4f8f5;
+  --nietzsche: #b84d3e;
+  --nietzsche-light: #e8a098;
+  --nietzsche-ink: #381812;
+  --nietzsche-paper: #fdf5f4;
+  --beauvoir: #4a68a8;
+  --beauvoir-light: #a0b8e8;
+  --beauvoir-ink: #142040;
+  --beauvoir-paper: #f2f5fb;
+  --bg: #f5f0e8;
+  --paper: #faf7f0;
+  --text: #2a2420;
+  --text-dim: #6a6458;
+  --accent: #b88030;
+  --accent-light: #e0c870;
+  --margin: 60px;
+  --col-gap: 40px;
+  --dossier-w: 720px;
+}
+
+* { box-sizing:border-box;margin:0;padding:0 }
+
+body {
+  font-family: 'Noto Serif SC','Georgia','Songti SC',serif;
+  background: var(--bg);
+  color: var(--text);
+  background-image:
+    radial-gradient(circle at 20% 20%, rgba(85,138,104,.04) 0%, transparent 50%),
+    radial-gradient(circle at 80% 60%, rgba(184,77,62,.04) 0%, transparent 50%),
+    radial-gradient(circle at 50% 80%, rgba(74,104,168,.04) 0%, transparent 50%);
+}
+
+/* === TOP DOSSIER HEADER === */
+.dossier-header {
+  background: var(--paper);
+  border-bottom: 1px solid rgba(0,0,0,.08);
+  padding: 18px var(--margin);
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  box-shadow: 0 2px 12px rgba(0,0,0,.04);
+}
+.dossier-stamp {
+  font-size: 10px;
+  letter-spacing: .2em;
+  font-weight: 700;
+  padding: 6px 14px;
+  border: 2px solid var(--accent);
+  color: var(--accent);
+  text-transform: uppercase;
+  transform: rotate(-2deg);
+}
+.dossier-title {
+  font-size: 20px;
+  font-weight: 900;
+  letter-spacing: .06em;
+}
+.dossier-meta {
+  font-size: 11px;
+  color: var(--text-dim);
+  margin-left: auto;
+  text-align: right;
+  line-height: 1.6;
+}
+.dossier-meta span { display: block }
+
+/* === TAB NAVIGATION === */
+.tab-nav {
+  display: flex;
+  gap: 0;
+  padding: 0 var(--margin);
+  background: var(--paper);
+  border-bottom: 1px solid rgba(0,0,0,.06);
+  position: sticky;
+  top: 68px;
+  z-index: 9;
+}
+.tab {
+  padding: 14px 28px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  letter-spacing: .04em;
+  border: none;
+  background: none;
+  color: var(--text-dim);
+  font-family: inherit;
+  border-bottom: 2px solid transparent;
+  transition: all .3s;
+  position: relative;
+}
+.tab:hover { color: var(--text) }
+.tab.active {
+  color: var(--text);
+  border-bottom-color: var(--accent);
+}
+.tab::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 28px;
+  right: 28px;
+  height: 1px;
+  opacity: 0;
+  transition: opacity .3s;
+}
+.tab[data-tab="zhuangzi"]::after { background: var(--zhuangzi) }
+.tab[data-tab="nietzsche"]::after { background: var(--nietzsche) }
+.tab[data-tab="beauvoir"]::after { background: var(--beauvoir) }
+.tab.active::after { opacity: 1 }
+
+/* === MAIN DOSSIER CONTENT === */
+.dossier-body {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 40px var(--margin) 80px;
+}
+
+/* === DOSSIER PANEL (one per philosopher) === */
+.dossier-panel {
+  display: none;
+  animation: panelIn .5s ease;
+}
+.dossier-panel.active { display: block }
+@keyframes panelIn { from { opacity:0;transform:translateY(16px) } to { opacity:1;transform:translateY(0) } }
+
+/* Hero block */
+.hero-block {
+  display: flex;
+  gap: 30px;
+  align-items: flex-start;
+  margin-bottom: 40px;
+  padding-bottom: 32px;
+  border-bottom: 1px solid rgba(0,0,0,.06);
+}
+
+/* Shape portrait (big) */
+.portrait {
+  width: 100px;
+  height: 100px;
+  flex-shrink: 0;
+  position: relative;
+}
+.panel-zhuangzi .portrait {
+  background: var(--zhuangzi);
+  clip-path: polygon(50% 3%, 88% 28%, 84% 74%, 50% 97%, 16% 74%, 12% 28%);
+}
+.panel-nietzsche .portrait {
+  background: var(--nietzsche);
+  clip-path: polygon(50% 3%, 78% 20%, 94% 50%, 78% 80%, 50% 97%, 22% 80%, 6% 50%, 22% 20%);
+}
+.panel-beauvoir .portrait {
+  background: var(--beauvoir);
+  clip-path: polygon(50% 3%, 74% 24%, 74% 76%, 50% 97%, 26% 76%, 26% 24%);
+}
+
+.hero-info { flex:1 }
+.hero-info .phil-name {
+  font-size: 32px;
+  font-weight: 900;
+  letter-spacing: .06em;
+  line-height: 1.2;
+}
+.panel-zhuangzi .phil-name { color: var(--zhuangzi-ink) }
+.panel-nietzsche .phil-name { color: var(--nietzsche-ink) }
+.panel-beauvoir .phil-name { color: var(--beauvoir-ink) }
+
+.hero-info .phil-dates {
+  font-size: 13px;
+  color: var(--text-dim);
+  margin: 8px 0;
+  letter-spacing: .04em;
+}
+.hero-info .tagline {
+  font-size: 16px;
+  font-weight: 600;
+  margin: 14px 0;
+  padding: 8px 16px;
+  display: inline-block;
+  letter-spacing: .04em;
+}
+.panel-zhuangzi .tagline { background: var(--zhuangzi-paper);color:var(--zhuangzi-ink) }
+.panel-nietzsche .tagline { background: var(--nietzsche-paper);color:var(--nietzsche-ink) }
+.panel-beauvoir .tagline { background: var(--beauvoir-paper);color:var(--beauvoir-ink) }
+
+/* === MARGINALIA GRID === */
+.marginalia-grid {
+  display: grid;
+  grid-template-columns: 1fr 200px;
+  gap: 30px;
+  margin: 30px 0;
+}
+
+/* Main text column */
+.main-col {
+  line-height: 2;
+  font-size: 14px;
+}
+
+/* Pull quote */
+.pull-quote {
+  font-size: 22px;
+  font-weight: 700;
+  line-height: 1.6;
+  padding: 20px 0;
+  margin: 20px 0;
+  border-top: 2px solid;
+  border-bottom: 2px solid;
+  letter-spacing: .03em;
+}
+.panel-zhuangzi .pull-quote { border-color: var(--zhuangzi);color:var(--zhuangzi-ink) }
+.panel-nietzsche .pull-quote { border-color: var(--nietzsche);color:var(--nietzsche-ink) }
+.panel-beauvoir .pull-quote { border-color: var(--beauvoir);color:var(--beauvoir-ink) }
+
+/* Marginal notes */
+.margin-col {
+  font-size: 11px;
+  color: var(--text-dim);
+  line-height: 1.7;
+  position: relative;
+}
+.margin-note {
+  background: var(--paper);
+  padding: 12px 14px;
+  margin-bottom: 12px;
+  border-left: 3px solid;
+  font-style: italic;
+  position: relative;
+}
+.panel-zhuangzi .margin-note { border-color: var(--zhuangzi-light);background:var(--zhuangzi-paper) }
+.panel-nietzsche .margin-note { border-color: var(--nietzsche-light);background:var(--nietzsche-paper) }
+.panel-beauvoir .margin-note { border-color: var(--beauvoir-light);background:var(--beauvoir-paper) }
+
+.margin-note-label {
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  font-style: normal;
+  margin-bottom: 4px;
+}
+
+/* Sticky note */
+.sticky-note {
+  background: #fef9e8;
+  padding: 12px 14px;
+  font-size: 11px;
+  line-height: 1.6;
+  transform: rotate(1.5deg);
+  box-shadow: 2px 3px 8px rgba(0,0,0,.08);
+  margin: 10px 0;
+  position: relative;
+}
+.sticky-note::before {
+  content: '';
+  position: absolute;
+  top: -6px; left: 50%;
+  width: 20px; height: 8px;
+  background: rgba(200,180,100,.4);
+  border-radius: 2px;
+  transform: translateX(-50%) rotate(-1deg);
+}
+
+/* === CROSS-REFERENCE TABLE === */
+.cross-ref {
+  margin: 36px 0;
+  overflow-x: auto;
+}
+.cross-ref h3 {
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: .06em;
+  margin-bottom: 14px;
+  color: var(--text-dim);
+}
+
+.cross-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12px;
+  line-height: 1.7;
+}
+.cross-table th {
+  text-align: left;
+  padding: 10px 14px;
+  font-weight: 700;
+  font-size: 11px;
+  letter-spacing: .08em;
+  border-bottom: 1px solid rgba(0,0,0,.1);
+  color: var(--text-dim);
+}
+.cross-table td {
+  padding: 10px 14px;
+  border-bottom: 1px solid rgba(0,0,0,.04);
+  vertical-align: top;
+}
+.cross-table tr:last-child td { border-bottom: none }
+.cross-table .zh-cell { background: var(--zhuangzi-paper) }
+.cross-table .ni-cell { background: var(--nietzsche-paper) }
+.cross-table .bv-cell { background: var(--beauvoir-paper) }
+.cross-table .label-cell {
+  font-weight: 700;
+  letter-spacing: .06em;
+  white-space: nowrap;
+}
+
+/* === RESPONSE CHAIN (debate as annotations) === */
+.response-chain {
+  margin: 30px 0;
+  padding: 20px;
+  background: var(--paper);
+  border: 1px solid rgba(0,0,0,.06);
+  border-radius: 8px;
+}
+.response-chain h3 {
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: .08em;
+  color: var(--text-dim);
+  margin-bottom: 16px;
+}
+
+.response-item {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 16px;
+  align-items: flex-start;
+}
+.response-shape {
+  width: 28px; height: 28px;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+.response-shape.zh {
+  background: var(--zhuangzi);
+  clip-path: polygon(50% 5%, 88% 30%, 84% 74%, 50% 95%, 16% 74%, 12% 30%);
+}
+.response-shape.ni {
+  background: var(--nietzsche);
+  clip-path: polygon(50% 5%, 80% 20%, 95% 50%, 80% 80%, 50% 95%, 20% 80%, 5% 50%, 20% 20%);
+}
+.response-shape.bv {
+  background: var(--beauvoir);
+  clip-path: polygon(50% 5%, 74% 25%, 74% 75%, 50% 95%, 26% 75%, 26% 25%);
+}
+.response-content { flex:1 }
+.response-from {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: .06em;
+  margin-bottom: 3px;
+}
+.response-from.zh { color: var(--zhuangzi) }
+.response-from.ni { color: var(--nietzsche) }
+.response-from.bv { color: var(--beauvoir) }
+.response-text {
+  font-size: 12px;
+  line-height: 1.7;
+  color: var(--text-dim);
+}
+
+/* === FOOTNOTES BAR === */
+.footnotes {
+  margin-top: 40px;
+  padding-top: 20px;
+  border-top: 1px solid rgba(0,0,0,.08);
+  font-size: 10px;
+  color: var(--text-dim);
+  line-height: 1.8;
+  columns: 2;
+  column-gap: 30px;
+}
+.footnote-num { font-weight: 700; margin-right: 4px }
+
+/* Cross panel (shows dialog) */
+.cross-panel {
+  display: none;
+  animation: panelIn .5s ease;
+}
+.cross-panel.active { display: block }
+
+.cross-hero {
+  text-align: center;
+  padding: 60px 0 30px;
+}
+.cross-hero h2 {
+  font-size: 28px;
+  font-weight: 900;
+  letter-spacing: .1em;
+  margin-bottom: 10px;
+}
+.cross-hero .sub {
+  font-size: 13px;
+  color: var(--text-dim);
+  letter-spacing: .08em;
+}
+
+/* Tri-column layout for cross */
+.tri-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: var(--col-gap);
+  margin: 30px 0;
+}
+.tri-card {
+  padding: 24px;
+  border-radius: 6px;
+  position: relative;
+}
+.tri-card.zh { background: var(--zhuangzi-paper);border-top:4px solid var(--zhuangzi) }
+.tri-card.ni { background: var(--nietzsche-paper);border-top:4px solid var(--nietzsche) }
+.tri-card.bv { background: var(--beauvoir-paper);border-top:4px solid var(--beauvoir) }
+.tri-card .card-shape {
+  width: 40px; height: 40px;
+  margin-bottom: 14px;
+}
+.tri-card.zh .card-shape {
+  background: var(--zhuangzi);
+  clip-path: polygon(50% 5%, 88% 30%, 84% 74%, 50% 95%, 16% 74%, 12% 30%);
+}
+.tri-card.ni .card-shape {
+  background: var(--nietzsche);
+  clip-path: polygon(50% 5%, 80% 20%, 95% 50%, 80% 80%, 50% 95%, 20% 80%, 5% 50%, 20% 20%);
+}
+.tri-card.bv .card-shape {
+  background: var(--beauvoir);
+  clip-path: polygon(50% 5%, 74% 25%, 74% 75%, 50% 95%, 26% 75%, 26% 25%);
+}
+.tri-card h4 { font-size: 15px; font-weight: 700; margin-bottom: 6px; }
+.tri-card .card-stance { font-size: 12px; font-style: italic; color: var(--text-dim); margin-bottom: 12px; }
+.tri-card .card-text { font-size: 12px; line-height: 1.8; color: var(--text-dim) }
+
+.topic-pills {
+  display: flex; gap: 8px; justify-content: center; margin: 20px 0; flex-wrap: wrap;
+}
+.topic-pill {
+  padding: 6px 16px; border-radius: 16px; font-size: 11px; cursor: pointer;
+  background: rgba(0,0,0,.04); border: 1px solid rgba(0,0,0,.08); color: var(--text-dim);
+  font-family: inherit; letter-spacing: .04em; transition: all .3s;
+}
+.topic-pill:hover { background: rgba(0,0,0,.08); color: var(--text) }
+.topic-pill.active { background: var(--accent); color: #fff; border-color: var(--accent) }
+
+@media (max-width:720px) {
+  .marginalia-grid { grid-template-columns:1fr }
+  .tri-grid { grid-template-columns:1fr }
+  .hero-block { flex-direction:column;align-items:center;text-align:center }
+  :root { --margin:24px }
+}
+</style>
+</head>
+<body>
+
+<!-- DOSSIER HEADER -->
+<div class="dossier-header">
+  <div class="dossier-stamp">卷宗 · 解构</div>
+  <div class="dossier-title">自由：三个答案</div>
+  <div class="dossier-meta">
+    <span>议题：何为自由？</span>
+    <span>案号：LIBERTAS-MMDCL</span>
+  </div>
+</div>
+
+<!-- TAB NAV -->
+<div class="tab-nav" id="tabNav">
+  <button class="tab active" data-tab="cross">全览 · 三声回响</button>
+  <button class="tab" data-tab="zhuangzi">庄周 · 逍遥游</button>
+  <button class="tab" data-tab="nietzsche">尼采 · 查拉图斯特拉</button>
+  <button class="tab" data-tab="beauvoir">波伏娃 · 第二性</button>
+</div>
+
+<!-- DOSSIER BODY -->
+<div class="dossier-body" id="dossierBody">
+
+  <!-- === CROSS PANEL === -->
+  <div class="cross-panel active" id="crossPanel">
+    <div class="cross-hero">
+      <h2>自由：三声回响</h2>
+      <div class="sub">跨越两千四百年的对话——庄周、尼采、波伏娃</div>
+    </div>
+
+    <div class="topic-pills" id="crossTopics">
+      <button class="topic-pill active" data-theme="nature">自由的本质</button>
+      <button class="topic-pill" data-theme="fate">自由与命运</button>
+      <button class="topic-pill" data-theme="others">自由与他人</button>
+    </div>
+
+    <div class="tri-grid" id="triGrid">
+      <!-- nature theme -->
+    </div>
+
+    <div class="response-chain" id="crossResponse">
+      <h3>📝 辩论记录</h3>
+    </div>
+  </div>
+
+  <!-- === ZHUANGZI PANEL === -->
+  <div class="dossier-panel panel-zhuangzi" id="zhPanel">
+    <div class="hero-block">
+      <div class="portrait"></div>
+      <div class="hero-info">
+        <div class="phil-name">庄 周</div>
+        <div class="phil-dates">约前369年—前286年 · 宋国蒙地</div>
+        <div class="tagline">逍遥 · 无待 · 物化</div>
+      </div>
+    </div>
+
+    <div class="marginalia-grid">
+      <div class="main-col">
+        <p>庄子论自由，不在挣脱，而在遗忘。"若夫乘天地之正，而御六气之辩，以游无穷者，彼且恶乎待哉？"——此言逍遥游之旨。众人向外觅自由，如北冥之鲲，欲化鹏南徙，犹有所待：风积不厚，则翼无力。此非真自由，乃有待之自由也。</p>
+
+        <div class="pull-quote">
+          「至人无己，神人无功，<br>圣人无名。」
+        </div>
+
+        <p>真自由者，无待也。不系于舟，不滞于物，不执于己。吾丧我——当连"自我"这个牢笼都被遗忘时，还有什么能束缚你呢？</p>
+
+        <p>庄子之自由，非西方哲学中"自由意志"之谓。西方之自由，预设一个选择的主体；庄子之自由，则超越了主客二分。非"我选择"，乃"我化入"。蝴蝶梦庄周，庄周梦蝴蝶——当"我"本身被悬置，自由便非主动之选择，而是自然而然之状态。</p>
+
+        <p>此亦"无用之用"：樗树不夭斤斧，以其无用也。非抗争而得自由，乃以无用避开被使用的命运。自由不在反抗，而在不被定义。</p>
+      </div>
+
+      <div class="margin-col">
+        <div class="margin-note">
+          <div class="margin-note-label">关键概念</div>
+          <strong>逍遥游</strong>：精神之绝对自由，不受任何条件限制的漫游。
+        </div>
+        <div class="margin-note">
+          <div class="margin-note-label">关键概念</div>
+          <strong>无待</strong>：不依赖任何外在条件。风、水、舟——皆有待；唯有"乘天地之正"者，无待。
+        </div>
+        <div class="sticky-note">
+          📌 <strong>对尼采的回应</strong><br>
+          "成为你自己"——何等沉重！汝所谓自我，不过一团变幻之云烟耳。
+        </div>
+        <div class="sticky-note">
+          📌 <strong>对波伏娃的回应</strong><br>
+          鱼相忘于江湖，人相忘于道术——非无视他人，乃各适其适也。
+        </div>
+      </div>
+    </div>
+
+    <div class="cross-ref">
+      <h3>📊 三哲对照：自由的本质</h3>
+      <table class="cross-table">
+        <tr><th></th><th>庄周</th><th>尼采</th><th>波伏娃</th></tr>
+        <tr>
+          <td class="label-cell">自由是什么</td>
+          <td class="zh-cell">无待之游——<br>遗忘"有待"这回事</td>
+          <td class="ni-cell">自我创造——<br>在"上帝已死"后<br>成为自己的立法者</td>
+          <td class="bv-cell">处境中的超越——<br>在给定条件下<br>不断成为自由</td>
+        </tr>
+        <tr>
+          <td class="label-cell">自由的障碍</td>
+          <td class="zh-cell">执著于"我"<br>执著于是非彼此</td>
+          <td class="ni-cell">旧价值的枷锁<br>末人的道德</td>
+          <td class="bv-cell">社会结构<br>性别/阶级/种族</td>
+        </tr>
+        <tr>
+          <td class="label-cell">自由的方法</td>
+          <td class="zh-cell">心斋·坐忘<br>无用之用</td>
+          <td class="ni-cell">锤子哲学<br>价值重估</td>
+          <td class="bv-cell">行动·介入<br>团结·解放</td>
+        </tr>
+      </table>
+    </div>
+
+    <div class="footnotes">
+      <span class="footnote-num">[1]</span>《庄子·逍遥游》：北冥有鱼，其名为鲲……
+      <span class="footnote-num">[2]</span>《庄子·齐物论》：昔者庄周梦为蝴蝶……
+      <span class="footnote-num">[3]</span>《庄子·人间世》：人皆知有用之用，而莫知无用之用也。
+    </div>
+  </div>
+
+  <!-- === NIETZSCHE PANEL === -->
+  <div class="dossier-panel panel-nietzsche" id="niPanel">
+    <div class="hero-block">
+      <div class="portrait"></div>
+      <div class="hero-info">
+        <div class="phil-name">弗里德里希 · 尼采</div>
+        <div class="phil-dates">1844—1900 · 德意志 · 西尔斯-玛利亚</div>
+        <div class="tagline">超人 · 权力意志 · 永恒轮回</div>
+      </div>
+    </div>
+
+    <div class="marginalia-grid">
+      <div class="main-col">
+        <p>尼采对自由的理解，建立在一个震古烁今的宣言之上：上帝已死。这句话不是无神论的炫耀，而是对人类处境的根本判断——当所有超验的价值来源都已崩塌，人类第一次在真正意义上获得了自由。但这份自由是可怕的，因为它意味着你必须自己创造价值。</p>
+
+        <div class="pull-quote">
+          「人是应被超越的<br>某种东西。」
+        </div>
+
+        <p>"超人"（Übermensch）即是这种自我超越的形象。他不是已有价值的继承者，而是新价值的创造者。查拉图斯特拉在山上独居十年，正是为了摆脱一切既定价值的桎梏——然后他下山，不是带着真理，而是带着一把锤子。</p>
+
+        <p>尼采的自由需要巨大的勇气：你必须承受"永恒轮回"的思想实验——如果你被告知，你生命中的每一个瞬间都将无限次重复，你能对它说"是"吗？如果你能，你就自由了。这就是 Amor fati（命运之爱）：不是顺从命运，而是以最饱满的热情拥抱命运中的每一个细节。</p>
+
+        <p>尼采的贵族式自由观与庄子的"逍遥"形成尖锐对照。庄子的自由是一种放下，尼采的自由是一种夺取；庄子消解自我，尼采锻造自我。</p>
+      </div>
+
+      <div class="margin-col">
+        <div class="margin-note">
+          <div class="margin-note-label">关键概念</div>
+          <strong>上帝已死</strong>：超验价值的全面崩塌，人类被抛入自我立法的境地。
+        </div>
+        <div class="margin-note">
+          <div class="margin-note-label">关键概念</div>
+          <strong>超人 (Übermensch)</strong>：自我超越的人类理想，价值的创造者而非继承者。
+        </div>
+        <div class="sticky-note">
+          📌 <strong>对庄周的回应</strong><br>
+          "逍遥"？那是虚无主义的借口！你以为放下即是自由，实则放弃了生命最根本的战斗。
+        </div>
+        <div class="sticky-note">
+          📌 <strong>对波伏娃的回应</strong><br>
+          同情弱者是奴隶道德的残留！自由属于敢于孤独者。
+        </div>
+      </div>
+    </div>
+
+    <div class="response-chain">
+      <h3>📝 尼采的回击</h3>
+      <div class="response-item">
+        <div class="response-shape ni"></div>
+        <div class="response-content">
+          <div class="response-from ni">尼采</div>
+          <div class="response-text">庄周说"无待"——无待于外物，却有待于"遗忘"的技艺。但我问：如果自由只是遗忘，那自由与虚无有何区别？我的自由不回避苦难——它在永恒轮回中肯定苦难本身。不是逃避，而是热爱。</div>
+        </div>
+      </div>
+      <div class="response-item">
+        <div class="response-shape ni"></div>
+        <div class="response-content">
+          <div class="response-from ni">尼采</div>
+          <div class="response-text">波伏娃的时代精神是"他者"——但我必须说：你们对"他者"的关注恰恰暴露了一种隐蔽的基督教道德。为什么自由必须是他人的？查拉图斯特拉的孤独不是自私，而是对更高人类的投资。</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- === BEAUVOIR PANEL === -->
+  <div class="dossier-panel panel-beauvoir" id="bvPanel">
+    <div class="hero-block">
+      <div class="portrait"></div>
+      <div class="hero-info">
+        <div class="phil-name">西蒙娜 · 德 · 波伏娃</div>
+        <div class="phil-dates">1908—1986 · 巴黎 · 花神咖啡馆</div>
+        <div class="tagline">处境 · 他者 · 成为</div>
+      </div>
+    </div>
+
+    <div class="marginalia-grid">
+      <div class="main-col">
+        <p>波伏娃的自由观植根于一个朴素的观察：人从来不是抽象地存在的。你被抛入一个特定的性别、阶级、种族、时代之中——这些"处境"不是你选择的，却从一开始就限定了你能成为什么样的人。自由，就是在这些给定条件中做出选择、创造意义的能力。</p>
+
+        <div class="pull-quote">
+          「女人不是天生的，<br>而是后天形成的。」
+        </div>
+
+        <p>这句出自《第二性》的名言道破了波伏娃自由观的核心：身份不是本质，而是处境与选择交互的结果。正因如此，自由不是一次性获得的东西——它是"不断成为"的过程。每一次选择都是在处境中重新定义自己。</p>
+
+        <p>但这里有一个至关重要的伦理维度：我的自由与他人的自由相互依存。波伏娃在《模糊性的道德》中论证：如果我的自由建立在他人的压迫之上，那它就不是真正的自由。因为压迫他人意味着我否认了"人是自由的"这一根本前提——而我的自由所依赖的，恰恰是这一前提。</p>
+
+        <p>波伏娃既不同意庄子的"忘我"，也不完全认同尼采的"超人"。庄子忘记了处境的存在，尼采轻视了压迫的结构。波伏娃坚持：自由必须同时是个人的和集体的，否则就不是自由。</p>
+      </div>
+
+      <div class="margin-col">
+        <div class="margin-note">
+          <div class="margin-note-label">关键概念</div>
+          <strong>处境 (situation)</strong>：自由总是在特定处境中的自由。处境既限制自由，又使自由成为可能。
+        </div>
+        <div class="margin-note">
+          <div class="margin-note-label">关键概念</div>
+          <strong>成为 (becoming)</strong>：人不是天生自由的，而是不断成为自由的。自由是一个持续的项目。
+        </div>
+        <div class="sticky-note">
+          📌 <strong>对庄周的回应</strong><br>
+          "相忘于江湖"的诗意令我感动——但请告诉我，当你的基本生存受到威胁时，你如何"忘"？
+        </div>
+        <div class="sticky-note">
+          📌 <strong>对尼采的回应</strong><br>
+          尼采的超人令人振奋，但那些被困在厨房里的女性——你让她们拿什么"超越"？
+        </div>
+      </div>
+    </div>
+
+    <div class="response-chain">
+      <h3>📝 波伏娃的审视</h3>
+      <div class="response-item">
+        <div class="response-shape bv"></div>
+        <div class="response-content">
+          <div class="response-from bv">波伏娃</div>
+          <div class="response-text">庄周的"逍遥"有一种令人羡慕的轻盈。但问题在于：这份轻盈预设了你可以飞——如果社会结构把你的翅膀折断了呢？处境不是幻觉，它是真实的限制。自由的第一步，是承认处境的存在。</div>
+        </div>
+      </div>
+      <div class="response-item">
+        <div class="response-shape bv"></div>
+        <div class="response-content">
+          <div class="response-from bv">波伏娃</div>
+          <div class="response-text">尼采先生，你那些关于"弱者"和"末人"的蔑视令我愤怒。你的"超人"在哲学上很迷人——但如果它成为现存等级结构的辩护词，它就成了自由的敌人。真正的自由必须同时是他人的解放，否则它只是另一种特权。</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+// === TAB SWITCHING ===
+const tabs = document.querySelectorAll('.tab');
+const panels = document.querySelectorAll('.dossier-panel, .cross-panel');
+
+tabs.forEach(tab => {
+  tab.addEventListener('click', () => {
+    tabs.forEach(t => t.classList.remove('active'));
+    tab.classList.add('active');
+
+    const target = tab.dataset.tab;
+    panels.forEach(p => {
+      if (target === 'cross' && p.classList.contains('cross-panel')) {
+        p.classList.add('active');
+      } else if (p.classList.contains('panel-' + target)) {
+        p.classList.add('active');
+      } else {
+        p.classList.remove('active');
+      }
+    });
+  });
+});
+
+// === CROSS PANEL THEME DATA ===
+const crossThemes = {
+  nature: {
+    zh: { stance:'逍遥·无待', text:'自由不是挣脱枷锁，而是遗忘"有待"这回事。鲲鹏九万里，非力也，风也。众人向外觅自由，我向内求逍遥。' },
+    ni: { stance:'超人·自我创造', text:'上帝已死——现在是你成为你自己的时候。自由不是顺应世界，而是在废墟上亲手建造你的价值神殿。' },
+    bv: { stance:'处境·共在', text:'庄子的自由太孤独，尼采的自由太傲慢。我的自由从来与你的自由相连——自由必须在关系中实现。' }
+  },
+  fate: {
+    zh: { stance:'安之若命', text:'知其不可奈何而安之若命，德之至也。命运如江湖，自由如相忘——适应而非对抗。' },
+    ni: { stance:'命运之爱', text:'Amor fati！不是顺从命运，而是以最饱满的热情拥抱它。对生命说"再来一次"——此即自由！' },
+    bv: { stance:'拒绝被定义', text:'当我作为女人被"命运"定义时——那个命运不是我的选择。自由的第一步是拒绝他人为我设定的命运。' }
+  },
+  others: {
+    zh: { stance:'相忘于江湖', text:'鱼相忘于江湖，人相忘于道术。非无视他人，而是各适其适、互不相伤的共逍遥。' },
+    ni: { stance:'超人的孤独', text:'查拉图斯特拉独自在山上十年——正是在孤独中，新价值才得以淬炼。弱者需要的是被超越，而非被怜悯。' },
+    bv: { stance:'他者的自由', text:'我的自由建立在他人自由的基础上。压迫他人就是否定自由本身——我必须在解放自己的同时解放他人。' }
+  }
+};
+
+const crossResponses = {
+  nature: [
+    {phil:'zh',from:'庄周',text:'"乘天地之正，御六气之辩"——此逍遥游之旨。自由不在挣，在顺；不在取，在忘。'},
+    {phil:'ni',from:'尼采',text:'庄周先生，"顺"不过是末人的自我安慰！真正的自由是一把锤子——敲碎旧碑，创造新价值。'},
+    {phil:'bv',from:'波伏娃',text:'二位的自由都缺少一个维度：他者。没有他人的解放，就没有我的自由。自由是共同的事业。'},
+  ],
+  fate: [
+    {phil:'zh',from:'庄周',text:'泉涸，鱼相与处于陆——与其相濡以沫，不如相忘于江湖。命运即是江湖。'},
+    {phil:'ni',from:'尼采',text:'永恒轮回是最高的肯定公式！如果你能对生命说"再来一次"，你便超越了命运本身。'},
+    {phil:'bv',from:'波伏娃',text:'但那些被定义为"他者"的人——他们首先需要的不是"爱命运"，而是改变命运的权力。'},
+  ],
+  others: [
+    {phil:'bv',from:'波伏娃',text:'庄周说"相忘于江湖"，尼采说"孤独地超越"——但二位的自由都预设了一种特权：可以自由选择是否与他人相关。'},
+    {phil:'zh',from:'庄周',text:'非特权也。众人皆在水中，只是多数人不知自己已在水中。知者，不挣扎；不知者，奋力拍水而愈沉。'},
+    {phil:'ni',from:'尼采',text:'波伏娃女士对"他者"的执着是一种隐蔽的基督教道德。最高的自由恰恰诞生于与他人的决裂。'},
+  ]
+};
+
+let activeTheme = 'nature';
+
+function renderCrossTheme() {
+  const theme = crossThemes[activeTheme];
+  const triGrid = document.getElementById('triGrid');
+  triGrid.innerHTML = `
+    <div class="tri-card zh">
+      <div class="card-shape"></div>
+      <h4>庄 周</h4>
+      <div class="card-stance">${theme.zh.stance}</div>
+      <div class="card-text">${theme.zh.text}</div>
+    </div>
+    <div class="tri-card ni">
+      <div class="card-shape"></div>
+      <h4>尼 采</h4>
+      <div class="card-stance">${theme.ni.stance}</div>
+      <div class="card-text">${theme.ni.text}</div>
+    </div>
+    <div class="tri-card bv">
+      <div class="card-shape"></div>
+      <h4>波伏娃</h4>
+      <div class="card-stance">${theme.bv.stance}</div>
+      <div class="card-text">${theme.bv.text}</div>
+    </div>
+  `;
+
+  const resp = crossResponses[activeTheme];
+  const respEl = document.getElementById('crossResponse');
+  respEl.innerHTML = '<h3>📝 辩论记录</h3>' + resp.map(r => `
+    <div class="response-item">
+      <div class="response-shape ${r.phil}"></div>
+      <div class="response-content">
+        <div class="response-from ${r.phil}">${r.from}</div>
+        <div class="response-text">${r.text}</div>
+      </div>
+    </div>
+  `).join('');
+}
+
+document.getElementById('crossTopics').addEventListener('click', e => {
+  if (!e.target.classList.contains('topic-pill')) return;
+  document.querySelectorAll('#crossTopics .topic-pill').forEach(p => p.classList.remove('active'));
+  e.target.classList.add('active');
+  activeTheme = e.target.dataset.theme;
+  renderCrossTheme();
+});
+
+// Init cross panel
+renderCrossTheme();
+</script>
+
+</body>
+</html>

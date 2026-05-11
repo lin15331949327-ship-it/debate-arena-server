@@ -1,0 +1,849 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>辩论档案 — 方案 N · 档案室</title>
+<style>
+/* ==========================================
+   方案 N: 档案室 (Archive / Dossier Redux)
+   设计关键词: 档案夹 · 打字机文本 · 红色批注 · 回形针 · 印章
+   哲学三人: 庄周(竹叶·水墨·太极) / 尼采(火焰·金属·闪电) / 波伏娃(水滴·玻璃·天平)
+   目标: 25-35KB 单文件 HTML
+   ========================================== */
+
+/* --- CSS Variables --- */
+:root {
+  --folder-tan: #d4c3a3;
+  --folder-cream: #f5ecd7;
+  --folder-dark: #b8a080;
+  --paper-bg: #faf6ee;
+  --paper-line: rgba(0,0,0,0.06);
+  --ink-red: #c0392b;
+  --ink-red-dark: #8b1a1a;
+  --ink-black: #2c2c2c;
+  --ink-blue: #2c5f8a;
+  --stamp-red: rgba(192,57,43,0.15);
+  --typewriter-font: 'Courier New', 'Noto Sans Mono SC', 'Consolas', monospace;
+  --serif-font: 'Georgia', 'Noto Serif SC', serif;
+  --tab-height: 30px;
+  --zhuangzi-wood: #5a7a4a;
+  --zhuangzi-ink: #2a3a22;
+  --nietzsche-fire: #c05030;
+  --nietzsche-metal: #7a7a7a;
+  --beauvoir-glass: #5a8aaa;
+  --beauvoir-blue: #2a4a6a;
+}
+
+*, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+html { font-size: 16px; scroll-behavior: smooth; }
+body {
+  background:
+    linear-gradient(135deg, #2a2218 0%, #1a1814 50%, #221a16 100%);
+  color: var(--ink-black);
+  font-family: var(--serif-font);
+  min-height: 100vh;
+  display: flex; flex-direction: column; align-items: center;
+  overflow-x: hidden;
+}
+
+/* --- Desk surface --- */
+.desk-surface {
+  position: fixed; inset: 0;
+  background: linear-gradient(180deg, rgba(40,32,24,1) 0%, rgba(60,50,38,1) 100%);
+  z-index: 0;
+}
+.desk-surface::before {
+  content: ''; position: absolute; inset: 0;
+  background:
+    repeating-linear-gradient(0deg, transparent, transparent 1px, rgba(255,255,255,0.008) 1px, rgba(255,255,255,0.008) 2px);
+  pointer-events: none;
+}
+
+/* --- Archive Folder Container --- */
+.archive-folder {
+  position: relative; z-index: 10;
+  width: min(92vw, 900px);
+  margin: 2rem 0 4rem;
+  background: var(--folder-tan);
+  border-radius: 4px 4px 8px 8px;
+  box-shadow:
+    0 2px 0 var(--folder-dark),
+    0 4px 12px rgba(0,0,0,0.3),
+    0 8px 30px rgba(0,0,0,0.2);
+  /* folder texture */
+  background-image:
+    linear-gradient(0deg, transparent 0%, rgba(255,255,255,0.03) 50%, transparent 100%);
+}
+
+/* --- Folder Tab --- */
+.folder-tab {
+  position: absolute; top: -var(--tab-height);
+  left: 2rem;
+  background: var(--folder-tan);
+  border-radius: 6px 6px 0 0;
+  padding: 0.4rem 1.5rem;
+  font-family: var(--typewriter-font);
+  font-size: 0.8rem;
+  font-weight: bold;
+  letter-spacing: 0.08em;
+  color: var(--ink-black);
+  border-bottom: 2px solid var(--folder-tan);
+  box-shadow: 0 -2px 4px rgba(0,0,0,0.1);
+  text-transform: uppercase;
+}
+.folder-tab::after {
+  content: '№ 42-17B';
+  display: block;
+  font-size: 0.6rem;
+  font-weight: normal;
+  opacity: 0.5;
+  letter-spacing: 0.12em;
+}
+
+/* --- Folder Interior (papers) --- */
+.folder-interior {
+  background: var(--paper-bg);
+  margin: 0 6px 6px 6px;
+  border-radius: 0 0 4px 4px;
+  min-height: 600px;
+  position: relative;
+  /* ruled paper lines */
+  background-image:
+    repeating-linear-gradient(0deg, transparent, transparent 27px, var(--paper-line) 27px, var(--paper-line) 28px);
+  background-position: 0 50px;
+}
+
+/* --- Cover Sheet --- */
+.cover-sheet {
+  padding: 3rem 2.5rem 2rem;
+  border-bottom: 2px dashed rgba(0,0,0,0.1);
+  position: relative;
+}
+.cover-stamp {
+  position: absolute; top: 1.5rem; right: 2rem;
+  width: 90px; height: 90px;
+  border: 4px solid var(--ink-red);
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-family: var(--typewriter-font);
+  font-size: 0.65rem;
+  font-weight: bold;
+  text-transform: uppercase;
+  color: var(--ink-red);
+  text-align: center;
+  transform: rotate(-15deg);
+  opacity: 0.7;
+  line-height: 1.3;
+}
+.cover-stamp::after {
+  content: ''; position: absolute; inset: -8px;
+  border: 2px solid var(--ink-red);
+  border-radius: 50%;
+  opacity: 0.5;
+}
+.cover-classification {
+  display: inline-block;
+  padding: 0.15rem 0.8rem;
+  background: var(--stamp-red);
+  border: 1px solid var(--ink-red);
+  font-family: var(--typewriter-font);
+  font-size: 0.6rem;
+  font-weight: bold;
+  letter-spacing: 0.2em;
+  color: var(--ink-red);
+  text-transform: uppercase;
+  margin-bottom: 1.5rem;
+}
+.cover-title {
+  font-family: var(--typewriter-font);
+  font-size: clamp(1.5rem, 3.5vw, 2.2rem);
+  font-weight: bold;
+  color: var(--ink-black);
+  line-height: 1.3;
+  position: relative;
+}
+.cover-title::before {
+  content: 'DOSSIER:';
+  display: block;
+  font-size: 0.55rem;
+  letter-spacing: 0.3em;
+  color: var(--ink-red);
+  margin-bottom: 0.4rem;
+  font-weight: normal;
+}
+.cover-meta {
+  display: flex; gap: 3rem;
+  margin-top: 1.5rem;
+  font-family: var(--typewriter-font);
+  font-size: 0.7rem;
+  color: rgba(0,0,0,0.5);
+}
+.cover-meta dd { color: var(--ink-black); font-weight: bold; margin-top: 0.15rem; }
+
+/* --- Paperclip --- */
+.paperclip {
+  position: absolute; top: -8px; left: 2.5rem;
+  width: 3px; height: 36px;
+  background: #888;
+  border-radius: 2px;
+  z-index: 5;
+  transform: rotate(5deg);
+}
+.paperclip::before {
+  content: ''; position: absolute;
+  top: 0; left: 0; width: 100%; height: 100%;
+  border: 2px solid #777;
+  border-radius: 4px;
+  clip-path: polygon(60% 0, 100% 0, 100% 70%, 50% 100%, 0 70%, 0 30%, 50% 0, 40% 10%, 10% 30%, 10% 70%, 50% 90%, 90% 70%, 90% 10%, 50% 10%);
+  opacity: 0.6;
+}
+
+/* --- Tab Dividers --- */
+.tab-divider {
+  display: flex; align-items: center;
+  gap: 0;
+  padding: 0 2.5rem;
+  position: relative;
+}
+.tab-label {
+  font-family: var(--typewriter-font);
+  font-size: 0.7rem;
+  font-weight: bold;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  padding: 0.5rem 1rem;
+  border-radius: 4px 4px 0 0;
+  border: 1px solid rgba(0,0,0,0.08);
+  border-bottom: none;
+  cursor: pointer;
+  transition: all 0.3s;
+  position: relative;
+  top: 1px;
+}
+.tab-label.zhuangzi-tab {
+  background: rgba(90,122,74,0.1);
+  color: var(--zhuangzi-wood);
+  border-color: rgba(90,122,74,0.2);
+}
+.tab-label.nietzsche-tab {
+  background: rgba(192,80,48,0.08);
+  color: var(--nietzsche-fire);
+  border-color: rgba(192,80,48,0.2);
+}
+.tab-label.beauvoir-tab {
+  background: rgba(90,138,170,0.08);
+  color: var(--beauvoir-glass);
+  border-color: rgba(90,138,170,0.2);
+}
+.tab-label.active {
+  background: var(--paper-bg);
+  color: var(--ink-black);
+  border-color: rgba(0,0,0,0.12);
+  z-index: 2;
+}
+.tab-label:hover { filter: brightness(0.9); }
+
+/* --- Document Section (inside folder) --- */
+.doc-section {
+  display: none;
+  padding: 2rem 2.5rem;
+  background: var(--paper-bg);
+  border-top: 1px solid rgba(0,0,0,0.08);
+}
+.doc-section.active { display: block; }
+
+/* Typewriter text block */
+.doc-block {
+  margin-bottom: 2rem;
+  position: relative;
+  padding-left: 2.5rem;
+  animation: docFadeIn 0.5s ease-out;
+}
+@keyframes docFadeIn {
+  from { opacity:0; transform: translateY(8px); }
+  to { opacity:1; transform: translateY(0); }
+}
+.doc-block::before {
+  content: '';
+  position: absolute; left:0; top:0; bottom:0;
+  width: 2px;
+  background: var(--ink-red);
+  opacity: 0.25;
+}
+
+/* --- Character Header Stamp --- */
+.char-header {
+  display: flex; align-items: center; gap: 1rem;
+  margin-bottom: 1.2rem;
+}
+.char-icon {
+  width: 48px; height: 48px;
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.6rem;
+  flex-shrink: 0;
+}
+/* Zhuangzi icon: bamboo + wood + Taiji */
+.char-icon.zhuangzi-icon {
+  background: radial-gradient(circle at 35% 35%, #7a9a6a, var(--zhuangzi-ink));
+  box-shadow: 0 0 20px rgba(90,122,74,0.5);
+  border: 2px solid #5a7a4a;
+}
+/* Nietzsche icon: flame + metal */
+.char-icon.nietzsche-icon {
+  background: radial-gradient(circle at 40% 40%, #f09050, #5a1a0a);
+  box-shadow: 0 0 20px rgba(192,80,48,0.5);
+  border: 2px solid #b04030;
+}
+/* Beauvoir icon: glass + water drop */
+.char-icon.beauvoir-icon {
+  background: radial-gradient(circle at 35% 35%, #c0e0f0, var(--beauvoir-blue));
+  box-shadow: 0 0 20px rgba(90,138,170,0.5);
+  border: 2px solid #4a7aaa;
+}
+
+.char-name-block h4 {
+  font-family: var(--typewriter-font);
+  font-size: 1rem;
+  letter-spacing: 0.08em;
+}
+.char-name-block small {
+  font-family: var(--serif-font);
+  font-style: italic;
+  color: rgba(0,0,0,0.45);
+  font-size: 0.75rem;
+}
+
+/* --- Typewriter Text --- */
+.type-text {
+  font-family: var(--typewriter-font);
+  font-size: 0.85rem;
+  line-height: 1.75;
+  color: var(--ink-black);
+  background: rgba(0,0,0,0.02);
+  padding: 1rem 1.2rem;
+  border-left: 3px solid rgba(0,0,0,0.1);
+  position: relative;
+}
+/* simulate uneven typewriter ink */
+.type-text::after {
+  content: ''; position: absolute; inset: 0;
+  background:
+    radial-gradient(circle at 15% 20%, rgba(0,0,0,0.015), transparent 30%),
+    radial-gradient(circle at 75% 60%, rgba(0,0,0,0.01), transparent 25%);
+  pointer-events: none;
+}
+
+/* Red annotation marks */
+.red-annotate {
+  position: absolute; left: -6px; top: 50%; transform: translateY(-50%);
+  font-family: var(--typewriter-font);
+  font-size: 0.6rem;
+  color: var(--ink-red);
+  font-weight: bold;
+  writing-mode: vertical-rl;
+  letter-spacing: 0.1em;
+  opacity: 0.6;
+}
+
+/* Red underline / highlight */
+.red-highlight {
+  background: linear-gradient(180deg, transparent 60%, var(--stamp-red) 60%);
+  padding: 0 0.15em;
+}
+
+/* --- Marginalia (red pen notes) --- */
+.marginalia {
+  position: absolute; right: -1.5rem;
+  font-family: var(--serif-font);
+  font-style: italic;
+  font-size: 0.65rem;
+  color: var(--ink-red);
+  opacity: 0.55;
+  max-width: 140px;
+  line-height: 1.4;
+  transform: rotate(-2deg);
+}
+@media (max-width: 768px) {
+  .marginalia { position: static; margin-top: 0.5rem; max-width: none; }
+}
+
+/* --- Source citation --- */
+.citation {
+  font-family: var(--typewriter-font);
+  font-size: 0.65rem;
+  color: var(--ink-blue);
+  margin-top: 0.6rem;
+  padding-top: 0.4rem;
+  border-top: 1px dotted rgba(0,0,0,0.1);
+  opacity: 0.6;
+}
+
+/* --- Red stamp annotation --- */
+.annotation-stamp {
+  display: inline-block;
+  padding: 0.2rem 0.6rem;
+  border: 1px solid var(--ink-red-dark);
+  font-family: var(--typewriter-font);
+  font-size: 0.55rem;
+  font-weight: bold;
+  color: var(--ink-red-dark);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  transform: rotate(-3deg);
+  opacity: 0.6;
+  margin: 0.3rem 0;
+}
+
+/* --- Section number label --- */
+.section-num {
+  position: absolute; left: -3rem;
+  font-family: var(--typewriter-font);
+  font-size: 0.55rem;
+  color: rgba(0,0,0,0.2);
+  letter-spacing: 0.1em;
+  writing-mode: vertical-rl;
+  opacity: 0.5;
+}
+
+/* --- Coffee ring (subtle) --- */
+.coffee-ring {
+  position: absolute; width: 70px; height: 70px;
+  border: 2px solid rgba(139,109,69,0.12);
+  border-radius: 50%;
+  pointer-events: none;
+  transform: rotate(-10deg);
+}
+
+/* --- Page curl effect --- */
+.page-curl {
+  position: absolute; bottom: 0; right: 0;
+  width: 40px; height: 40px;
+  background: linear-gradient(135deg, transparent 50%, rgba(0,0,0,0.06) 50%);
+  border-radius: 0 0 8px 0;
+  pointer-events: none;
+  z-index: 5;
+}
+
+/* --- Redacted bar --- */
+.redacted {
+  background: #1a1a1a;
+  color: #1a1a1a;
+  padding: 0 0.3em;
+  border-radius: 2px;
+  user-select: none;
+  cursor: pointer;
+  transition: color 0.3s, background 0.3s;
+}
+.redacted:hover {
+  background: transparent;
+  color: var(--ink-red);
+  cursor: default;
+}
+
+/* --- Note card slipped in --- */
+.note-card {
+  background: #fffef5;
+  border: 1px solid rgba(0,0,0,0.08);
+  padding: 0.8rem 1rem;
+  margin: 1rem 0;
+  font-family: var(--serif-font);
+  font-style: italic;
+  font-size: 0.8rem;
+  color: rgba(0,0,0,0.55);
+  transform: rotate(0.5deg);
+  box-shadow: 2px 2px 6px rgba(0,0,0,0.06);
+  position: relative;
+}
+.note-card::before {
+  content: '📎 档案员笔记';
+  display: block;
+  font-family: var(--typewriter-font);
+  font-size: 0.6rem;
+  font-style: normal;
+  color: var(--ink-red);
+  margin-bottom: 0.4rem;
+  letter-spacing: 0.1em;
+}
+
+/* --- Rubber stamp effect --- */
+.rubber-stamp {
+  font-family: var(--typewriter-font);
+  font-size: 0.8rem;
+  font-weight: bold;
+  color: var(--ink-red);
+  border: 3px solid var(--ink-red);
+  border-radius: 4px;
+  padding: 0.3rem 0.8rem;
+  display: inline-block;
+  transform: rotate(-5deg);
+  opacity: 0.35;
+  box-shadow: 0 0 0 2px var(--paper-bg), 0 0 0 5px var(--ink-red);
+  text-transform: uppercase;
+  letter-spacing: 0.2em;
+}
+
+/* --- Binder ring marks --- */
+.binder-holes {
+  position: absolute; left: 1.2rem; top: 0; bottom: 0;
+  display: flex; flex-direction: column;
+  justify-content: space-around;
+  pointer-events: none;
+  opacity: 0.08;
+}
+.binder-hole {
+  width: 16px; height: 16px;
+  border-radius: 50%;
+  background: #888;
+  box-shadow: inset 0 1px 2px rgba(0,0,0,0.3);
+}
+
+/* --- Fold mark --- */
+.fold-mark {
+  position: absolute;
+  width: 100%;
+  height: 1px;
+  background: linear-gradient(90deg, transparent 20%, rgba(0,0,0,0.04) 50%, transparent 80%);
+  pointer-events: none;
+}
+
+/* --- Folder Bottom Tab --- */
+.folder-bottom {
+  height: 14px;
+  background: linear-gradient(180deg, var(--folder-tan), var(--folder-dark));
+  border-radius: 0 0 8px 8px;
+  margin: 0 6px;
+  position: relative;
+}
+
+/* --- Control Buttons --- */
+.archive-controls {
+  position: fixed; bottom: 2rem; right: 2rem;
+  z-index: 100; display: flex; gap: 0.5rem;
+}
+.archive-controls button {
+  width: 40px; height: 40px;
+  border-radius: 50%;
+  border: 1px solid rgba(255,255,255,0.2);
+  background: rgba(40,32,24,0.8);
+  color: rgba(255,255,255,0.6);
+  font-size: 1.1rem;
+  cursor: pointer;
+  transition: all 0.3s;
+  backdrop-filter: blur(4px);
+}
+.archive-controls button:hover {
+  border-color: var(--ink-red);
+  color: white;
+  box-shadow: 0 0 16px rgba(192,57,43,0.2);
+}
+
+/* --- Footer --- */
+.archive-footer {
+  position: relative; z-index: 10;
+  font-family: var(--typewriter-font);
+  font-size: 0.65rem;
+  color: rgba(255,255,255,0.25);
+  letter-spacing: 0.15em;
+  margin-bottom: 2rem;
+}
+
+/* --- Responsive --- */
+@media (max-width: 768px) {
+  .archive-folder { width: 96vw; margin: 1rem 0 3rem; }
+  .folder-tab { left: 1rem; padding: 0.3rem 1rem; font-size: 0.7rem; }
+  .cover-sheet { padding: 2rem 1.2rem 1.5rem; }
+  .doc-section { padding: 1.5rem 1.2rem; }
+  .doc-block { padding-left: 1.5rem; }
+  .cover-stamp { width: 70px; height: 70px; font-size: 0.55rem; right: 1rem; }
+  .cover-meta { flex-direction: column; gap: 0.5rem; }
+  .char-icon { width: 38px; height: 38px; font-size: 1.3rem; }
+}
+@media (max-width: 480px) {
+  .tab-divider { padding: 0 1rem; overflow-x: auto; }
+  .tab-label { font-size: 0.65rem; padding: 0.4rem 0.7rem; }
+  .type-text { font-size: 0.78rem; }
+}
+</style>
+</head>
+<body>
+
+<div class="desk-surface"></div>
+
+<!-- Archive Folder -->
+<div class="archive-folder" id="archiveFolder">
+
+  <!-- Folder Tab -->
+  <div class="folder-tab">思想档案</div>
+
+  <!-- Folder Interior -->
+  <div class="folder-interior">
+
+    <!-- Cover Sheet -->
+    <div class="cover-sheet">
+      <div class="cover-stamp">
+        ARCHIVE<br>RESTRICTED
+      </div>
+      <div class="cover-classification">▲ 内部档案 · 哲学辩论记录</div>
+      <h1 class="cover-title">三重对话：<br>庄子、尼采与波伏娃<br>论自由·权力·存在</h1>
+      <dl class="cover-meta">
+        <div><dt>归档日期</dt><dd>2026-05-11</dd></div>
+        <div><dt>分类编号</dt><dd>PHIL-042-DBT</dd></div>
+        <div><dt>档案员</dt><dd>小爪</dd></div>
+      </dl>
+      <div class="paperclip"></div>
+      <div class="coffee-ring" style="bottom:40px;right:120px;"></div>
+    </div>
+
+    <!-- Tab Dividers -->
+    <div class="tab-divider" id="tabDivider">
+      <div class="tab-label zhuangzi-tab active" data-tab="zhuangzi" onclick="switchTab('zhuangzi')">
+        🎋 EXHIBIT A · 庄周
+      </div>
+      <div class="tab-label nietzsche-tab" data-tab="nietzsche" onclick="switchTab('nietzsche')">
+        ⚡ EXHIBIT B · 尼采
+      </div>
+      <div class="tab-label beauvoir-tab" data-tab="beauvoir" onclick="switchTab('beauvoir')">
+        💧 EXHIBIT C · 波伏娃
+      </div>
+    </div>
+
+    <!-- Exhibit A: Zhuangzi -->
+    <div class="doc-section active" id="tab-zhuangzi">
+      <div class="doc-block">
+        <div class="char-header">
+          <div class="char-icon zhuangzi-icon">☯</div>
+          <div class="char-name-block">
+            <h4>庄周 · 约公元前 369–286</h4>
+            <small>Daoist Sage · 道家哲人 · 《庄子》</small>
+          </div>
+        </div>
+        <div class="type-text" style="position:relative;">
+          <span class="red-annotate">核心</span>
+          <p>北冥有鱼，其名为鲲。鲲之大，不知其几千里也。化而为鸟，其名为鹏。鹏之背，不知其几千里也；<span class="red-highlight">怒而飞</span>，其翼若垂天之云。是鸟也，海运则将徙于南冥。</p>
+          <p style="margin-top:0.8rem;">泉涸，鱼相与处于陆，相呴以湿，相濡以沫，不如<span class="red-highlight">相忘于江湖</span>。与其誉尧而非桀，不如两忘而化其道。</p>
+          <span class="marginalia">真正的自由：<br>不依赖任何<br>外在条件</span>
+        </div>
+        <div class="citation">来源：《庄子·逍遥游》《庄子·大宗师》</div>
+      </div>
+
+      <div class="doc-block">
+        <div class="type-text" style="position:relative;">
+          <span class="red-annotate">关键</span>
+          <p>昔者庄周梦为蝴蝶，栩栩然蝴蝶也，自喻适志与！不知周也。俄然觉，则蘧蘧然周也。不知<span class="red-highlight">周之梦为蝴蝶与，蝴蝶之梦为周与</span>？周与蝴蝶，则必有分矣。此之谓物化。</p>
+          <span class="marginalia">物我两忘<br>——取消主客<br>对立</span>
+        </div>
+        <div class="citation">来源：《庄子·齐物论》</div>
+      </div>
+
+      <div class="annotation-stamp">▲ 注释：逍遥——即"无所待"之自由</div>
+
+      <div class="doc-block">
+        <div class="type-text" style="position:relative;">
+          <span class="red-annotate">延伸</span>
+          <p>夫大块载我以形，劳我以生，佚我以老，息我以死。故善吾生者，乃所以善吾死也。夫藏舟于壑，藏山于泽，谓之固矣。然而夜半有力者负之而走，<span class="red-highlight">昧者不知也</span>。</p>
+        </div>
+        <div class="citation">来源：《庄子·大宗师》</div>
+      </div>
+
+      <div class="note-card">
+        庄周的逍遥并非逃避，而是一种更彻底的自由——"无所待"。他不依赖社会地位、财富或他人的认可。有趣的是，这与尼采的"超人"形成微妙对比：一个是"由内而外的完满"，另一个是"向上的永恒斗争"。
+      </div>
+
+      <div class="rubber-stamp" style="margin-top:1rem;">VERIFIED</div>
+    </div>
+
+    <!-- Exhibit B: Nietzsche -->
+    <div class="doc-section" id="tab-nietzsche">
+      <div class="doc-block">
+        <div class="char-header">
+          <div class="char-icon nietzsche-icon">🔥</div>
+          <div class="char-name-block">
+            <h4>弗里德里希·尼采 · 1844–1900</h4>
+            <small>Philosopher of Power · 《查拉图斯特拉如是说》</small>
+          </div>
+        </div>
+        <div class="type-text" style="position:relative;">
+          <span class="red-annotate">宣言</span>
+          <p>人是一根系在动物与超人之间的绳索——一根悬在深渊之上的绳索。<span class="red-highlight">人的伟大之处在于，他是一座桥梁而非目的</span>：人的可爱之处在于，他是一种过渡与一种毁灭。</p>
+          <p style="margin-top:0.8rem;">我告诉你们：人心中必须仍有混沌，才能生出一颗<span class="red-highlight">跳舞的星辰</span>。我告诉你们：你们心中仍有混沌。</p>
+          <span class="marginalia">超人不是终点<br>是永恒的运动<br>是自我超越</span>
+        </div>
+        <div class="citation">来源：《查拉图斯特拉如是说》· 序言</div>
+      </div>
+
+      <div class="doc-block">
+        <div class="type-text" style="position:relative;">
+          <span class="red-annotate">力量</span>
+          <p>凡杀不死我的，必使我更强大。你们说，甚至战争也是神圣的，它以善的名义圣化每一个目标。我要告诉你们：那让你们热爱和平的，必是善良的战争，它以善的名义<span class="red-highlight">圣化你们的目标</span>。</p>
+          <span class="marginalia">权力意志：<br>生命的本质<br>是扩张与<br>提升</span>
+        </div>
+        <div class="citation">来源：《偶像的黄昏》</div>
+      </div>
+
+      <div class="annotation-stamp">▲ 注释：Übermensch —— 人的自我超越</div>
+
+      <div class="doc-block">
+        <div class="type-text" style="position:relative;">
+          <span class="red-annotate">激荡</span>
+          <p>你必须准备好在你自己的火焰中燃烧：你若不先化为灰烬，又怎能重生呢？<span class="red-highlight">我爱那些不知道如何生活的人</span>，因为他们正是超越者——那些为着没落而活的人。因为他们正是那渡向彼岸的人。</p>
+        </div>
+        <div class="citation">来源：《查拉图斯特拉如是说》· 第一部</div>
+      </div>
+
+      <div class="note-card">
+        尼采的火焰美学——"在自己的火焰中燃烧"——与庄子的"物化"形成镜像。一个在烈火中重生，一个在梦中消融自我。但两者都指向对"既定自我"的超越。这场对话的核心张力，正是"力"与"道"的对峙。
+      </div>
+
+      <div class="rubber-stamp" style="margin-top:1rem;">EXAMINED</div>
+    </div>
+
+    <!-- Exhibit C: Beauvoir -->
+    <div class="doc-section" id="tab-beauvoir">
+      <div class="doc-block">
+        <div class="char-header">
+          <div class="char-icon beauvoir-icon">⚖</div>
+          <div class="char-name-block">
+            <h4>西蒙娜·德·波伏娃 · 1908–1986</h4>
+            <small>Existentialist Feminist · 《第二性》</small>
+          </div>
+        </div>
+        <div class="type-text" style="position:relative;">
+          <span class="red-annotate">命题</span>
+          <p><span class="red-highlight">女人不是天生的，而是后天成为的。</span>任何生理、心理或经济命运都不能决定女性在社会中所呈现的形象；是整个文明塑造了这一介于男性与被阉者之间的、被称为女性的中间产物。</p>
+          <p style="margin-top:0.8rem;">想要成为主体而非客体，这是人类心底最深切的渴望。但这种渴望不仅仅是个人的——它必须在<span class="red-highlight">与他人的关系</span>中得以实现，在相互承认的辩证法中。</p>
+          <span class="marginalia">存在先于本质<br>性别是社会<br>建构</span>
+        </div>
+        <div class="citation">来源：《第二性》· 第一卷</div>
+      </div>
+
+      <div class="doc-block">
+        <div class="type-text" style="position:relative;">
+          <span class="red-annotate">处境</span>
+          <p>一个人的生命之所以有意义，仅在于它<span class="red-highlight">对他人的影响程度</span>。我们是被抛入这个世界的——但我们是自由的；我们被判处自由。</p>
+          <span class="marginalia">自由即责任<br>在处境中<br>实现超越</span>
+        </div>
+        <div class="citation">来源：《模糊性的道德》</div>
+      </div>
+
+      <div class="annotation-stamp">▲ 注释：第二性 —— 他者化机制分析</div>
+
+      <div class="doc-block">
+        <div class="type-text" style="position:relative;">
+          <span class="red-annotate">伦理</span>
+          <p>每个主体都必须通过谋划——作为超越性的运动——来具体地确立自身；只有当它朝向<span class="red-highlight">其他自由</span>不断超越自身时，它才能实现自由。除了向无限开放的未来不断延展之外，没有其他为当下生存辩护的方式。</p>
+        </div>
+        <div class="citation">来源：《第二性》· 结论</div>
+      </div>
+
+      <div class="note-card">
+        波伏娃的分析既非庄周式的"无为"，也非尼采式的"意志"。她提出一种"处境中的自由"——自由不是抽象的权利，而是在具体的社会关系中被实现或被剥夺的。这恰好补充了前两者的盲区："道"不谈权力结构，"权力"不谈互为主体的承认。
+      </div>
+
+      <div class="rubber-stamp" style="margin-top:1rem;">CERTIFIED</div>
+    </div>
+
+    <!-- Cross-reference section -->
+    <div style="padding:1.5rem 2.5rem;border-top:2px dashed rgba(0,0,0,0.1);position:relative;">
+      <div class="binder-holes" style="left:1.5rem;">
+        <div class="binder-hole" style="margin-top:2rem;"></div>
+        <div class="binder-hole"></div>
+        <div class="binder-hole" style="margin-bottom:2rem;"></div>
+      </div>
+      <div style="font-family:var(--typewriter-font);font-size:0.7rem;letter-spacing:0.1em;opacity:0.4;margin-bottom:0.8rem;">
+        ── 交叉索引 · CROSS REFERENCE ──
+      </div>
+      <div style="display:flex;gap:2rem;flex-wrap:wrap;font-family:var(--typewriter-font);font-size:0.7rem;color:rgba(0,0,0,0.5);">
+        <div>
+          <span style="color:var(--zhuangzi-wood);">🎋 庄周</span>
+          → 参见: 尼采(权力意志批判) · 波伏娃(处境中的自由)
+        </div>
+        <div>
+          <span style="color:var(--nietzsche-fire);">⚡ 尼采</span>
+          → 参见: 庄周(物我两忘) · 波伏娃(主体性建构)
+        </div>
+        <div>
+          <span style="color:var(--beauvoir-glass);">💧 波伏娃</span>
+          → 参见: 庄周(相互承认) · 尼采(自我超越)
+        </div>
+      </div>
+
+      <!-- Final summary note -->
+      <div class="note-card" style="margin-top:1.5rem;">
+        三重对话的核心线索：<br>
+        <span style="color:var(--zhuangzi-wood);">庄周</span> 追问——自由能否不依赖任何外在条件？<br>
+        <span style="color:var(--nietzsche-fire);">尼采</span> 追问——人能否成为价值的创造者？<br>
+        <span style="color:var(--beauvoir-glass);">波伏娃</span> 追问——自由如何在具体的处境中实现？<br><br>
+        它们交叉在同一个点上：<span class="red-highlight">自我超越的可能性条件</span>是什么？庄周说"忘"，尼采说"斗"，波伏娃说"认"。三者不矛盾，而是互补——忘掉虚假的自我，斗争以创造新的自我，在相互承认中找到真实的自由。
+      </div>
+
+      <div class="rubber-stamp" style="margin-top:1.5rem;margin-left:2rem;transform:rotate(-8deg);">CLOSED</div>
+    </div>
+  </div>
+
+  <!-- Folder Bottom -->
+  <div class="folder-bottom"></div>
+</div>
+
+<!-- Controls -->
+<div class="archive-controls">
+  <button title="庄周档案" onclick="switchTab('zhuangzi')">🎋</button>
+  <button title="尼采档案" onclick="switchTab('nietzsche')">⚡</button>
+  <button title="波伏娃档案" onclick="switchTab('beauvoir')">💧</button>
+  <button title="返回封面" onclick="window.scrollTo({top:0,behavior:'smooth'})">📑</button>
+</div>
+
+<!-- Footer -->
+<div class="archive-footer">辩论档案 · 方案 N 档案室 · 设计提案</div>
+
+<script>
+// ======== 档案引擎 ========
+
+function switchTab(char) {
+  // Update tab labels
+  document.querySelectorAll('.tab-label').forEach(t => t.classList.remove('active'));
+  document.querySelector(`.tab-label[data-tab="${char}"]`)?.classList.add('active');
+
+  // Update doc sections
+  document.querySelectorAll('.doc-section').forEach(s => s.classList.remove('active'));
+  const section = document.getElementById(`tab-${char}`);
+  if (section) {
+    section.classList.add('active');
+    // Re-trigger animations
+    section.querySelectorAll('.doc-block').forEach((block, i) => {
+      block.style.animation = 'none';
+      block.offsetHeight; // reflow
+      block.style.animation = `docFadeIn 0.5s ease-out ${i * 0.15}s forwards`;
+    });
+  }
+}
+
+// Keyboard shortcuts
+document.addEventListener('keydown', e => {
+  if (e.ctrlKey || e.metaKey) return;
+  switch(e.key) {
+    case '1': switchTab('zhuangzi'); break;
+    case '2': switchTab('nietzsche'); break;
+    case '3': switchTab('beauvoir'); break;
+  }
+});
+
+// Scroll-reveal animation for cover sheet
+const coverObserver = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      entry.target.style.opacity = '1';
+      entry.target.style.transform = 'translateY(0)';
+    }
+  });
+}, { threshold: 0.3 });
+
+document.querySelectorAll('.cover-sheet').forEach(el => {
+  el.style.transition = 'opacity 0.6s, transform 0.6s';
+  coverObserver.observe(el);
+});
+</script>
+
+</body>
+</html>

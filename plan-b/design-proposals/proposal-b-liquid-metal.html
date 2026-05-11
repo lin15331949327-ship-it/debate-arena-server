@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Debate Arena — 液金暗室 Liquid Metal Darkroom</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@300;500;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --metal-deep: #0a0c14;
+  --metal-mid: #111620;
+  --metal-surface: #1a1f2e;
+  --metal-high: #252d3f;
+  --chrome-text: #c8d0e0;
+  --chrome-bright: #e8ecf4;
+  --accent-blue: #5b8def;
+  --accent-cyan: #3dd6d0;
+  --accent-silver: #8899aa;
+  --border-metal: #2a3040;
+  --glow-blue: rgba(91,141,239,0.15);
+  --glow-cyan: rgba(61,214,208,0.1);
+  --noise-opacity: 0.06;
+  --brush-opacity: 0.03;
+  --font-body: 'Noto Serif SC', serif;
+  --font-mono: 'Space Mono', 'Courier New', monospace;
+  --font-heading: 'Space Mono', monospace;
+}
+* { margin:0; padding:0; box-sizing:border-box; }
+body {
+  font-family: var(--font-body);
+  background: var(--metal-deep);
+  color: var(--chrome-text);
+  min-height:100vh;
+  overflow-x:hidden;
+}
+/* === NOISE TEXTURE === */
+body::before {
+  content: '';
+  position:fixed; inset:0; z-index:2; pointer-events:none;
+  background: url("data:image/svg+xml,%3Csvg viewBox='0 0 300 300' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.12'/%3E%3C/svg%3E");
+  opacity: var(--noise-opacity);
+  mix-blend-mode: overlay;
+}
+/* === BRUSHED METAL GRAIN === */
+.metal-grain {
+  position:fixed; inset:0; z-index:1; pointer-events:none;
+  background: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 1024' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='stretch'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.02 0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23stretch)' opacity='0.08'/%3E%3C/svg%3E");
+  background-size: cover;
+  opacity: var(--brush-opacity);
+  mix-blend-mode: soft-light;
+}
+/* === RADIAL METAL HIGHLIGHT === */
+body::after {
+  content: '';
+  position:fixed; inset:0; z-index:3; pointer-events:none;
+  background:
+    radial-gradient(ellipse 800px 400px at 50% 0%, rgba(91,141,239,0.08) 0%, transparent 60%),
+    radial-gradient(ellipse 600px 300px at 80% 80%, rgba(61,214,208,0.05) 0%, transparent 60%),
+    radial-gradient(ellipse 1000px 500px at 20% 50%, rgba(120,140,180,0.04) 0%, transparent 70%);
+}
+/* === MAIN === */
+.app { position:relative; z-index:5; max-width:1400px; margin:0 auto; padding:24px 32px; }
+/* === HEADER === */
+.header {
+  text-align:center; padding:40px 20px 24px;
+  border-bottom: 1px solid var(--border-metal);
+  margin-bottom: 28px;
+  position:relative;
+}
+.header h1 {
+  font-family: var(--font-mono);
+  font-size: 2rem;
+  font-weight: 400;
+  letter-spacing: 0.25em;
+  color: var(--chrome-bright);
+  text-transform: uppercase;
+}
+.header h1 span {
+  background: linear-gradient(135deg, var(--accent-blue), var(--accent-cyan));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+.header .subtitle {
+  font-size:0.78rem; letter-spacing:0.4em;
+  color: var(--accent-silver);
+  font-family: var(--font-mono);
+  margin-top:6px;
+}
+.header .glow-line {
+  width:80px; height:1px;
+  margin: 14px auto 0;
+  background: linear-gradient(90deg, transparent, var(--accent-blue), var(--accent-cyan), transparent);
+}
+/* === TOPIC BAR === */
+.topic-bar {
+  display:flex; gap:12px; align-items:center;
+  margin-bottom:28px;
+  background: var(--metal-surface);
+  padding: 14px 20px;
+  border: 1px solid var(--border-metal);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.04);
+}
+.topic-bar .prompt-icon {
+  font-family: var(--font-mono);
+  font-size:0.9rem;
+  color: var(--accent-cyan);
+  flex-shrink:0;
+}
+.topic-input {
+  flex:1;
+  border: none;
+  background: transparent;
+  font-family: var(--font-mono);
+  font-size:0.92rem;
+  color: var(--chrome-bright);
+  padding: 8px 4px;
+  outline: none;
+}
+.topic-input::placeholder { color: var(--accent-silver); }
+.topic-btn {
+  background: transparent;
+  color: var(--accent-cyan);
+  border: 1px solid var(--accent-cyan);
+  padding: 8px 20px;
+  font-family: var(--font-mono);
+  font-size:0.85rem;
+  letter-spacing:0.1em;
+  cursor:pointer;
+  transition: all 0.3s;
+}
+.topic-btn:hover {
+  background: rgba(61,214,208,0.1);
+  box-shadow: 0 0 20px rgba(61,214,208,0.2), inset 0 0 20px rgba(61,214,208,0.05);
+}
+/* === LAYOUT === */
+.main-layout { display:flex; gap:24px; align-items:flex-start; }
+.debate-grid { flex:1; display:grid; grid-template-columns: repeat(3, 1fr); gap:20px; }
+.sidebar { width:260px; flex-shrink:0; }
+/* === CARDS === */
+.debate-card {
+  background: var(--metal-surface);
+  border: 1px solid var(--border-metal);
+  padding: 22px 18px 18px;
+  position: relative;
+  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  overflow: hidden;
+}
+.debate-card::before {
+  content: '';
+  position:absolute; inset:0; z-index:0; pointer-events:none;
+  background: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='cf'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.02 1.5' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23cf)' opacity='0.06'/%3E%3C/svg%3E");
+  mix-blend-mode: overlay;
+  transition: opacity 0.4s;
+}
+.debate-card::after {
+  content:'';
+  position:absolute; top:0; left:0; right:0; height:1px;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
+  z-index:1;
+}
+.debate-card:hover {
+  transform: translateY(-4px);
+  border-color: var(--accent-blue);
+  box-shadow:
+    0 0 30px var(--glow-blue),
+    0 0 60px rgba(91,141,239,0.05),
+    inset 0 1px 0 rgba(255,255,255,0.06);
+}
+.debate-card:hover::before { opacity:0.1; }
+.debate-card .card-header {
+  position:relative; z-index:1;
+  display:flex; align-items:center; gap:10px;
+  margin-bottom:14px;
+  padding-bottom:10px;
+  border-bottom: 1px solid var(--border-metal);
+}
+.card-avatar {
+  width:40px; height:40px;
+  display:flex; align-items:center; justify-content:center;
+  font-family: var(--font-mono);
+  font-size:0.9rem;
+  font-weight:700;
+  border:1px solid;
+  flex-shrink:0;
+}
+.card-avatar.z { color:var(--accent-blue); border-color:var(--accent-blue); background:rgba(91,141,239,0.1); }
+.card-avatar.n { color:var(--accent-cyan); border-color:var(--accent-cyan); background:rgba(61,214,208,0.1); }
+.card-avatar.b { color:var(--accent-silver); border-color:var(--accent-silver); background:rgba(136,153,170,0.1); }
+.card-name { font-family:var(--font-mono); font-size:0.9rem; color:var(--chrome-bright); letter-spacing:0.05em; }
+.card-role { font-size:0.7rem; color:var(--accent-silver); font-family:var(--font-mono); }
+.debate-card .card-body { position:relative; z-index:1; font-size:0.88rem; line-height:1.7; color:var(--chrome-text); }
+.debate-card .card-body p { margin-bottom:8px; }
+.debate-card .card-body .quote {
+  border-left: 2px solid var(--accent-blue);
+  padding: 6px 12px;
+  margin: 8px 0;
+  font-family: var(--font-mono);
+  font-size:0.78rem;
+  color: var(--accent-silver);
+  background: rgba(255,255,255,0.02);
+}
+.debate-card .card-stance {
+  margin-top:12px; padding-top:8px;
+  border-top: 1px solid var(--border-metal);
+  font-size:0.75rem;
+  font-family: var(--font-mono);
+  color: var(--accent-cyan);
+}
+/* === SIDEBAR === */
+.sidebar {
+  background: var(--metal-surface);
+  border: 1px solid var(--border-metal);
+  padding: 20px;
+}
+.sidebar h3 {
+  font-family: var(--font-mono);
+  font-size:0.85rem;
+  color: var(--chrome-bright);
+  margin-bottom:16px;
+  text-align:center;
+  letter-spacing:0.15em;
+}
+.heatmap-bar { margin-bottom:12px; }
+.heatmap-label {
+  display:flex; justify-content:space-between;
+  font-size:0.7rem; font-family:var(--font-mono);
+  color: var(--accent-silver);
+  margin-bottom:4px;
+}
+.heatmap-track {
+  height:6px; background: var(--metal-deep);
+  border: 1px solid var(--border-metal);
+  overflow:hidden;
+}
+.heatmap-fill { height:100%; }
+.heatmap-fill.high { background: linear-gradient(90deg, var(--accent-blue), var(--accent-cyan)); }
+.heatmap-fill.mid { background: linear-gradient(90deg, var(--accent-silver), var(--chrome-text)); }
+.heatmap-fill.low { background: linear-gradient(90deg, #3a3a4a, var(--accent-silver)); }
+.sidebar .insight {
+  margin-top:18px; padding:12px;
+  border: 1px solid var(--border-metal);
+  font-size:0.75rem; font-family:var(--font-mono);
+  color:var(--accent-silver); line-height:1.6;
+  background:rgba(255,255,255,0.02);
+}
+@media (max-width:1024px) {
+  .main-layout { flex-direction:column; }
+  .sidebar { width:100% }
+  .debate-grid { grid-template-columns:1fr }
+}
+</style>
+</head>
+<body>
+<div class="metal-grain"></div>
+<div class="app">
+  <header class="header">
+    <h1>DEBATE <span>ARENA</span></h1>
+    <div class="subtitle">/ 液金暗室 · LIQUID METAL DARKROOM /</div>
+    <div class="glow-line"></div>
+  </header>
+
+  <div class="topic-bar">
+    <span class="prompt-icon">&gt;_</span>
+    <input class="topic-input" placeholder="Enter debate topic..." value="自由意志是否存在？">
+    <button class="topic-btn">INITIATE</button>
+  </div>
+
+  <div class="main-layout">
+    <div class="debate-grid">
+      <div class="debate-card">
+        <div class="card-header">
+          <div class="card-avatar z">Z</div>
+          <div>
+            <div class="card-name">ZHUANGZI</div>
+            <div class="card-role">DAOIST · WANDERING</div>
+          </div>
+        </div>
+        <div class="card-body">
+          <p>The fish becomes a bird — not by choice, but by nature. The ten thousand things arise and fall, yet none claims authorship.</p>
+          <div class="quote">"Ride upon the true course of heaven and earth, drive the changes of the six breaths."</div>
+          <p>Freedom is not choosing. Freedom is returning to the root, where the distinction between self and world has not yet been drawn.</p>
+        </div>
+        <div class="card-stance">POSITION: FREEDOM_AS_UNITY &gt; FREEDOM_AS_CHOICE</div>
+      </div>
+
+      <div class="debate-card">
+        <div class="card-header">
+          <div class="card-avatar n">N</div>
+          <div>
+            <div class="card-name">NIETZSCHE</div>
+            <div class="card-role">UBERMENSCH · WILL</div>
+          </div>
+        </div>
+        <div class="card-body">
+          <p>Your "returning to the root" is a beautiful phrase for nihilism. The tightrope walker does not dissolve — he walks.</p>
+          <div class="quote">"Become who you are. What does your conscience say? — You shall become who you are."</div>
+          <p>Freedom is the hammer that breaks old tablets. Fate? I say: Amor fati — love it, then overcome it.</p>
+        </div>
+        <div class="card-stance">POSITION: FREEDOM_AS_SELF-OVERCOMING</div>
+      </div>
+
+      <div class="debate-card">
+        <div class="card-header">
+          <div class="card-avatar b">B</div>
+          <div>
+            <div class="card-name">BEAUVOIR</div>
+            <div class="card-role">EXISTENTIALIST · SITUATED</div>
+          </div>
+        </div>
+        <div class="card-body">
+          <p>Gentlemen, you speak from positions that history has made comfortable. Freedom does not float above the world.</p>
+          <div class="quote">"One is not born, but rather becomes, a woman."</div>
+          <p>Freedom is always freedom-in-situation. To transcend one's facticity — that is the project, not dissolution nor domination.</p>
+        </div>
+        <div class="card-stance">POSITION: FREEDOM_AS_SITUATED_TRANSCENDENCE</div>
+      </div>
+    </div>
+
+    <aside class="sidebar">
+      <h3>// TENSION HEATMAP</h3>
+      <div class="heatmap-bar">
+        <div class="heatmap-label"><span>ZHUANGZI</span><span>0.72</span></div>
+        <div class="heatmap-track"><div class="heatmap-fill high" style="width:72%"></div></div>
+      </div>
+      <div class="heatmap-bar">
+        <div class="heatmap-label"><span>NIETZSCHE</span><span>0.94</span></div>
+        <div class="heatmap-track"><div class="heatmap-fill high" style="width:94%"></div></div>
+      </div>
+      <div class="heatmap-bar">
+        <div class="heatmap-label"><span>BEAUVOIR</span><span>0.61</span></div>
+        <div class="heatmap-track"><div class="heatmap-fill mid" style="width:61%"></div></div>
+      </div>
+      <div class="insight">
+        <span style="color:var(--accent-cyan)">&gt; INSIGHT</span><br>
+        Zhuangzi and Nietzsche form the deepest opposition — dissolution of self versus intensification of self. Beauvoir's situated freedom offers a synthesis that neither East nor West alone can reach.
+      </div>
+    </aside>
+  </div>
+</div>
+</body>
+</html>

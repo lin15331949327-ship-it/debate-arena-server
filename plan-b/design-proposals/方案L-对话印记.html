@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>方案L：对话印记 · 自由辩论堂</title>
+<style>
+:root {
+  --zhuangzi: #4a9470;
+  --zhuangzi-bubble: #e8f5ee;
+  --zhuangzi-text: #1a3a28;
+  --zhuangzi-avatar-bg: #c8e8d4;
+  --nietzsche: #c45545;
+  --nietzsche-bubble: #fef0ee;
+  --nietzsche-text: #3d1810;
+  --nietzsche-avatar-bg: #f8d8d0;
+  --beauvoir: #5578b8;
+  --beauvoir-bubble: #eef2fb;
+  --beauvoir-text: #162040;
+  --beauvoir-avatar-bg: #d0daf0;
+  --bg: #1a1a20;
+  --chat-bg: #242430;
+  --text: #e8e4dc;
+  --text-dim: #908c80;
+  --accent: #e0b860;
+  --system-bg: rgba(255,255,255,.03);
+}
+
+* { box-sizing:border-box;margin:0;padding:0 }
+
+body {
+  font-family: 'Noto Serif SC','Georgia','Songti SC',serif;
+  background: var(--bg);
+  color: var(--text);
+  display: flex;
+  justify-content: center;
+  min-height: 100vh;
+}
+
+/* Phone mockup */
+.phone {
+  width: 100%;
+  max-width: 440px;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: var(--chat-bg);
+  position: relative;
+  overflow: hidden;
+}
+
+/* Header bar */
+.chat-header {
+  padding: 14px 18px;
+  background: rgba(26,26,32,.9);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid rgba(255,255,255,.06);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  z-index: 5;
+}
+.header-avatars {
+  display: flex;
+  position: relative;
+}
+.header-avatars .mini-av {
+  width: 30px; height: 30px;
+  border-radius: 50%;
+  font-size: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  font-weight: 700;
+  margin-right: -8px;
+  border: 2px solid var(--chat-bg);
+  position: relative;
+}
+.mini-av.zh { 
+  background: var(--zhuangzi);
+  clip-path: polygon(50% 8%, 85% 28%, 82% 72%, 50% 92%, 18% 72%, 15% 28%);
+  border-radius: 0;
+  width: 32px; height: 32px;
+}
+.mini-av.ni { 
+  background: var(--nietzsche);
+  clip-path: polygon(50% 8%, 78% 22%, 92% 50%, 78% 78%, 50% 92%, 22% 78%, 8% 50%, 22% 22%);
+  border-radius: 0;
+  width: 32px; height: 32px;
+}
+.mini-av.bv { 
+  background: var(--beauvoir);
+  clip-path: polygon(50% 8%, 72% 25%, 72% 75%, 50% 92%, 28% 75%, 28% 25%);
+  border-radius: 0;
+  width: 32px; height: 32px;
+}
+.header-info { flex:1 }
+.header-info .group-name {
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: .04em;
+}
+.header-info .members {
+  font-size: 11px;
+  color: var(--text-dim);
+}
+.header-info .online-dot {
+  display: inline-block;
+  width: 6px; height: 6px;
+  background: #5ac85a;
+  border-radius: 50%;
+  margin-right: 4px;
+}
+
+/* Topic banner */
+.topic-banner {
+  background: linear-gradient(135deg, rgba(224,184,96,.08), rgba(224,184,96,.02));
+  padding: 10px 18px;
+  border-bottom: 1px solid rgba(255,255,255,.04);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  z-index: 4;
+}
+.topic-label {
+  font-size: 11px;
+  color: var(--accent);
+  letter-spacing: .1em;
+  font-weight: 700;
+}
+.topic-chip-row {
+  display: flex;
+  gap: 6px;
+}
+.topic-chip {
+  font-size: 10px;
+  padding: 4px 12px;
+  border-radius: 12px;
+  background: rgba(255,255,255,.04);
+  border: 1px solid rgba(255,255,255,.06);
+  color: var(--text-dim);
+  cursor: pointer;
+  transition: all .25s;
+  font-family: inherit;
+}
+.topic-chip:hover { background: rgba(255,255,255,.08);color:#fff }
+.topic-chip.active {
+  background: rgba(224,184,96,.15);
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+/* Messages area */
+.messages {
+  flex: 1;
+  overflow-y: auto;
+  padding: 20px 14px 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  scroll-behavior: smooth;
+}
+
+/* System message */
+.system-msg {
+  text-align: center;
+  padding: 16px 10px;
+}
+.system-msg .inner {
+  display: inline-block;
+  background: var(--system-bg);
+  padding: 8px 16px;
+  border-radius: 10px;
+  font-size: 11px;
+  color: var(--text-dim);
+  letter-spacing: .06em;
+}
+
+/* Message block */
+.msg-block {
+  display: flex;
+  gap: 8px;
+  margin: 6px 0;
+  animation: msgIn .4s ease;
+  max-width: 88%;
+}
+.msg-block.right { flex-direction: row-reverse; margin-left: auto; }
+.msg-block.left { margin-right: auto; }
+@keyframes msgIn { from { opacity:0;transform:translateY(12px) } to { opacity:1;transform:translateY(0) } }
+
+/* Avatar */
+.msg-avatar {
+  width: 38px; height: 38px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: 900;
+  color: #fff;
+  position: relative;
+}
+.msg-avatar.zh { 
+  background: var(--zhuangzi);
+  clip-path: polygon(50% 5%, 88% 30%, 84% 74%, 50% 95%, 16% 74%, 12% 30%);
+  width: 40px; height: 40px;
+}
+.msg-avatar.ni { 
+  background: var(--nietzsche);
+  clip-path: polygon(50% 5%, 80% 20%, 95% 50%, 80% 80%, 50% 95%, 20% 80%, 5% 50%, 20% 20%);
+  width: 40px; height: 40px;
+}
+.msg-avatar.bv { 
+  background: var(--beauvoir);
+  clip-path: polygon(50% 5%, 74% 25%, 74% 75%, 50% 95%, 26% 75%, 26% 25%);
+  width: 40px; height: 40px;
+}
+
+/* Bubble */
+.bubble {
+  padding: 12px 16px;
+  border-radius: 16px;
+  font-size: 13px;
+  line-height: 1.7;
+  position: relative;
+}
+.bubble.zh { background: var(--zhuangzi-bubble);color:var(--zhuangzi-text);border-bottom-left-radius:4px }
+.bubble.ni { background: var(--nietzsche-bubble);color:var(--nietzsche-text);border-bottom-right-radius:4px }
+.bubble.bv { background: var(--beauvoir-bubble);color:var(--beauvoir-text);border-bottom-left-radius:4px }
+
+.bubble .sender {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: .06em;
+  opacity: .6;
+  margin-bottom: 4px;
+}
+
+/* Quote decoration inside bubble */
+.bubble .inline-quote {
+  display: block;
+  margin: 8px 0;
+  padding: 6px 10px;
+  border-left: 3px solid;
+  font-style: italic;
+  font-size: 12px;
+  opacity: .75;
+}
+.bubble.zh .inline-quote { border-color: var(--zhuangzi) }
+.bubble.ni .inline-quote { border-color: var(--nietzsche) }
+.bubble.bv .inline-quote { border-color: var(--beauvoir) }
+
+/* Scroll indicator */
+.scroll-indicator {
+  text-align: center;
+  padding: 6px;
+  font-size: 10px;
+  color: var(--text-dim);
+  opacity: .4;
+  animation: fadePulse 2.5s infinite;
+}
+@keyframes fadePulse {
+  0%,100% { opacity:.2 }
+  50% { opacity:.5 }
+}
+
+/* Typing indicator */
+.typing {
+  display: flex;
+  gap: 4px;
+  padding: 8px 0;
+  align-items: center;
+}
+.typing span {
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: var(--text-dim);
+  animation: dotBounce .8s infinite;
+}
+.typing span:nth-child(2) { animation-delay: .15s }
+.typing span:nth-child(3) { animation-delay: .3s }
+@keyframes dotBounce {
+  0%,60%,100% { transform:translateY(0);opacity:.3 }
+  30% { transform:translateY(-6px);opacity:.8 }
+}
+
+/* Divider date */
+.date-divider {
+  text-align: center;
+  margin: 16px 0;
+  font-size: 10px;
+  color: var(--text-dim);
+  opacity: .35;
+  letter-spacing: .08em;
+}
+</style>
+</head>
+<body>
+
+<div class="phone">
+
+  <!-- HEADER -->
+  <div class="chat-header">
+    <div class="header-avatars">
+      <div class="mini-av zh">庄</div>
+      <div class="mini-av ni">尼</div>
+      <div class="mini-av bv">波</div>
+    </div>
+    <div class="header-info">
+      <div class="group-name">自由辩论堂</div>
+      <div class="members"><span class="online-dot"></span>庄周 · 尼采 · 波伏娃 — 3人在线</div>
+    </div>
+  </div>
+
+  <!-- TOPIC BANNER -->
+  <div class="topic-banner">
+    <div class="topic-label">当前议题</div>
+    <div class="topic-chip-row" id="topicChips">
+      <button class="topic-chip active" data-topic="自由的定义">什么是自由</button>
+      <button class="topic-chip" data-topic="自由与命运">自由与命运</button>
+      <button class="topic-chip" data-topic="自由的代价">自由的代价</button>
+      <button class="topic-chip" data-topic="自由的可能性">自由可能吗</button>
+    </div>
+  </div>
+
+  <!-- MESSAGES -->
+  <div class="messages" id="messages">
+    <!-- Generated by JS -->
+  </div>
+
+</div>
+
+<script>
+const conversations = {
+  '自由的定义': [
+    {type:'system',text:'群聊已创建 · 议题：什么是自由？'},
+    {type:'date',text:'约公元前330年 · 蒙地'},
+    {side:'left',phil:'zh',sender:'庄周',
+     text:'自由者，非挣脱枷锁之谓也。天下万物，各有其性。大鹏扶摇九万里，非力大也，顺风而已。',
+     quote:'若夫乘天地之正，而御六气之辩，以游无穷者，彼且恶乎待哉？——《逍遥游》'},
+    {side:'right',phil:'ni',sender:'尼采',
+     text:'庄周先生，恕我直言：你所谓的"顺风"不过是软弱者的自欺！自由不是顺应，而是创造。上帝已死，人必须成为价值的赋予者。',
+     quote:'人是应被超越的某种东西。你们可曾做了什么以超越他呢？——《查拉图斯特拉如是说》'},
+    {side:'left',phil:'bv',sender:'波伏娃',
+     text:'二位，我不得不打断。你们谈论的"自由"都忽略了一件最基本的事情：人从来不是在真空中存在的。我们被抛入一个特定的性别、阶级、时代之中——自由，就是在这些给定条件中做出选择的能力。',
+     quote:'人不是天生自由的，而是不断成为自由的。——《模糊性的道德》'},
+    {side:'left',phil:'zh',sender:'庄周',
+     text:'处境？哈！蝴蝶梦为庄周，庄周梦为蝴蝶——连"我是谁"都未曾确定，"处境"何足道哉？你所执着的身份，不过是化中之形。'},
+    {side:'right',phil:'ni',sender:'尼采',
+     text:'波伏娃女士说了实话：处境的确存在。但我的回答是——超越它！查拉图斯特拉在山上独居十年，正是为了摆脱一切社会给定的价值。然后他下山，带着锤子。'},
+    {side:'left',phil:'bv',sender:'波伏娃',
+     text:'尼采先生，不是每个人都能像查拉图斯特拉一样上山。那些被困在厨房里的女性、那些被迫沉默的群体——你让他们拿什么"超越"？自由必须同时是他人的解放，否则就不是自由。'},
+  ],
+  '自由与命运': [
+    {type:'system',text:'议题切换 · 自由与命运'},
+    {side:'left',phil:'zh',sender:'庄周',
+     text:'命运？我称之为"命"。泉涸，鱼相与处于陆，相呴以湿，相濡以沫——不如相忘于江湖。命运即是江湖，自由即是相忘。'},
+    {side:'right',phil:'ni',sender:'尼采',
+     text:'有趣的比喻！但我的回答是：爱你的命运。Amor fati。不是顺从，而是在永恒轮回中肯定每一个瞬间——包括最痛苦的瞬间。你能对生命说"再来一次"吗？那才是自由！'},
+    {side:'left',phil:'bv',sender:'波伏娃',
+     text:'"永恒轮回"——多么迷人的概念。但让我说一句：当我作为女人被定义时，那个"命运"不是我选择的。自由的第一步，是拒绝他人为我设定的命运。'},
+    {side:'right',phil:'ni',sender:'尼采',
+     text:'所以你也承认：否定、拒绝、摧毁旧价值——这正是我说的！用锤子从事哲学！'},
+    {side:'left',phil:'zh',sender:'庄周',
+     text:'汝之锤子，不亦累乎？我以无用为用。樗树不夭斤斧，以其无用也。自由，不在反抗，在无用之用。'},
+  ],
+  '自由的代价': [
+    {type:'system',text:'议题切换 · 自由的代价'},
+    {side:'left',phil:'bv',sender:'波伏娃',
+     text:'让我先说：自由有代价。萨特说过"人被判定为自由"——判定的意思是，你逃不掉。每一次不选择，本身就是一种选择。这就是存在的焦虑。'},
+    {side:'right',phil:'ni',sender:'尼采',
+     text:'焦虑？那是弱者的反应！自由确实有代价——最沉重的代价是孤独。成为你自己意味着与人群决裂。但这是值得的：末人追求舒适，超人追求伟大。'},
+    {side:'left',phil:'zh',sender:'庄周',
+     text:'代价？我不付。吾丧我——连自己都不执着，何来代价？你二位的自由，用力太猛，反被自由所累。'},
+    {side:'right',phil:'ni',sender:'尼采',
+     text:'庄周！你这种"不执着"恰恰是最大的执着——你执着地逃避所有执着。波伏娃女士，你同意吗？'},
+    {side:'left',phil:'bv',sender:'波伏娃',
+     text:'我部分同意。庄子的"无待"看似自由，实则回避了一个事实：只要你是人，你就已经在关系中。逃避关系本身，就是一种对他人的责任放弃。'},
+    {side:'left',phil:'zh',sender:'庄周',
+     text:'非逃避也。鱼相忘于江湖——我与他人在大道中共在，互不相伤，是谓真逍遥。汝等以关系为网，我以关系为水。'},
+  ],
+  '自由的可能性': [
+    {type:'system',text:'议题切换 · 自由真的可能吗？'},
+    {side:'left',phil:'bv',sender:'波伏娃',
+     text:'让我坦诚地说：绝对的自由是不可能的。我总是在一个已经给定的世界中行动。但正因如此，自由才成为一项持续的任务——我们必须不断地、一次次地征服它。'},
+    {side:'right',phil:'ni',sender:'尼采',
+     text:'不完全同意。自由可能，但只为少数人。金发野兽不需要"处境分析"——他直接创造价值。大多数人宁愿被命令，也不想承担自由的重量。'},
+    {side:'left',phil:'zh',sender:'庄周',
+     text:'自由为所有人可能——但非如尔等所想。非创造，非征服，乃忘却。忘是非，忘彼此，忘生死。此三忘之后，何来不自由？'},
+    {side:'left',phil:'bv',sender:'波伏娃',
+     text:'庄子的"忘"是一种禅意——但它预设了一个前提：你可以忘。当你的基本生存都受到威胁时，请告诉我，你如何"忘"？'},
+    {side:'left',phil:'zh',sender:'庄周',
+     text:'颜回居陋巷，一箪食，一瓢饮，人不堪其忧，回也不改其乐。自由在心，不在物。'},
+    {side:'right',phil:'ni',sender:'尼采',
+     text:'说得妙——但你用儒家的例子来答道家的理！不过我不反对你的结论：自由确实最终在心。但心需要一场战争，而不是一场遗忘。'},
+  ],
+};
+
+let activeTopic = '自由的定义';
+const messagesEl = document.getElementById('messages');
+const topicChips = document.getElementById('topicChips');
+
+function renderMessages(topicKey) {
+  const msgs = conversations[topicKey] || [];
+  messagesEl.innerHTML = '';
+
+  msgs.forEach(m => {
+    if (m.type === 'system') {
+      const div = document.createElement('div');
+      div.className = 'system-msg';
+      div.innerHTML = `<span class="inner">${m.text}</span>`;
+      messagesEl.appendChild(div);
+      return;
+    }
+    if (m.type === 'date') {
+      const div = document.createElement('div');
+      div.className = 'date-divider';
+      div.textContent = m.text;
+      messagesEl.appendChild(div);
+      return;
+    }
+
+    const block = document.createElement('div');
+    block.className = `msg-block ${m.side}`;
+
+    const avatar = document.createElement('div');
+    avatar.className = `msg-avatar ${m.phil}`;
+    const initials = {zh:'庄',ni:'尼',bv:'波'};
+    avatar.textContent = initials[m.phil];
+
+    const bubble = document.createElement('div');
+    bubble.className = `bubble ${m.phil}`;
+    bubble.innerHTML = `<div class="sender">${m.sender}</div>${m.text}`;
+    if (m.quote) {
+      bubble.innerHTML += `<span class="inline-quote">${m.quote}</span>`;
+    }
+
+    block.appendChild(avatar);
+    block.appendChild(bubble);
+    messagesEl.appendChild(block);
+  });
+
+  // Scroll to bottom with delay for animation
+  setTimeout(() => {
+    messagesEl.scrollTop = messagesEl.scrollHeight;
+  }, 100);
+}
+
+topicChips.addEventListener('click', (e) => {
+  if (!e.target.classList.contains('topic-chip')) return;
+  topicChips.querySelectorAll('.topic-chip').forEach(c => c.classList.remove('active'));
+  e.target.classList.add('active');
+  activeTopic = e.target.dataset.topic;
+  renderMessages(activeTopic);
+});
+
+// Initial render
+renderMessages(activeTopic);
+</script>
+
+</body>
+</html>

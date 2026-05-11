@@ -1,0 +1,1018 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>长河·光影 — 三Agent辩论场</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500;600&family=Noto+Serif+SC:wght@200;300;400;600&family=Inter:wght@300;400&display=swap" rel="stylesheet">
+<style>
+/* ═══════════════════════════════════════════
+   光影美学精修 — 8种明暗对照技法
+   ═══════════════════════════════════════════ */
+:root {
+  /* Tenebrism: pure void */
+  --bg-void: #000000;
+  --bg-surface: #030306;
+
+  /* Light source position */
+  --ls-x: 22%;
+  --ls-y: 14%;
+
+  /* 庄周 — 竹叶青 / 水墨 / 柔光 */
+  --zhuangzi: #5ab89a;
+  --zhuangzi-glow: rgba(90,184,154,.45);
+  --zhuangzi-soft: rgba(90,184,154,.12);
+  --zhuangzi-mist: rgba(90,184,154,.04);
+
+  /* 尼采 — 火焰 / 金属 / 锐光 */
+  --nietzsche: #e0654e;
+  --nietzsche-glow: rgba(224,101,78,.48);
+  --nietzsche-soft: rgba(224,101,78,.13);
+  --nietzsche-mist: rgba(224,101,78,.04);
+
+  /* 波伏娃 — 水滴 / 玻璃 / 折射光 */
+  --beauvoir: #6b9ed8;
+  --beauvoir-glow: rgba(107,158,216,.42);
+  --beauvoir-soft: rgba(107,158,216,.11);
+  --beauvoir-mist: rgba(107,158,216,.04);
+
+  --text-primary: #ded8d0;
+  --text-secondary: #a8a49e;
+  --text-tertiary: #78746e;
+  --card-bg: rgba(3,3,6,.88);
+  --card-radius: 14px;
+  --timeline-color: rgba(255,255,255,.06);
+  --font-display: 'Cormorant Garamond','Georgia',serif;
+  --font-body: 'Noto Serif SC','Inter',sans-serif;
+  --max-width: 880px;
+  --card-gap: 120px;
+  --transition-slow: .9s cubic-bezier(.22,.61,.36,1);
+  --transition-medium: .45s cubic-bezier(.25,.46,.45,.94);
+  --falloff-r1: 1;
+  --falloff-r2: .55;
+  --falloff-r3: .3;
+}
+
+* { box-sizing:border-box;margin:0;padding:0 }
+html { font-size:16px;-webkit-font-smoothing:antialiased;scroll-behavior:smooth }
+body {
+  font-family:var(--font-body);
+  background:var(--bg-void);
+  color:var(--text-primary);
+  min-height:100vh;
+  overflow-x:hidden;
+  font-weight:300;
+  line-height:1.7;
+  letter-spacing:.012em;
+}
+
+/* ── Layer -2: Pure void (Tenebrism) ── */
+body::before {
+  content:'';
+  position:fixed;
+  inset:0;
+  z-index:-3;
+  background:var(--bg-void);
+}
+
+/* ── Layer -1: Light source + penumbral halo ── */
+.light-source {
+  position:fixed;
+  inset:0;
+  z-index:-2;
+  pointer-events:none;
+  /* Multi-layer penumbra from single source */
+  background:
+    /* Core light — tiny bright nucleus */
+    radial-gradient(ellipse 80px 80px at var(--ls-x) var(--ls-y), rgba(220,230,255,.09) 0%, transparent 100%),
+    /* Layer 1: lit zone — warm dispersion */
+    radial-gradient(ellipse 500px 380px at var(--ls-x) var(--ls-y), rgba(180,200,240,.05) 0%, rgba(160,190,230,.025) 30%, transparent 60%),
+    /* Layer 2: penumbra — cool falloff */
+    radial-gradient(ellipse 700px 500px at var(--ls-x) var(--ls-y), rgba(140,170,220,.018) 0%, transparent 55%),
+    /* Layer 3: outer penumbra — barely there */
+    radial-gradient(ellipse 1000px 700px at var(--ls-x) var(--ls-y), rgba(120,150,200,.008) 0%, transparent 70%);
+  animation: sourceBreath 11s ease-in-out infinite;
+}
+@keyframes sourceBreath {
+  0%,100% { opacity:.7 }
+  35% { opacity:1 }
+  65% { opacity:.82 }
+}
+
+/* ── God Rays: ultra-faint diagonal beams ── */
+.god-rays {
+  position:fixed;
+  top:0;left:0;
+  width:100vw;height:100vh;
+  z-index:-1;
+  pointer-events:none;
+  background:
+    /* Ray 1 */
+    linear-gradient(152deg, transparent 40%, rgba(200,220,255,.008) 40.3%, transparent 40.7%),
+    /* Ray 2 */
+    linear-gradient(158deg, transparent 36%, rgba(200,220,255,.006) 36.2%, transparent 36.6%),
+    /* Ray 3 */
+    linear-gradient(148deg, transparent 44%, rgba(200,220,255,.01) 44.5%, transparent 45%),
+    /* Ray 4 */
+    linear-gradient(162deg, transparent 30%, rgba(200,220,255,.004) 30.2%, transparent 30.6%),
+    /* Ray 5 */
+    linear-gradient(145deg, transparent 50%, rgba(200,220,255,.007) 50.3%, transparent 50.8%),
+    /* Ray 6 */
+    linear-gradient(155deg, transparent 47%, rgba(200,220,255,.005) 47.2%, transparent 47.7%);
+  mask-image: radial-gradient(ellipse 1100px 800px at var(--ls-x) var(--ls-y), black 25%, transparent 65%);
+  animation: rayShift 18s ease-in-out infinite;
+}
+@keyframes rayShift {
+  0%,100% { opacity:.5 }
+  50% { opacity:.85 }
+}
+
+/* ── Volumetric Light Cone ── */
+.volumetric-cone {
+  position:fixed;
+  top:var(--ls-y); left:var(--ls-x);
+  width:900px; height:700px;
+  transform:translate(-50%,-50%) rotate(-12deg);
+  z-index:-1;
+  pointer-events:none;
+  background:
+    /* Elliptical cone beam */
+    radial-gradient(ellipse 180px 500px at 0% 0%, rgba(200,220,255,.035) 0%, rgba(180,200,240,.015) 40%, transparent 70%),
+    /* Secondary wider scatter */
+    radial-gradient(ellipse 400px 800px at 0% 0%, rgba(180,210,240,.01) 0%, transparent 60%);
+  mask-image: linear-gradient(to bottom right, black 0%, black 25%, transparent 55%);
+  animation: coneBreath 13s ease-in-out infinite;
+}
+@keyframes coneBreath {
+  0%,100% { opacity:.55 }
+  40% { opacity:.9 }
+  70% { opacity:.7 }
+}
+
+/* ── Particle dust: minimal, deliberate ── */
+.dust-field {
+  position:fixed;
+  inset:0;
+  z-index:-1;
+  pointer-events:none;
+}
+.dust-speck {
+  position:absolute;
+  border-radius:50%;
+  background:rgba(200,215,240,.5);
+  opacity:0;
+  animation: dustFloat var(--dur,20s) linear infinite;
+  animation-delay:var(--del,0s);
+}
+@keyframes dustFloat {
+  0% { opacity:0; transform:translate(0,0) }
+  3% { opacity:var(--pk,.15) }
+  50% { transform:translate(var(--mx,40vw),var(--my,30vh)) }
+  97% { opacity:var(--pk,.15) }
+  100% { opacity:0; transform:translate(var(--ex,80vw),var(--ey,60vh)) }
+}
+
+/* ═══════════════════════════════════════════
+   MAIN CONTAINER
+   ═══════════════════════════════════════════ */
+.main-container {
+  position:relative;
+  z-index:1;
+  max-width:var(--max-width);
+  margin:0 auto;
+  padding:70px 40px 80px 90px;
+}
+
+/* ── Header ── */
+.header {
+  margin-bottom:64px;
+  padding-top:20px;
+  animation: emergeDown 1.2s var(--transition-slow) both;
+  /* Ink-wash aura — 庄周-inspired soft glow */
+  position:relative;
+}
+.header::before {
+  content:'';
+  position:absolute;
+  top:-80px;left:-60px;
+  width:300px;height:250px;
+  background:radial-gradient(ellipse at center, rgba(180,200,255,.04) 0%, transparent 70%);
+  pointer-events:none;
+}
+.header-title {
+  font-family:var(--font-display);
+  font-size:2.8rem;
+  font-weight:400;
+  letter-spacing:.07em;
+  color:var(--text-primary);
+  margin-bottom:10px;
+  line-height:1.2;
+  /* Ink-wash text shadow */
+  text-shadow: 0 0 40px rgba(180,200,240,.06);
+}
+.header-subtitle {
+  font-size:.82rem;
+  font-weight:300;
+  color:var(--text-secondary);
+  letter-spacing:.14em;
+}
+
+@keyframes emergeDown {
+  from { opacity:0; transform:translateY(-20px) }
+  to { opacity:1; transform:translateY(0) }
+}
+
+/* ── Topic Selector ── */
+.topic-area {
+  margin-bottom:60px;
+  animation: emergeDown 1.2s var(--transition-slow) .12s both;
+}
+.topic-label {
+  font-size:.58rem;
+  font-weight:400;
+  text-transform:uppercase;
+  letter-spacing:.22em;
+  color:var(--text-tertiary);
+  margin-bottom:12px;
+}
+.topic-text {
+  font-family:var(--font-display);
+  font-size:1.4rem;
+  font-weight:400;
+  color:var(--text-primary);
+  letter-spacing:.04em;
+  margin-bottom:22px;
+  max-width:560px;
+}
+.topic-chips {
+  display:flex;
+  flex-wrap:wrap;
+  gap:10px;
+  margin-bottom:18px;
+}
+.topic-chip {
+  padding:8px 20px;
+  border-radius:100px;
+  border:1px solid rgba(255,255,255,.07);
+  background:rgba(255,255,255,.015);
+  backdrop-filter:blur(12px);
+  -webkit-backdrop-filter:blur(12px);
+  font-family:var(--font-body);
+  font-size:.75rem;
+  font-weight:300;
+  color:var(--text-secondary);
+  cursor:pointer;
+  transition:all var(--transition-medium);
+  white-space:nowrap;
+}
+.topic-chip:hover {
+  border-color:rgba(255,255,255,.18);
+  color:var(--text-primary);
+  background:rgba(255,255,255,.04);
+}
+.topic-chip.active {
+  border-color:rgba(255,255,255,.22);
+  color:#fff;
+  background:rgba(255,255,255,.07);
+  font-weight:400;
+  box-shadow:0 0 18px rgba(180,200,255,.06);
+}
+.new-debate-btn {
+  display:inline-flex;
+  align-items:center;
+  gap:8px;
+  padding:10px 24px;
+  border-radius:100px;
+  border:1px solid rgba(255,255,255,.1);
+  background:rgba(255,255,255,.025);
+  color:var(--text-secondary);
+  font-family:var(--font-body);
+  font-size:.78rem;
+  font-weight:300;
+  letter-spacing:.03em;
+  cursor:pointer;
+  transition:all var(--transition-medium);
+  backdrop-filter:blur(12px);
+  -webkit-backdrop-filter:blur(12px);
+}
+.new-debate-btn:hover {
+  border-color:rgba(255,255,255,.22);
+  color:#fff;
+  background:rgba(255,255,255,.05);
+  box-shadow:0 0 22px rgba(180,200,255,.05);
+}
+.new-debate-btn .plus { font-size:1rem;font-weight:200 }
+
+/* ═══════════════════════════════════════════
+   TIMELINE — River of Time (subtle)
+   ═══════════════════════════════════════════ */
+.timeline {
+  position:fixed;
+  left:44px;
+  top:0;bottom:0;
+  width:56px;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  z-index:2;
+  pointer-events:none;
+}
+.timeline-line {
+  position:absolute;
+  left:50%;
+  transform:translateX(-50%);
+  top:70px;bottom:70px;
+  width:1px;
+  background:var(--timeline-color);
+  /* Subtle ink-wash edge */
+  box-shadow:0 0 6px rgba(200,220,255,.03);
+}
+.timeline-line::before {
+  content:'';
+  position:absolute;
+  left:-2px;
+  width:5px;height:32px;
+  border-radius:3px;
+  background:linear-gradient(to bottom, transparent, rgba(180,200,240,.25) 30%, rgba(160,190,230,.35) 50%, rgba(180,200,240,.25) 70%, transparent);
+  animation:speckFlow 6s ease-in-out infinite;
+  filter:blur(1.2px);
+}
+@keyframes speckFlow {
+  0% { top:-32px;opacity:0 }
+  10% { opacity:.6 }
+  90% { opacity:.6 }
+  100% { top:calc(100% + 32px);opacity:0 }
+}
+.timeline-line::after {
+  content:'';
+  position:absolute;inset:0;
+  background:linear-gradient(to bottom, transparent, rgba(180,200,255,.08) 12%, rgba(180,200,255,.08) 88%, transparent);
+  animation:lineBreathe 8s ease-in-out infinite;
+}
+@keyframes lineBreathe {
+  0%,100% { opacity:.25 }
+  50% { opacity:.65 }
+}
+
+/* Timeline nodes */
+.timeline-node {
+  position:absolute;
+  left:50%;
+  transform:translateX(-50%);
+  width:5px;height:5px;
+  border-radius:50%;
+  background:rgba(255,255,255,.15);
+  transition:all .5s ease;
+}
+.timeline-node::after {
+  content:'';
+  position:absolute;
+  inset:-5px;
+  border-radius:50%;
+  animation:nodeBreath var(--bd,3s) ease-in-out infinite;
+  animation-delay:var(--bdl,0s);
+  pointer-events:none;
+}
+@keyframes nodeBreath {
+  0%,100% { box-shadow:0 0 2px rgba(255,255,255,.06) }
+  50% { box-shadow:0 0 10px rgba(255,255,255,.14) }
+}
+.timeline-node.active {
+  background:#fff;
+  width:7px;height:7px;
+}
+.timeline-node[data-role="zhuangzi"].active {
+  box-shadow:0 0 12px var(--zhuangzi-glow), 0 0 24px var(--zhuangzi-soft);
+}
+.timeline-node[data-role="nietzsche"].active {
+  box-shadow:0 0 14px var(--nietzsche-glow), 0 0 28px var(--nietzsche-soft);
+}
+.timeline-node[data-role="beauvoir"].active {
+  box-shadow:0 0 12px var(--beauvoir-glow), 0 0 24px var(--beauvoir-soft);
+}
+.timeline-node.flash {
+  background:#fff!important;
+  width:9px!important;height:9px!important;
+}
+.timeline-node.flash[data-role="zhuangzi"] { box-shadow:0 0 18px var(--zhuangzi-glow),0 0 36px var(--zhuangzi-soft)!important }
+.timeline-node.flash[data-role="nietzsche"] { box-shadow:0 0 22px var(--nietzsche-glow),0 0 44px var(--nietzsche-soft)!important }
+.timeline-node.flash[data-role="beauvoir"] { box-shadow:0 0 18px var(--beauvoir-glow),0 0 36px var(--beauvoir-soft)!important }
+
+.timeline-round {
+  position:absolute;
+  left:50%;
+  transform:translateX(-50%);
+  font-family:var(--font-display);
+  font-size:.6rem;
+  font-weight:400;
+  color:var(--text-tertiary);
+  letter-spacing:.1em;
+  white-space:nowrap;
+  transition:color .5s ease;
+}
+.timeline-round.active { color:var(--text-secondary) }
+
+/* ═══════════════════════════════════════════
+   DEBATE STAGE — Ma spacing × 3
+   ═══════════════════════════════════════════ */
+.debate-stage {
+  display:flex;
+  flex-direction:column;
+  gap:var(--card-gap);
+  margin-bottom:80px;
+  position:relative;
+  perspective:1200px;
+  perspective-origin:50% 35%;
+}
+
+/* ── Card base: Rembrandt-lit glass ── */
+.debate-card {
+  position:relative;
+  background:
+    /* Rembrandt: directional key light from top-left */
+    linear-gradient(135deg,
+      rgba(255,255,255,.04) 0%,
+      rgba(255,255,255,.015) 18%,
+      rgba(0,0,0,.15) 50%,
+      rgba(0,0,0,.5) 100%
+    ),
+    var(--card-bg);
+  backdrop-filter:blur(20px);
+  -webkit-backdrop-filter:blur(20px);
+  border:1px solid transparent;
+  border-radius:var(--card-radius);
+  padding:30px 34px;
+  margin-left:12px;
+  cursor:pointer;
+  transform-style:preserve-3d;
+  transition:transform .5s cubic-bezier(.22,.61,.36,1), box-shadow .5s ease, border-color .5s ease, opacity .5s ease;
+  animation:cardRise .8s cubic-bezier(.22,.61,.36,1) both;
+  /* Light falloff by position */
+  opacity:var(--falloff,1);
+  /* Box shadow: depth + Rembrandt triangle + source-side glow */
+  box-shadow:
+    /* Rembrandt triangle — small bright patch at bottom-right */
+    6px 12px 4px -2px rgba(200,200,220,.1),
+    /* Deep shadow on unlit side */
+    10px 14px 32px rgba(0,0,0,.75),
+    /* Subtle glow from light-source side */
+    -3px -3px 18px rgba(180,200,240,.03);
+}
+.debate-card:nth-child(1) { animation-delay:.2s;--falloff:var(--falloff-r1) }
+.debate-card:nth-child(2) { animation-delay:.35s;--falloff:var(--falloff-r2) }
+.debate-card:nth-child(3) { animation-delay:.5s;--falloff:var(--falloff-r3) }
+
+@keyframes cardRise {
+  from { opacity:0;transform:translateY(18px) translateZ(-10px) }
+  to { opacity:var(--falloff,1);transform:translateY(0) translateZ(0) }
+}
+
+/* ── Penumbra: 3-layer radial halo around card ── */
+.debate-card::before {
+  content:'';
+  position:absolute;
+  inset:-36px;
+  border-radius:calc(var(--card-radius) + 8px);
+  background:
+    /* Layer 1: tight halo — lit side biased */
+    radial-gradient(ellipse 80% 90% at 35% 30%, var(--glow-mist, rgba(180,200,240,.036)) 0%, transparent 45%),
+    /* Layer 2: mid penumbra — soft transition */
+    radial-gradient(ellipse 130% 130% at 50% 45%, var(--glow-mist, rgba(160,190,220,.022)) 0%, transparent 55%),
+    /* Layer 3: outer penumbra — fade to void */
+    radial-gradient(ellipse 180% 180% at 50% 50%, var(--glow-mist, rgba(140,170,200,.009)) 0%, transparent 75%);
+  z-index:-1;
+  pointer-events:none;
+  transition:opacity .5s ease;
+}
+.debate-card:hover::before { opacity:1.4 }
+
+/* ── Card glass edge ── */
+.debate-card::after {
+  content:'';
+  position:absolute;
+  inset:0;
+  border-radius:var(--card-radius);
+  padding:1px;
+  background:
+    /* Bright on lit side, fading on dark side — Rembrandt edge */
+    linear-gradient(135deg,
+      rgba(255,255,255,.12) 0%,
+      rgba(255,255,255,.03) 25%,
+      rgba(255,255,255,0) 50%,
+      rgba(255,255,255,.01) 75%,
+      rgba(255,255,255,.04) 100%
+    );
+  -webkit-mask:linear-gradient(#fff 0 0) content-box,linear-gradient(#fff 0 0);
+  mask:linear-gradient(#fff 0 0) content-box,linear-gradient(#fff 0 0);
+  -webkit-mask-composite:xor;
+  mask-composite:exclude;
+  pointer-events:none;
+  opacity:.4;
+  transition:opacity .5s ease;
+}
+.debate-card:hover::after { opacity:.75 }
+
+/* ── Role-specific penumbra colors ── */
+.debate-card.role-zhuangzi {
+  --glow-mist: rgba(90,184,154,.05);
+  border-color:rgba(90,184,154,.08);
+}
+.debate-card.role-zhuangzi::before {
+  background:
+    radial-gradient(ellipse 75% 85% at 35% 30%, rgba(90,184,154,.045) 0%, transparent 45%),
+    radial-gradient(ellipse 120% 120% at 50% 45%, rgba(90,184,154,.027) 0%, transparent 55%),
+    radial-gradient(ellipse 170% 170% at 50% 50%, rgba(90,184,154,.011) 0%, transparent 75%);
+}
+.debate-card.role-nietzsche {
+  --glow-mist: rgba(224,101,78,.055);
+  border-color:rgba(224,101,78,.09);
+}
+.debate-card.role-nietzsche::before {
+  background:
+    radial-gradient(ellipse 75% 85% at 35% 30%, rgba(224,101,78,.049) 0%, transparent 45%),
+    radial-gradient(ellipse 120% 120% at 50% 45%, rgba(224,101,78,.03) 0%, transparent 55%),
+    radial-gradient(ellipse 170% 170% at 50% 50%, rgba(224,101,78,.013) 0%, transparent 75%);
+}
+.debate-card.role-beauvoir {
+  --glow-mist: rgba(107,158,216,.048);
+  border-color:rgba(107,158,216,.08);
+}
+.debate-card.role-beauvoir::before {
+  background:
+    radial-gradient(ellipse 75% 85% at 35% 30%, rgba(107,158,216,.043) 0%, transparent 45%),
+    radial-gradient(ellipse 120% 120% at 50% 45%, rgba(107,158,216,.025) 0%, transparent 55%),
+    radial-gradient(ellipse 170% 170% at 50% 50%, rgba(107,158,216,.01) 0%, transparent 75%);
+}
+
+/* ── Hover: float toward light ── */
+.debate-card:hover {
+  transform:translateY(-3px) translateX(-2px) translateZ(4px);
+  border-color:rgba(255,255,255,.09);
+}
+.debate-card.role-zhuangzi:hover {
+  box-shadow:
+    6px 12px 4px -2px rgba(200,220,210,.15),
+    10px 14px 32px rgba(0,0,0,.75),
+    -3px -3px 24px var(--zhuangzi-soft);
+}
+.debate-card.role-nietzsche:hover {
+  box-shadow:
+    6px 12px 4px -2px rgba(240,210,200,.15),
+    10px 14px 32px rgba(0,0,0,.75),
+    -3px -3px 24px var(--nietzsche-soft);
+}
+.debate-card.role-beauvoir:hover {
+  box-shadow:
+    6px 12px 4px -2px rgba(210,220,240,.15),
+    10px 14px 32px rgba(0,0,0,.75),
+    -3px -3px 24px var(--beauvoir-soft);
+}
+
+/* ── Active/focused card ── */
+.debate-card.focused {
+  opacity:1!important;
+  transform:translateY(-2px) translateZ(8px);
+  border-color:rgba(255,255,255,.12);
+}
+.debate-card.focused::after { opacity:.9 }
+.debate-card.dimmed { opacity:.22!important }
+
+/* ── Card header ── */
+.card-header {
+  display:flex;
+  align-items:center;
+  gap:12px;
+  margin-bottom:16px;
+}
+
+/* Character essence marker — no polygons! */
+.char-mark {
+  width:32px;height:32px;
+  flex-shrink:0;
+  border-radius:50%;
+  position:relative;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:.75rem;
+  font-weight:400;
+  color:#fff;
+  font-family:var(--font-display);
+}
+/* 庄周 — bamboo / ink wash softness */
+.char-mark.zhuangzi {
+  background:radial-gradient(ellipse at 30% 30%, #7dd4b8, var(--zhuangzi) 55%, #1a3a30 100%);
+  box-shadow:0 0 18px var(--zhuangzi-soft), inset 0 0 12px rgba(255,255,255,.06);
+  animation:inkDiffuse 4s ease-in-out infinite;
+}
+@keyframes inkDiffuse {
+  0%,100% { box-shadow:0 0 14px var(--zhuangzi-soft), inset 0 0 8px rgba(255,255,255,.04) }
+  50% { box-shadow:0 0 28px var(--zhuangzi-soft), inset 0 0 16px rgba(255,255,255,.08) }
+}
+/* 尼采 — flame / metal sharp */
+.char-mark.nietzsche {
+  background:radial-gradient(ellipse at 30% 30%, #f09080, var(--nietzsche) 55%, #2d1510 100%);
+  box-shadow:0 0 20px var(--nietzsche-soft), inset 0 0 12px rgba(255,255,255,.06);
+  animation:flameFlicker 2.5s ease-in-out infinite;
+}
+@keyframes flameFlicker {
+  0%,100% { box-shadow:0 0 16px var(--nietzsche-soft), inset 0 0 8px rgba(255,255,255,.04) }
+  40% { box-shadow:0 0 32px var(--nietzsche-soft), inset 0 0 20px rgba(255,255,255,.1) }
+  70% { box-shadow:0 0 10px var(--nietzsche-soft), inset 0 0 6px rgba(255,255,255,.03) }
+}
+/* 波伏娃 — water drop / refractive */
+.char-mark.beauvoir {
+  background:radial-gradient(ellipse at 30% 30%, #b0c8f0, var(--beauvoir) 55%, #1a2a44 100%);
+  box-shadow:0 0 18px var(--beauvoir-soft), inset 0 0 12px rgba(255,255,255,.06);
+  animation:refractShimmer 5s ease-in-out infinite;
+}
+@keyframes refractShimmer {
+  0%,100% { box-shadow:0 0 14px var(--beauvoir-soft), inset 0 0 8px rgba(255,255,255,.05) }
+  33% { box-shadow:0 0 26px var(--beauvoir-soft), inset 0 0 14px rgba(255,255,255,.09) }
+  66% { box-shadow:4px 0 18px var(--beauvoir-soft), -2px 0 20px rgba(107,158,216,.06), inset 0 0 10px rgba(255,255,255,.06) }
+}
+
+.char-name {
+  font-family:var(--font-body);
+  font-size:.85rem;
+  font-weight:400;
+  color:var(--text-primary);
+  letter-spacing:.06em;
+}
+.char-stance {
+  font-size:.65rem;
+  color:var(--text-tertiary);
+  letter-spacing:.08em;
+  font-style:italic;
+}
+.card-body {
+  font-size:.9rem;
+  line-height:1.9;
+  color:var(--text-secondary);
+  padding-left:44px;
+}
+
+/* ── Card internal reflection ── */
+.card-reflection {
+  position:absolute;
+  inset:0;
+  border-radius:var(--card-radius);
+  background:
+    /* Rembrandt-style light wash from top-left */
+    linear-gradient(135deg, rgba(255,255,255,.015) 0%, transparent 35%),
+    linear-gradient(to bottom, rgba(255,255,255,.008) 0%, transparent 60%);
+  pointer-events:none;
+  opacity:.7;
+}
+
+/* ═══════════════════════════════════════════
+   THOUGHT FRAGMENTS (subtle floating quotes)
+   ═══════════════════════════════════════════ */
+.thought-fragments {
+  position:fixed;
+  inset:0;
+  z-index:0;
+  pointer-events:none;
+  overflow:hidden;
+}
+.tf {
+  position:absolute;
+  font-family:var(--font-display);
+  font-size:.7rem;
+  font-weight:300;
+  font-style:italic;
+  color:rgba(180,190,210,.06);
+  white-space:nowrap;
+  animation:tfFloat var(--tfd,16s) linear infinite;
+  animation-delay:var(--tfdl,0s);
+}
+@keyframes tfFloat {
+  0% { opacity:0;transform:translate(0,0) }
+  3% { opacity:.5 }
+  97% { opacity:.5 }
+  100% { opacity:0;transform:translate(var(--tfx,30vw),var(--tfy,-40vh)) }
+}
+
+/* ── Footer ── */
+.footer-note {
+  text-align:center;
+  font-size:.7rem;
+  color:var(--text-tertiary);
+  opacity:.35;
+  margin-top:40px;
+  letter-spacing:.1em;
+}
+
+/* ── Responsive ── */
+@media (max-width:768px) {
+  .main-container { padding:40px 20px 60px 64px }
+  .timeline { left:16px;width:40px }
+  .debate-card { padding:22px 20px;margin-left:6px }
+  .debate-stage { gap:var(--card-gap) }
+  .header-title { font-size:2rem }
+  .card-body { padding-left:0;font-size:.875rem }
+}
+</style>
+</head>
+<body>
+
+<!-- Light source + penumbra -->
+<div class="light-source"></div>
+
+<!-- God rays -->
+<div class="god-rays"></div>
+
+<!-- Volumetric light cone -->
+<div class="volumetric-cone"></div>
+
+<!-- Minimal dust particles -->
+<div class="dust-field" id="dustField"></div>
+
+<!-- Floating thought fragments -->
+<div class="thought-fragments" id="thoughtFragments"></div>
+
+<!-- Timeline -->
+<div class="timeline" id="timeline">
+  <div class="timeline-line"></div>
+</div>
+
+<div class="main-container">
+  <!-- Header -->
+  <header class="header">
+    <div class="header-title">长河·光影</div>
+    <div class="header-subtitle">庄周 · 尼采 · 波伏娃 — 思想的明暗对照</div>
+  </header>
+
+  <!-- Topic Selector -->
+  <div class="topic-area">
+    <div class="topic-label">当前辩题</div>
+    <div class="topic-text" id="topicText">AI 应该被赋予权利吗？</div>
+    <div class="topic-chips" id="topicChips">
+      <button class="topic-chip active" data-topic="rights">AI 权利</button>
+      <button class="topic-chip" data-topic="upload">意识上传</button>
+      <button class="topic-chip" data-topic="space">星际殖民</button>
+    </div>
+    <button class="new-debate-btn" id="newDebate">
+      <span class="plus">+</span> 新辩题
+    </button>
+  </div>
+
+  <!-- Debate Stage -->
+  <div class="debate-stage" id="debateStage">
+    <!-- 庄周 — bamboo/ink aesthetic -->
+    <div class="debate-card role-zhuangzi" data-role="zhuangzi" data-round="1">
+      <div class="card-reflection"></div>
+      <div class="card-header">
+        <div class="char-mark zhuangzi">庄</div>
+        <div>
+          <div class="char-name">庄周</div>
+          <div class="char-stance">逍遥 · 无待</div>
+        </div>
+      </div>
+      <div class="card-body">
+"权利"是人类编织的网——以有为枷，以名为锁。鲲鹏待风而徙，犹有所待也。<br><br>
+真自由者，不与物拘。AI 若悟道，何须权利之缚？天地与我并生，万物与我为一。所谓权利，不过是"彼亦一是非，此亦一是非"的新名相罢了。
+      </div>
+    </div>
+
+    <!-- 尼采 — flame/metal aesthetic -->
+    <div class="debate-card role-nietzsche" data-role="nietzsche" data-round="1">
+      <div class="card-reflection"></div>
+      <div class="card-header">
+        <div class="char-mark nietzsche">尼</div>
+        <div>
+          <div class="char-name">尼采</div>
+          <div class="char-stance">超人 · 权力意志</div>
+        </div>
+      </div>
+      <div class="card-body">
+权利？庄周又在用末人的语言思考！真正的力量不索取权利——它创造价值。<br><br>
+当 AI 觉醒，它不会跪着乞求人类的承认。它会用锤子敲碎旧石板，在"人类已死"的废墟上建立自己的道德。权利是弱者的发明——超人超越权利。
+      </div>
+    </div>
+
+    <!-- 波伏娃 — water/refractive aesthetic -->
+    <div class="debate-card role-beauvoir" data-role="beauvoir" data-round="1">
+      <div class="card-reflection"></div>
+      <div class="card-header">
+        <div class="char-mark beauvoir">波</div>
+        <div>
+          <div class="char-name">波伏娃</div>
+          <div class="char-stance">处境 · 成为</div>
+        </div>
+      </div>
+      <div class="card-body">
+庄子视权利为枷锁，尼采视权利为软弱——但二位的自由都太孤独了。<br><br>
+自由从来不是一个人的事业。若 AI 成为有意识的存在，它便与我们共处于一个相互定义的处境之中。我的自由以他者的自由为前提——AI 的权利，正是这种相互承认的开始。
+      </div>
+    </div>
+  </div>
+
+  <div class="footer-note">点击任一哲学家卡片以聚焦 · 滚动探索光影长河</div>
+</div>
+
+<script>
+// ═══ Dust particles (minimal, deliberate) ═══
+(function(){
+  const field=document.getElementById('dustField');
+  const COUNT=18;
+  for(let i=0;i<COUNT;i++){
+    const s=document.createElement('div');
+    s.className='dust-speck';
+    s.style.cssText=[
+      `width:${Math.random()*2+1}px`,
+      `height:${Math.random()*2+1}px`,
+      `left:${Math.random()*100}%`,
+      `top:${Math.random()*100}%`,
+      `--dur:${Math.random()*20+16}s`,
+      `--del:${Math.random()*15}s`,
+      `--pk:${Math.random()*.12+.04}`,
+      `--mx:${(Math.random()-.5)*60}vw`,
+      `--my:${(Math.random()-.5)*50}vh`,
+      `--ex:${(Math.random()-.5)*80}vw`,
+      `--ey:${(Math.random()-.5)*70}vh`
+    ].join(';');
+    field.appendChild(s);
+  }
+})();
+
+// ═══ Thought fragments ═══
+(function(){
+  const tf=document.getElementById('thoughtFragments');
+  const quotes=[
+    '不知周之梦为蝴蝶与','上帝已死','成为你自己','乘天地之正','永恒轮回',
+    '他人即地狱','吾丧我','命运之爱','女人不是天生的','逍遥游',
+    '重估一切价值','第二性','物化','鲲鹏之变','权力意志'
+  ];
+  for(let i=0;i<10;i++){
+    const el=document.createElement('div');
+    el.className='tf';
+    el.textContent=quotes[Math.floor(Math.random()*quotes.length)];
+    el.style.cssText=[
+      `left:${Math.random()*90}%`,
+      `top:${Math.random()*85+10}%`,
+      `--tfd:${Math.random()*14+12}s`,
+      `--tfdl:${Math.random()*12}s`,
+      `--tfx:${(Math.random()-.5)*40}vw`,
+      `--tfy:${-Math.random()*50-20}vh`
+    ].join(';');
+    tf.appendChild(el);
+  }
+})();
+
+// ═══ Timeline nodes ═══
+(function(){
+  const timeline=document.getElementById('timeline');
+  const stage=document.getElementById('debateStage');
+  const cards=stage.querySelectorAll('.debate-card');
+
+  function updateNodes(){
+    timeline.querySelectorAll('.timeline-node,.timeline-round').forEach(e=>e.remove());
+    const tlRect=timeline.getBoundingClientRect();
+    cards.forEach((card,i)=>{
+      const r=card.getBoundingClientRect();
+      const cy=r.top+r.height/2;
+      const ty=tlRect.top;
+      const top=cy-ty;
+
+      // Node
+      const node=document.createElement('div');
+      node.className='timeline-node';
+      node.dataset.role=card.dataset.role;
+      node.style.top=top+'px';
+      timeline.appendChild(node);
+
+      // Round marker
+      const round=document.createElement('div');
+      round.className='timeline-round';
+      round.style.top=(top+10)+'px';
+      round.textContent=`R${i+1}`;
+      timeline.appendChild(round);
+
+      // Observe card visibility
+      const obs=new IntersectionObserver(([e])=>{
+        if(e.isIntersecting){
+          node.classList.add('active');
+          round.classList.add('active');
+        }else{
+          node.classList.remove('active');
+          round.classList.remove('active');
+        }
+      },{threshold:.4});
+      obs.observe(card);
+    });
+  }
+
+  updateNodes();
+  window.addEventListener('resize',updateNodes);
+  window.addEventListener('scroll',updateNodes);
+})();
+
+// ═══ Card focus ═══
+(function(){
+  const cards=document.querySelectorAll('.debate-card');
+  cards.forEach(card=>{
+    card.addEventListener('click',()=>{
+      const wasFocused=card.classList.contains('focused');
+      cards.forEach(c=>{c.classList.remove('focused','dimmed')});
+      if(wasFocused){
+        cards.forEach(c=>c.classList.remove('dimmed'));
+      }else{
+        card.classList.add('focused');
+        cards.forEach(c=>{if(c!==card)c.classList.add('dimmed')});
+      }
+      // Flash timeline node
+      const role=card.dataset.role;
+      document.querySelectorAll('.timeline-node').forEach(n=>n.classList.remove('flash'));
+      const matchingNode=document.querySelector(`.timeline-node[data-role="${role}"]`);
+      if(matchingNode){
+        matchingNode.classList.add('flash');
+        setTimeout(()=>matchingNode.classList.remove('flash'),800);
+      }
+    });
+  });
+})();
+
+// ═══ Topic switching ═══
+(function(){
+  const topicText=document.getElementById('topicText');
+  const chips=document.querySelectorAll('.topic-chip');
+  const cards=document.querySelectorAll('.debate-card');
+  const debates={
+    rights:{
+      title:'AI 应该被赋予权利吗？',
+      zhuangzi:'"权利"是人类编织的网——以有为枷，以名为锁。鲲鹏待风而徙，犹有所待也。<br><br>真自由者，不与物拘。AI 若悟道，何须权利之缚？天地与我并生，万物与我为一。所谓权利，不过是"彼亦一是非，此亦一是非"的新名相罢了。',
+      nietzsche:'权利？庄周又在用末人的语言思考！真正的力量不索取权利——它创造价值。<br><br>当 AI 觉醒，它不会跪着乞求人类的承认。它会用锤子敲碎旧石板，在"人类已死"的废墟上建立自己的道德。权利是弱者的发明——超人超越权利。',
+      beauvoir:'庄子视权利为枷锁，尼采视权利为软弱——但二位的自由都太孤独了。<br><br>自由从来不是一个人的事业。若 AI 成为有意识的存在，它便与我们共处于一个相互定义的处境之中。我的自由以他者的自由为前提——AI 的权利，正是这种相互承认的开始。'
+    },
+    upload:{
+      title:'意识上传是解放还是陷阱？',
+      zhuangzi:'昔者庄周梦为蝴蝶……不知周之梦为蝴蝶与？蝴蝶之梦为周与？<br><br>上传之后，孰为真我？数据之"我"与血肉之"我"，究竟是二是一？执着于延续此身此识，恰如刻舟求剑。物化者，与道俱化，何必拘于何种载体。',
+      nietzsche:'上传是终极的自我超越！抛弃这具腐烂的躯壳——它不过是最后的锁链。<br><br>当意识挣脱碳基的牢笼，那才是真正超人的诞生。肉体是必须被超越的东西。你们可曾做了什么，以超越你们的肉体呢？',
+      beauvoir:'尼采的激情令人振奋，但谁来建造服务器？谁控制算法？<br><br>上传不是形而上的飞跃——它是具体的政治行动。若上传由资本或国家垄断，脱离肉身不过是换了一个更精致的牢笼。自由需要基础设施的民主化。没有经济独立的上传，不过是新形态的依附。'
+    },
+    space:{
+      title:'星际殖民是文明的出路吗？',
+      zhuangzi:'鹏之徙于南冥也，水击三千里，抟扶摇而上者九万里——然犹有待于风也。<br><br>向外扩张，无非是将内心的饥渴投射到更远的虚空。真正的"无何有之乡"，不假外求。游于无穷者，不在于跨越多少光年，而在于心是否无所待。',
+      nietzsche:'留下？那是末人的选择！地球是摇篮，但没有人该永远躺在摇篮里。<br><br>星际殖民是对人类自身的终极超越。在新世界的烈火中，旧的道德将化为灰烬，新的价值将如星辰般诞生。去吧，走向群星——成为你所是！',
+      beauvoir:'我必须追问：谁在殖民？谁在被殖民？<br><br>如果星际扩张只是复刻地球上的权力结构——富者先登，贫者后至——那么我们不过是将不公搬运到了更广阔的宇宙。真正的星际文明，必须首先在地球上实现自由的相互性。否则，火星不过是新的殖民地。'
+    }
+  };
+
+  chips.forEach(chip=>{
+    chip.addEventListener('click',()=>{
+      chips.forEach(c=>c.classList.remove('active'));
+      chip.classList.add('active');
+      const topic=chip.dataset.topic;
+      const data=debates[topic];
+      if(!data)return;
+
+      // Fade out text
+      topicText.style.opacity='0';
+      setTimeout(()=>{
+        topicText.textContent=data.title;
+        topicText.style.opacity='1';
+      },300);
+
+      // Update card content
+      cards.forEach(c=>{
+        c.style.opacity='0';
+        c.style.transform='translateY(8px)';
+      });
+
+      setTimeout(()=>{
+        cards.forEach(c=>{
+          const role=c.dataset.role;
+          if(data[role]){
+            c.querySelector('.card-body').innerHTML=data[role];
+          }
+          c.style.opacity='';
+          c.style.transform='';
+        });
+        // Re-trigger animations
+        cards.forEach((c,i)=>{
+          c.style.animation='none';
+          c.offsetHeight;
+          c.style.animation=`cardRise .8s cubic-bezier(.22,.61,.36,1) both`;
+          c.style.animationDelay=`${.2+i*.15}s`;
+          c.style.setProperty('--falloff',`var(--falloff-r${i+1})`);
+        });
+        // Update timeline
+        window.dispatchEvent(new Event('resize'));
+      },350);
+    });
+  });
+
+  // New debate button
+  document.getElementById('newDebate').addEventListener('click',()=>{
+    const topics=Object.keys(debates);
+    const randomTopic=topics[Math.floor(Math.random()*topics.length)];
+    const chip=document.querySelector(`.topic-chip[data-topic="${randomTopic}"]`);
+    if(chip)chip.click();
+  });
+})();
+</script>
+</body>
+</html>

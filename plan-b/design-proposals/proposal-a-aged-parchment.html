@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Debate Arena — 古卷轴 Aged Parchment</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@300;400;600;700&family=Ma+Shan+Zheng&display=swap" rel="stylesheet">
+<style>
+:root {
+  --parchment-base: #f4e4c1;
+  --parchment-dark: #e8d5a3;
+  --parchment-deep: #d4b896;
+  --ink-color: #2c1810;
+  --ink-light: #3d2b1f;
+  --ink-faded: #6b5a4e;
+  --seal-red: #8b2500;
+  --gold-accent: #b8860b;
+  --card-bg: #faf0dc;
+  --shadow-soft: rgba(44,24,16,0.12);
+  --shadow-deep: rgba(44,24,16,0.25);
+  --noise-opacity: 0.12;
+  --vignette-strength: 0.45;
+  --fiber-frequency: 0.5;
+  --font-body: 'Noto Serif SC', 'STSong', 'SimSun', serif;
+  --font-display: 'Ma Shan Zheng', 'Noto Serif SC', cursive;
+  --font-mono: 'Noto Serif SC', monospace;
+}
+* { margin:0; padding:0; box-sizing:border-box; }
+body {
+  font-family: var(--font-body);
+  background: var(--parchment-base);
+  color: var(--ink-color);
+  min-height: 100vh;
+  position: relative;
+  overflow-x: hidden;
+}
+/* === SVG FILTERS === */
+.filters { position:absolute; width:0; height:0; }
+/* === NOISE OVERLAY === */
+body::before {
+  content: '';
+  position: fixed; inset:0; z-index:1; pointer-events:none;
+  background: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.5' numOctaves='5' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.15'/%3E%3C/svg%3E");
+  opacity: var(--noise-opacity);
+  mix-blend-mode: multiply;
+}
+/* === RADIAL VIGNETTE === */
+body::after {
+  content: '';
+  position: fixed; inset:0; z-index:2; pointer-events:none;
+  background: radial-gradient(ellipse at center, transparent 40%, rgba(44,24,16,0.35) 70%, rgba(44,24,16,0.55) 100%);
+}
+/* === INK STAIN SPOTS === */
+.ink-stains {
+  position: fixed; inset:0; z-index:0; pointer-events:none;
+  background:
+    radial-gradient(ellipse 180px 120px at 15% 20%, rgba(44,24,16,0.04) 0%, transparent 70%),
+    radial-gradient(ellipse 220px 100px at 78% 65%, rgba(44,24,16,0.03) 0%, transparent 70%),
+    radial-gradient(ellipse 140px 160px at 85% 12%, rgba(44,24,16,0.05) 0%, transparent 70%),
+    radial-gradient(ellipse 160px 90px at 30% 80%, rgba(44,24,16,0.03) 0%, transparent 70%);
+}
+/* === MAIN CONTAINER === */
+.app { position:relative; z-index:5; max-width:1400px; margin:0 auto; padding:20px 32px; }
+/* === HEADER === */
+.header {
+  text-align:center; padding:36px 20px 20px;
+  position:relative;
+  border-bottom: 2px solid var(--ink-faded);
+  margin-bottom: 32px;
+}
+.header::after {
+  content: '';
+  position:absolute; bottom:-6px; left:50%; transform:translateX(-50%);
+  width: 60px; height: 4px;
+  background: var(--seal-red);
+  border-radius: 2px;
+}
+.header h1 {
+  font-family: var(--font-display);
+  font-size: 2.6rem;
+  color: var(--ink-color);
+  letter-spacing: 0.15em;
+  margin-bottom: 6px;
+}
+.header .subtitle {
+  font-size: 0.92rem;
+  color: var(--ink-faded);
+  letter-spacing: 0.3em;
+  font-family: var(--font-body);
+}
+.seal {
+  display:inline-block; width:44px; height:44px;
+  border: 3px solid var(--seal-red);
+  border-radius: 4px;
+  color: var(--seal-red);
+  font-family: var(--font-display);
+  font-size: 1.4rem;
+  line-height:38px;
+  text-align:center;
+  margin:0 12px;
+  transform: rotate(-5deg);
+  opacity:0.7;
+}
+/* === TOPIC INPUT === */
+.topic-bar {
+  display:flex; gap:12px; align-items:center;
+  margin-bottom: 28px;
+  background: var(--card-bg);
+  padding: 12px 20px;
+  border: 1px solid var(--parchment-deep);
+  box-shadow: 2px 2px 0 var(--shadow-soft), inset 0 1px 3px rgba(44,24,16,0.06);
+}
+.topic-bar .icon-debate {
+  font-family: var(--font-display);
+  font-size: 1.5rem;
+  color: var(--seal-red);
+  flex-shrink: 0;
+}
+.topic-input {
+  flex:1;
+  border: none;
+  background: transparent;
+  font-family: var(--font-body);
+  font-size: 1.05rem;
+  color: var(--ink-color);
+  padding: 8px 4px;
+  outline: none;
+}
+.topic-input::placeholder { color: var(--ink-faded); font-style:italic; }
+.topic-btn {
+  background: var(--ink-color);
+  color: var(--parchment-base);
+  border: none;
+  padding: 10px 24px;
+  font-family: var(--font-display);
+  font-size: 1rem;
+  cursor: pointer;
+  letter-spacing: 0.1em;
+  transition: all 0.25s;
+}
+.topic-btn:hover { background: var(--seal-red); transform: translateY(-1px); box-shadow: 0 4px 12px rgba(139,37,0,0.3); }
+/* === LAYOUT === */
+.main-layout { display:flex; gap:24px; align-items:flex-start; }
+.debate-grid { flex:1; display:grid; grid-template-columns: repeat(3, 1fr); gap:20px; }
+.sidebar { width:260px; flex-shrink:0; }
+/* === DEBATE CARDS === */
+.debate-card {
+  background: var(--card-bg);
+  border: 1px solid var(--parchment-deep);
+  padding: 24px 20px 20px;
+  position: relative;
+  transition: all 0.35s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  box-shadow:
+    2px 2px 0 var(--shadow-soft),
+    4px 4px 8px rgba(44,24,16,0.06);
+}
+.debate-card::before {
+  content: '';
+  position:absolute; inset:0; pointer-events:none; z-index:0;
+  background: url("data:image/svg+xml,%3Csvg viewBox='0 0 128 128' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='cf'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.7' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23cf)' opacity='0.08'/%3E%3C/svg%3E");
+  mix-blend-mode: multiply;
+  transition: opacity 0.4s;
+}
+.debate-card:hover { transform: translateY(-3px) scale(1.015); box-shadow: 3px 3px 0 var(--shadow-deep), 6px 8px 16px rgba(44,24,16,0.12); }
+.debate-card:hover::before { opacity:0.14; }
+.debate-card .card-header {
+  position:relative; z-index:1;
+  display:flex; align-items:center; gap:10px;
+  margin-bottom: 14px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--parchment-deep);
+}
+.card-avatar {
+  width:44px; height:44px; border-radius:50%;
+  display:flex; align-items:center; justify-content:center;
+  font-family: var(--font-display);
+  font-size: 1.4rem;
+  flex-shrink:0;
+}
+.card-avatar.zhuangzi { background: #e8d5c8; color: #5b3a29; border:2px solid #c4a88c; }
+.card-avatar.nietzsche { background: #d0cfc8; color: #2c2c2c; border:2px solid #888; }
+.card-avatar.beauvoir { background: #d4c8d8; color: #3d2b4a; border:2px solid #9b8ea8; }
+.card-name {
+  font-family: var(--font-display);
+  font-size: 1.2rem;
+  color: var(--ink-color);
+}
+.card-role { font-size:0.78rem; color:var(--ink-faded); }
+.debate-card .card-body {
+  position:relative; z-index:1;
+  font-size:0.93rem; line-height:1.75;
+  color: var(--ink-light);
+}
+.debate-card .card-body p { margin-bottom:8px; }
+.debate-card .card-body .quote {
+  border-left: 3px solid var(--seal-red);
+  padding-left: 12px;
+  margin: 8px 0;
+  font-style: italic;
+  color: var(--ink-faded);
+  font-size:0.88rem;
+}
+.debate-card .card-stance {
+  margin-top:14px; padding-top:10px;
+  border-top: 1px dotted var(--parchment-deep);
+  font-size:0.82rem;
+  color: var(--seal-red);
+  font-family: var(--font-display);
+}
+/* === SIDEBAR HEATMAP === */
+.sidebar {
+  background: var(--card-bg);
+  border: 1px solid var(--parchment-deep);
+  padding: 20px;
+  box-shadow: 2px 2px 0 var(--shadow-soft);
+}
+.sidebar h3 {
+  font-family: var(--font-display);
+  font-size: 1.15rem;
+  color: var(--ink-color);
+  margin-bottom: 16px;
+  text-align:center;
+  letter-spacing:0.08em;
+}
+.heatmap-bar {
+  margin-bottom:14px;
+}
+.heatmap-label {
+  display:flex; justify-content:space-between;
+  font-size:0.8rem;
+  color: var(--ink-faded);
+  margin-bottom:4px;
+}
+.heatmap-track {
+  height:8px; background: var(--parchment-dark);
+  border-radius:1px;
+  overflow:hidden;
+}
+.heatmap-fill {
+  height:100%; border-radius:1px;
+  transition: width 0.6s ease;
+}
+.heatmap-fill.agree { background: linear-gradient(90deg, #b8860b, #d4a843); }
+.heatmap-fill.disagree { background: linear-gradient(90deg, var(--seal-red), #c06040); }
+.heatmap-fill.neutral { background: linear-gradient(90deg, var(--ink-faded), #8a7a6a); }
+.sidebar .insight-box {
+  margin-top:20px; padding:14px;
+  background: rgba(184,134,11,0.08);
+  border-left: 3px solid var(--gold-accent);
+  font-size:0.82rem; color: var(--ink-faded);
+  line-height:1.6;
+}
+/* === RESPONSIVE === */
+@media (max-width:1024px) {
+  .main-layout { flex-direction:column; }
+  .sidebar { width:100%; }
+  .debate-grid { grid-template-columns:1fr; }
+}
+</style>
+</head>
+<body>
+<div class="ink-stains"></div>
+<div class="app">
+  <header class="header">
+    <span class="seal">辩</span>
+    <h1>道 法 自 然</h1>
+    <div class="subtitle">—— 三子辩场 · 古卷轴 ——</div>
+  </header>
+
+  <div class="topic-bar">
+    <span class="icon-debate">论</span>
+    <input class="topic-input" placeholder="输入辩题..." value="自由意志是否存在？">
+    <button class="topic-btn">开 辩</button>
+  </div>
+
+  <div class="main-layout">
+    <div class="debate-grid">
+      <!-- ZHUANGZI -->
+      <div class="debate-card" style="--card-accent:#5b3a29">
+        <div class="card-header">
+          <div class="card-avatar zhuangzi">庄</div>
+          <div>
+            <div class="card-name">庄周</div>
+            <div class="card-role">道家 · 逍遥游</div>
+          </div>
+        </div>
+        <div class="card-body">
+          <p>夫自由者，非外求可得也。北冥有鱼，化而为鹏，海运则将徙于南冥——此非外力所驱，乃天性使然。</p>
+          <div class="quote">"若夫乘天地之正，而御六气之辩，以游无穷者，彼且恶乎待哉？"</div>
+          <p>世人以为自由在择，吾以为自由在忘。忘是非，忘彼此，乃至忘我。既已忘矣，何来束缚？何来命运之桎梏？</p>
+        </div>
+        <div class="card-stance">立场：自由即天人合一，非选择而在无待</div>
+      </div>
+
+      <!-- NIETZSCHE -->
+      <div class="debate-card" style="--card-accent:#2c2c2c">
+        <div class="card-header">
+          <div class="card-avatar nietzsche">尼</div>
+          <div>
+            <div class="card-name">尼采</div>
+            <div class="card-role">超人哲学 · 权力意志</div>
+          </div>
+        </div>
+        <div class="card-body">
+          <p>庄子君，汝之"逍遥"不过是一种精致的逃避——东方版的虚无主义披上了诗意的外衣。</p>
+          <div class="quote">"人是一条绳索，架在动物与超人之间——一条悬于深渊之上的绳索。"</div>
+          <p>自由不是"忘我"，而是"成为你自己"！命运？是的——但那是 Amor fati，热爱你的命运，将其转化为你的意志！</p>
+        </div>
+        <div class="card-stance">立场：自由即自我超越，命运乃意志之材料</div>
+      </div>
+
+      <!-- BEAUVOIR -->
+      <div class="debate-card" style="--card-accent:#3d2b4a">
+        <div class="card-header">
+          <div class="card-avatar beauvoir">波</div>
+          <div>
+            <div class="card-name">波伏娃</div>
+            <div class="card-role">存在主义 · 第二性</div>
+          </div>
+        </div>
+        <div class="card-body">
+          <p>二位先生的"自由"都太过——奢侈了。庄子的无待、尼采的超人，似乎都忽略了一个简单的事实：人并非生而自由，而是"成为"自由的。</p>
+          <div class="quote">"一个人不是天生成为女人，而是变成女人的。"</div>
+          <p>处境塑造我们——性别、阶级、历史。自由从来不是起点，而是一场抗争，一次在具体处境中的行动。</p>
+        </div>
+        <div class="card-stance">立场：自由寓于处境之中，通过行动创造</div>
+      </div>
+    </div>
+
+    <aside class="sidebar">
+      <h3>辩论张力热力图</h3>
+      <div class="heatmap-bar">
+        <div class="heatmap-label"><span>庄周 · 自然论</span><span>78%</span></div>
+        <div class="heatmap-track"><div class="heatmap-fill agree" style="width:78%"></div></div>
+      </div>
+      <div class="heatmap-bar">
+        <div class="heatmap-label"><span>尼采 · 超越论</span><span>92%</span></div>
+        <div class="heatmap-track"><div class="heatmap-fill disagree" style="width:92%"></div></div>
+      </div>
+      <div class="heatmap-bar">
+        <div class="heatmap-label"><span>波伏娃 · 处境论</span><span>65%</span></div>
+        <div class="heatmap-track"><div class="heatmap-fill neutral" style="width:65%"></div></div>
+      </div>
+      <div class="insight-box">
+        <strong>本场洞察</strong><br>
+        庄周与尼采在"自我"的理解上形成最尖锐的对立——东方消解自我与西方强化自我，构成辩论的核心张力。波伏娃则从具体性切入，为这场形而上学之争提供了第三条道路。
+      </div>
+    </aside>
+  </div>
+</div>
+</body>
+</html>

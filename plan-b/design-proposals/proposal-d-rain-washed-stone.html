@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Debate Arena — 雨后青石 Rain-washed Stone</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@300;400;500;700&family=ZCOOL+XiaoWei&display=swap" rel="stylesheet">
+<style>
+:root {
+  --stone-deep: #1c2428;
+  --stone-mid: #2a353a;
+  --stone-surface: #35424a;
+  --stone-light: #4a5863;
+  --wet-highlight: #5a6e7a;
+  --moss-green: #5b8c5a;
+  --moss-light: #7aaa78;
+  --water-cyan: #6ba4b8;
+  --text-stone: #c8d6d8;
+  --text-dim: #8a9ea4;
+  --ink-brush: #1a2a20;
+  --noise-freq-high: 0.8;
+  --noise-freq-mid: 0.4;
+  --noise-freq-low: 0.15;
+  --font-body: 'Noto Serif SC', serif;
+  --font-brush: 'ZCOOL XiaoWei', 'Noto Serif SC', serif;
+}
+* { margin:0; padding:0; box-sizing:border-box; }
+body {
+  font-family: var(--font-body);
+  background: var(--stone-deep);
+  color: var(--text-stone);
+  min-height:100vh;
+  overflow-x:hidden;
+}
+/* === STONE TEXTURE LAYERS === */
+body::before {
+  content:'';
+  position:fixed; inset:0; z-index:1; pointer-events:none;
+  background: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='stone-coarse'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.15' numOctaves='5' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23stone-coarse)' opacity='0.2'/%3E%3C/svg%3E");
+  mix-blend-mode: overlay;
+  opacity:0.06;
+}
+.mid-texture {
+  position:fixed; inset:0; z-index:2; pointer-events:none;
+  background: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='stone-mid'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.4' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23stone-mid)' opacity='0.14'/%3E%3C/svg%3E");
+  mix-blend-mode: soft-light;
+  opacity:0.07;
+}
+.high-texture {
+  position:fixed; inset:0; z-index:3; pointer-events:none;
+  background: url("data:image/svg+xml,%3Csvg viewBox='0 0 150 150' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='stone-fine'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23stone-fine)' opacity='0.06'/%3E%3C/svg%3E");
+  mix-blend-mode: overlay;
+  opacity:0.04;
+}
+/* === WATER STAIN SPOTS === */
+body::after {
+  content:'';
+  position:fixed; inset:0; z-index:4; pointer-events:none;
+  background:
+    radial-gradient(ellipse 300px 200px at 25% 30%, rgba(107,164,184,0.06) 0%, transparent 60%),
+    radial-gradient(ellipse 250px 180px at 70% 70%, rgba(107,164,184,0.04) 0%, transparent 60%),
+    radial-gradient(ellipse 200px 140px at 85% 15%, rgba(90,110,122,0.05) 0%, transparent 55%),
+    radial-gradient(ellipse 1200px 400px at 50% 100%, rgba(0,0,0,0.4) 0%, transparent 70%);
+}
+/* === MAIN === */
+.app { position:relative; z-index:6; max-width:1400px; margin:0 auto; padding:24px 32px; }
+/* === HEADER === */
+.header {
+  text-align:center; padding:40px 20px 24px;
+  border-bottom: 1px solid rgba(91,140,90,0.15);
+  margin-bottom:28px;
+  position:relative;
+}
+.header h1 {
+  font-family: var(--font-brush);
+  font-size:2.8rem;
+  font-weight:400;
+  color: var(--text-stone);
+  letter-spacing:0.18em;
+  text-shadow: 0 2px 8px rgba(0,0,0,0.4);
+}
+.header h1 .accent {
+  color: var(--moss-green);
+}
+.header .subtitle {
+  font-size:0.85rem;
+  letter-spacing:0.3em;
+  color: var(--text-dim);
+  font-family: var(--font-body);
+  margin-top:8px;
+}
+.header .rain-drop {
+  display:inline-block; width:4px; height:8px;
+  background: var(--water-cyan);
+  border-radius:2px 2px 50% 50%;
+  margin:0 8px;
+  opacity:0.5;
+  vertical-align:middle;
+}
+/* === TOPIC BAR === */
+.topic-bar {
+  display:flex; gap:12px; align-items:center;
+  margin-bottom:28px;
+  background: var(--stone-mid);
+  padding:14px 20px;
+  border: 1px solid rgba(91,140,90,0.1);
+  box-shadow: inset 0 2px 6px rgba(0,0,0,0.2), 0 1px 0 rgba(255,255,255,0.03);
+}
+.topic-bar .brush-icon {
+  font-family: var(--font-brush);
+  font-size:1.3rem;
+  color: var(--moss-green);
+}
+.topic-input {
+  flex:1; border:none; background:transparent;
+  font-family: var(--font-brush);
+  font-size:1.05rem;
+  color: var(--text-stone);
+  padding:8px 4px;
+  outline:none;
+}
+.topic-input::placeholder { color:var(--text-dim); }
+.topic-btn {
+  background: transparent;
+  color: var(--moss-green);
+  border: 1px solid var(--moss-green);
+  padding:8px 22px;
+  font-family: var(--font-brush);
+  font-size:0.95rem;
+  letter-spacing:0.08em;
+  cursor:pointer;
+  transition: all 0.35s;
+}
+.topic-btn:hover {
+  background: rgba(91,140,90,0.1);
+  box-shadow: 0 0 16px rgba(91,140,90,0.15);
+  color: var(--moss-light);
+}
+/* === LAYOUT === */
+.main-layout { display:flex; gap:24px; align-items:flex-start; }
+.debate-grid { flex:1; display:grid; grid-template-columns: repeat(3, 1fr); gap:20px; }
+.sidebar { width:260px; flex-shrink:0; }
+/* === CARDS === */
+.debate-card {
+  background: linear-gradient(170deg, var(--stone-surface), var(--stone-mid));
+  border: 1px solid rgba(255,255,255,0.04);
+  padding: 22px 18px 18px;
+  position:relative;
+  transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  box-shadow:
+    0 6px 24px rgba(0,0,0,0.35),
+    0 1px 0 rgba(255,255,255,0.02) inset;
+  overflow:hidden;
+}
+.debate-card::before {
+  content:'';
+  position:absolute; inset:0; z-index:0; pointer-events:none;
+  background: url("data:image/svg+xml,%3Csvg viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='cs'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.7' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23cs)' opacity='0.08'/%3E%3C/svg%3E");
+  mix-blend-mode: overlay;
+  transition: opacity 0.4s;
+}
+.debate-card::after {
+  content:'';
+  position:absolute; top:0; left:10%; right:10%; height:1px; z-index:1;
+  background: linear-gradient(90deg, transparent, rgba(107,164,184,0.2), transparent);
+}
+.debate-card:hover {
+  transform: translateY(-4px);
+  border-color: rgba(91,140,90,0.3);
+  box-shadow:
+    0 10px 32px rgba(0,0,0,0.45),
+    0 2px 0 rgba(107,164,184,0.05) inset,
+    0 0 30px rgba(91,140,90,0.05);
+}
+.debate-card:hover::before { opacity:0.11; }
+.debate-card .card-header {
+  position:relative; z-index:1;
+  display:flex; align-items:center; gap:10px;
+  margin-bottom:14px;
+  padding-bottom:10px;
+  border-bottom: 1px solid rgba(255,255,255,0.05);
+}
+.card-avatar {
+  width:42px; height:42px;
+  display:flex; align-items:center; justify-content:center;
+  font-family: var(--font-brush);
+  font-size:1.1rem;
+  border:1px solid;
+  flex-shrink:0;
+}
+.card-avatar.z { color:var(--moss-green); border-color:var(--moss-green); background:rgba(91,140,90,0.08); }
+.card-avatar.n { color:var(--water-cyan); border-color:var(--water-cyan); background:rgba(107,164,184,0.08); }
+.card-avatar.b { color:var(--text-dim); border-color:var(--text-dim); background:rgba(138,158,164,0.08); }
+.card-name { font-family:var(--font-brush); font-size:1.1rem; color:var(--text-stone); }
+.card-role { font-size:0.72rem; color:var(--text-dim); }
+.debate-card .card-body { position:relative; z-index:1; font-size:0.88rem; line-height:1.8; color:var(--text-stone); }
+.debate-card .card-body p { margin-bottom:8px; }
+.debate-card .card-body .quote {
+  border-left: 2px solid var(--moss-green);
+  padding: 6px 12px;
+  margin: 8px 0;
+  color: var(--text-dim);
+  font-size:0.85rem;
+}
+.debate-card .card-stance {
+  margin-top:12px; padding-top:8px;
+  border-top: 1px solid rgba(255,255,255,0.04);
+  font-size:0.78rem; color:var(--moss-green);
+}
+/* === SIDEBAR === */
+.sidebar {
+  background: linear-gradient(170deg, var(--stone-surface), var(--stone-mid));
+  border: 1px solid rgba(255,255,255,0.04);
+  padding:20px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+}
+.sidebar h3 {
+  font-family: var(--font-brush);
+  font-size:1.05rem;
+  color: var(--text-stone);
+  margin-bottom:16px;
+  text-align:center;
+  letter-spacing:0.1em;
+}
+.heatmap-bar { margin-bottom:12px; }
+.heatmap-label {
+  display:flex; justify-content:space-between;
+  font-size:0.72rem; color:var(--text-dim);
+  margin-bottom:4px;
+}
+.heatmap-track {
+  height:5px; background: var(--stone-deep);
+  overflow:hidden;
+}
+.heatmap-fill { height:100%; transition:width 0.6s ease; }
+.heatmap-fill.green { background: linear-gradient(90deg, var(--moss-green), var(--moss-light)); }
+.heatmap-fill.blue { background: linear-gradient(90deg, var(--water-cyan), #8cc4d4); }
+.heatmap-fill.grey { background: linear-gradient(90deg, var(--stone-light), var(--wet-highlight)); }
+.sidebar .insight-box {
+  margin-top:18px; padding:14px;
+  border-left: 2px solid var(--moss-green);
+  background: rgba(91,140,90,0.05);
+  font-size:0.78rem; color:var(--text-dim);
+  line-height:1.7;
+}
+@media (max-width:1024px) {
+  .main-layout { flex-direction:column }
+  .sidebar { width:100% }
+  .debate-grid { grid-template-columns:1fr }
+}
+</style>
+</head>
+<body>
+<div class="mid-texture"></div>
+<div class="high-texture"></div>
+<div class="app">
+  <header class="header">
+    <h1><span class="accent">青</span>石<span class="accent">问</span>道</h1>
+    <div class="subtitle"><span class="rain-drop"></span> 雨后青石 · Rain-washed Stone <span class="rain-drop"></span></div>
+  </header>
+
+  <div class="topic-bar">
+    <span class="brush-icon">墨</span>
+    <input class="topic-input" placeholder="砚池待墨..." value="自由意志是否存在？">
+    <button class="topic-btn">落 笔</button>
+  </div>
+
+  <div class="main-layout">
+    <div class="debate-grid">
+      <div class="debate-card">
+        <div class="card-header">
+          <div class="card-avatar z">庄</div>
+          <div>
+            <div class="card-name">庄周</div>
+            <div class="card-role">道法自然</div>
+          </div>
+        </div>
+        <div class="card-body">
+          <p>泉涸，鱼相与处于陆，相呴以湿，相濡以沫，不如相忘于江湖。与其誉尧而非桀，不如两忘而化其道。</p>
+          <div class="quote">"天地与我并生，而万物与我为一。"</div>
+          <p>世人争辩自由与命运，犹如鱼在干涸的车辙中相濡以沫。何不跃入大江大海，消融了这个问题本身？</p>
+        </div>
+        <div class="card-stance">立场：齐物而忘，自由即与道合一</div>
+      </div>
+
+      <div class="debate-card">
+        <div class="card-header">
+          <div class="card-avatar n">尼</div>
+          <div>
+            <div class="card-name">尼采</div>
+            <div class="card-role">锤子哲学</div>
+          </div>
+        </div>
+        <div class="card-body">
+          <p>"相忘于江湖"？多么优雅的自杀！将个体消融于所谓的"道"，不过是对生命本身的叛逃。</p>
+          <div class="quote">"凡杀不死我的，必使我更强大。"</div>
+          <p>自由不是"忘"，而是"记"——记起你是一根绷紧的弓弦，记起你必须射出自己的箭。命运只是弓，而你是箭。</p>
+        </div>
+        <div class="card-stance">立场：自由就是成为你自己，超越一切既定</div>
+      </div>
+
+      <div class="debate-card">
+        <div class="card-header">
+          <div class="card-avatar b">波</div>
+          <div>
+            <div class="card-name">波伏娃</div>
+            <div class="card-role">处境之思</div>
+          </div>
+        </div>
+        <div class="card-body">
+          <p>庄周的"江湖"何其辽阔，尼采的"弓弦"何其紧绷——但二位似乎都忘记了一件事：并不是每个人都有资格"忘"，也不是每个人都有力量"射"。</p>
+          <div class="quote">"解放必须是集体的，否则它不过是压迫的另一种形式。"</div>
+          <p>自由从来不是一个人能独自抵达的地方。它发生在关系之中，在行动之中，在拒绝接受"既定命运"的那一刻。</p>
+        </div>
+        <div class="card-stance">立场：自由在具体处境中通过行动实现</div>
+      </div>
+    </div>
+
+    <aside class="sidebar">
+      <h3>石 纹 张 力</h3>
+      <div class="heatmap-bar">
+        <div class="heatmap-label"><span>庄周 · 齐物</span><span>70%</span></div>
+        <div class="heatmap-track"><div class="heatmap-fill green" style="width:70%"></div></div>
+      </div>
+      <div class="heatmap-bar">
+        <div class="heatmap-label"><span>尼采 · 超越</span><span>85%</span></div>
+        <div class="heatmap-track"><div class="heatmap-fill blue" style="width:85%"></div></div>
+      </div>
+      <div class="heatmap-bar">
+        <div class="heatmap-label"><span>波伏娃 · 处境</span><span>62%</span></div>
+        <div class="heatmap-track"><div class="heatmap-fill grey" style="width:62%"></div></div>
+      </div>
+      <div class="insight-box">
+        <strong>石语</strong><br>
+        庄周消解问题，尼采激化问题，波伏娃落地问题。三块青石，雨后各自呈现不同的纹路——因水而显，因石而异。
+      </div>
+    </aside>
+  </div>
+</div>
+</body>
+</html>

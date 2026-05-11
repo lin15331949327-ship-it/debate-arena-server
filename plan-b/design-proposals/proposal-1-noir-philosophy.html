@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Debate Arena — Noir Philosophy</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@300;400;600;700&family=Noto+Sans+SC:wght@300;400;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --noir-bg: #0a0a0a;
+  --noir-surface: #121212;
+  --noir-card: #171717;
+  --noir-border: #282828;
+  --gold: #d4a853;
+  --gold-dim: #8b7648;
+  --gold-glow: rgba(212,168,83,0.3);
+  --text-primary: #e0ddd5;
+  --text-secondary: #9a968b;
+  --text-dim: #5a5550;
+  --accent-red: #8b3a3a;
+  --film-grain-opacity: 0.04;
+  --card-grain-opacity: 0.06;
+  --particle-glow: rgba(212,168,83,0.12);
+  --font-body: 'Noto Serif SC', serif;
+  --font-ui: 'Noto Sans SC', sans-serif;
+  --font-mono: 'Noto Sans SC', monospace;
+}
+* { margin:0; padding:0; box-sizing:border-box; }
+body {
+  font-family: var(--font-body);
+  background: var(--noir-bg);
+  color: var(--text-primary);
+  min-height:100vh;
+  overflow-x:hidden;
+}
+/* === GLOBAL FILM GRAIN === */
+body::before {
+  content:'';
+  position:fixed; inset:0; z-index:10; pointer-events:none;
+  background: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='film'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23film)' opacity='0.12'/%3E%3C/svg%3E");
+  opacity: var(--film-grain-opacity);
+  mix-blend-mode: overlay;
+}
+/* === RADIAL GLOW SYSTEM === */
+body::after {
+  content:'';
+  position:fixed; inset:0; z-index:11; pointer-events:none;
+  background:
+    radial-gradient(ellipse 900px 200px at 50% 0%, rgba(212,168,83,0.07) 0%, transparent 60%),
+    radial-gradient(ellipse 600px 400px at 80% 50%, rgba(139,58,58,0.04) 0%, transparent 60%),
+    radial-gradient(ellipse 500px 500px at 20% 70%, rgba(212,168,83,0.03) 0%, transparent 55%);
+}
+/* === GOLDEN PARTICLE DUST (below header) === */
+.golden-dust {
+  position:fixed; top:0; left:0; right:0; height:200px;
+  z-index:0; pointer-events:none;
+  background:
+    radial-gradient(1px 1px at 30% 30%, var(--gold-dim), transparent),
+    radial-gradient(1px 1px at 70% 50%, var(--gold-dim), transparent),
+    radial-gradient(1px 1px at 15% 60%, var(--gold-dim), transparent),
+    radial-gradient(1.5px 1.5px at 60% 15%, var(--gold), transparent),
+    radial-gradient(1px 1px at 45% 40%, var(--gold-dim), transparent),
+    radial-gradient(1px 1px at 85% 25%, var(--gold-dim), transparent),
+    radial-gradient(1.5px 1.5px at 50% 10%, var(--gold), transparent),
+    radial-gradient(1px 1px at 22% 45%, var(--gold-dim), transparent);
+  animation: dust-drift 12s ease-in-out infinite alternate;
+}
+@keyframes dust-drift {
+  0% { opacity: 0.4; transform: translateY(0); }
+  100% { opacity: 0.7; transform: translateY(-4px); }
+}
+/* === MAIN === */
+.app { position:relative; z-index:15; max-width:1400px; margin:0 auto; padding:24px 32px; }
+/* === HEADER === */
+.header {
+  text-align:center; padding:48px 20px 28px;
+  border-bottom: 1px solid var(--noir-border);
+  margin-bottom: 28px;
+  position:relative;
+}
+.header h1 {
+  font-family: var(--font-body);
+  font-size:2.2rem;
+  font-weight:600;
+  letter-spacing:0.2em;
+  color: var(--gold);
+  text-shadow: 0 0 60px var(--gold-glow), 0 2px 0 rgba(0,0,0,0.5);
+}
+.header .subtitle {
+  font-size:0.78rem;
+  letter-spacing:0.4em;
+  color: var(--text-secondary);
+  font-family: var(--font-ui);
+  margin-top:8px;
+}
+.header .divider {
+  width:100px; height:1px;
+  margin:16px auto 0;
+  background: linear-gradient(90deg, transparent, var(--gold-dim), var(--gold), var(--gold-dim), transparent);
+}
+/* === TOPIC BAR === */
+.topic-bar {
+  display:flex; gap:12px; align-items:center;
+  margin-bottom:28px;
+  background: var(--noir-surface);
+  padding:14px 20px;
+  border: 1px solid var(--noir-border);
+  box-shadow: 0 4px 24px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.02);
+}
+.topic-bar .icon-debate {
+  font-family: var(--font-body);
+  font-size:1.1rem;
+  color: var(--gold-dim);
+}
+.topic-input {
+  flex:1; border:none; background:transparent;
+  font-family: var(--font-body);
+  font-size:1rem;
+  color: var(--text-primary);
+  padding:8px 4px;
+  outline:none;
+}
+.topic-input::placeholder { color: var(--text-dim); }
+.topic-btn {
+  background: transparent;
+  color: var(--gold);
+  border: 1px solid var(--gold-dim);
+  padding:9px 26px;
+  font-family: var(--font-ui);
+  font-size:0.88rem;
+  letter-spacing:0.12em;
+  cursor:pointer;
+  transition: all 0.35s;
+}
+.topic-btn:hover {
+  background: rgba(212,168,83,0.08);
+  border-color: var(--gold);
+  box-shadow: 0 0 28px var(--gold-glow);
+  text-shadow: 0 0 12px var(--gold-glow);
+}
+/* === LAYOUT === */
+.main-layout { display:flex; gap:24px; align-items:flex-start; }
+.debate-grid { flex:1; display:grid; grid-template-columns: repeat(3, 1fr); gap:20px; }
+.sidebar { width:260px; flex-shrink:0; }
+/* === CARDS === */
+.debate-card {
+  background: var(--noir-card);
+  border: 1px solid var(--noir-border);
+  padding: 24px 20px 20px;
+  position:relative;
+  transition: all 0.4s cubic-bezier(0.2, 0, 0, 1);
+  /* Multi-layer shadow system */
+  box-shadow:
+    0 2px 6px rgba(0,0,0,0.5),      /* near shadow */
+    0 8px 24px rgba(0,0,0,0.4),     /* mid shadow */
+    0 1px 0 rgba(255,255,255,0.02) inset; /* ambient light */
+  overflow:hidden;
+}
+/* Individual card paper grain */
+.debate-card::before {
+  content:'';
+  position:absolute; inset:0; z-index:0; pointer-events:none;
+  background: url("data:image/svg+xml,%3Csvg viewBox='0 0 150 150' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='pg'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.6' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23pg)' opacity='0.1'/%3E%3C/svg%3E");
+  mix-blend-mode: overlay;
+  opacity: var(--card-grain-opacity);
+  transition: opacity 0.4s;
+}
+/* Card top highlight */
+.debate-card::after {
+  content:'';
+  position:absolute; top:0; left:15%; right:15%; height:1px; z-index:1;
+  background: linear-gradient(90deg, transparent, rgba(212,168,83,0.15), transparent);
+}
+.debate-card:hover {
+  transform: translateY(-5px);
+  border-color: rgba(212,168,83,0.2);
+  box-shadow:
+    0 4px 16px rgba(0,0,0,0.6),
+    0 12px 36px rgba(0,0,0,0.5),
+    0 0 48px rgba(212,168,83,0.06),
+    0 1px 0 rgba(255,255,255,0.03) inset;
+}
+.debate-card:hover::before { opacity: 0.1; }
+.debate-card .card-header {
+  position:relative; z-index:1;
+  display:flex; align-items:center; gap:12px;
+  margin-bottom:14px;
+  padding-bottom:12px;
+  border-bottom: 1px solid var(--noir-border);
+}
+.card-avatar {
+  width:44px; height:44px; border-radius:50%;
+  display:flex; align-items:center; justify-content:center;
+  font-family: var(--font-body);
+  font-size:1.1rem; font-weight:600;
+  border:1px solid;
+  flex-shrink:0;
+}
+.card-avatar.zhuangzi { color:var(--gold); border-color:rgba(212,168,83,0.4); background:rgba(212,168,83,0.08); }
+.card-avatar.nietzsche { color:#d48b8b; border-color:rgba(212,139,139,0.4); background:rgba(212,139,139,0.08); }
+.card-avatar.beauvoir { color:#8ba8d4; border-color:rgba(139,168,212,0.4); background:rgba(139,168,212,0.08); }
+.card-name { font-family:var(--font-body); font-size:1.15rem; font-weight:600; color:var(--text-primary); }
+.card-role { font-size:0.72rem; color:var(--text-secondary); font-family:var(--font-ui); }
+.debate-card .card-body { position:relative; z-index:1; font-size:0.9rem; line-height:1.8; color:var(--text-primary); }
+.debate-card .card-body p { margin-bottom:8px; }
+.debate-card .card-body .quote {
+  border-left: 2px solid rgba(212,168,83,0.4);
+  padding: 8px 14px;
+  margin: 10px 0;
+  font-style: italic;
+  color: var(--text-secondary);
+  background: rgba(212,168,83,0.03);
+}
+.debate-card .card-stance {
+  margin-top:14px; padding-top:10px;
+  border-top: 1px solid rgba(255,255,255,0.04);
+  font-size:0.76rem; color:var(--gold-dim);
+  font-family:var(--font-ui);
+  letter-spacing:0.04em;
+}
+/* === SIDEBAR === */
+.sidebar {
+  background: var(--noir-card);
+  border: 1px solid var(--noir-border);
+  padding:20px;
+  box-shadow:
+    0 2px 6px rgba(0,0,0,0.4),
+    0 8px 24px rgba(0,0,0,0.3);
+}
+.sidebar h3 {
+  font-family: var(--font-body);
+  font-size:1rem;
+  color: var(--gold);
+  margin-bottom:16px;
+  text-align:center;
+  letter-spacing:0.08em;
+}
+.heatmap-bar { margin-bottom:14px; }
+.heatmap-label {
+  display:flex; justify-content:space-between;
+  font-size:0.72rem; color:var(--text-secondary);
+  font-family:var(--font-ui);
+  margin-bottom:4px;
+}
+.heatmap-track {
+  height:5px; background: var(--noir-border);
+  overflow:hidden;
+}
+.heatmap-fill { height:100%; transition:width 0.7s ease; }
+.heatmap-fill.gold { background: linear-gradient(90deg, var(--gold-dim), var(--gold)); }
+.heatmap-fill.red { background: linear-gradient(90deg, var(--accent-red), #d48b8b); }
+.heatmap-fill.blue { background: linear-gradient(90deg, #4a5678, #8ba8d4); }
+.sidebar .insight-box {
+  margin-top:18px; padding:14px;
+  border-left: 2px solid rgba(212,168,83,0.3);
+  background: rgba(212,168,83,0.04);
+  font-size:0.78rem; color:var(--text-secondary);
+  line-height:1.7;
+}
+@media (max-width:1024px) {
+  .main-layout { flex-direction:column; }
+  .sidebar { width:100%; }
+  .debate-grid { grid-template-columns:1fr; }
+}
+</style>
+</head>
+<body>
+<div class="golden-dust"></div>
+<div class="app">
+  <header class="header">
+    <h1>黑 暗 哲 学 厅</h1>
+    <div class="subtitle">NOIR PHILOSOPHY</div>
+    <div class="divider"></div>
+  </header>
+
+  <div class="topic-bar">
+    <span class="icon-debate">&#9670;</span>
+    <input class="topic-input" placeholder="在此刻下你的疑问..." value="自由意志是否存在？">
+    <button class="topic-btn">开 始 思 辨</button>
+  </div>
+
+  <div class="main-layout">
+    <div class="debate-grid">
+      <div class="debate-card">
+        <div class="card-header">
+          <div class="card-avatar zhuangzi">庄</div>
+          <div>
+            <div class="card-name">庄周</div>
+            <div class="card-role">道家·逍遥</div>
+          </div>
+        </div>
+        <div class="card-body">
+          <p>夫言非吹也，言者有言。其所言者特未定也。果有言邪？其未尝有言邪？</p>
+          <div class="quote">"吾丧我。"</div>
+          <p>你们争论"自由"与"命运"，仿佛它们是两件事物。岂不知，当你说"我选择"之时，那个"我"本身就是最大的幻觉？吾丧我，而后天地见。</p>
+        </div>
+        <div class="card-stance">立场：丧我而逍遥，自由与命运本是一体</div>
+      </div>
+
+      <div class="debate-card">
+        <div class="card-header">
+          <div class="card-avatar nietzsche">尼</div>
+          <div>
+            <div class="card-name">尼采</div>
+            <div class="card-role">超人·意志</div>
+          </div>
+        </div>
+        <div class="card-body">
+          <p>"吾丧我"？——这是最精致的虚无主义宣言。你所谓的超越，不过是从生命的战场上撤退。</p>
+          <div class="quote">"人必须带着他的美德与邪恶，站在生命的中央，说：这就是我！"</div>
+          <p>我拒绝"丧我"。我要"成为我"——一遍又一遍，在永恒轮回中拥抱我的每一个选择，说：再来一次！</p>
+        </div>
+        <div class="card-stance">立场：永恒轮回即最高自由，自我即命运</div>
+      </div>
+
+      <div class="debate-card">
+        <div class="card-header">
+          <div class="card-avatar beauvoir">波</div>
+          <div>
+            <div class="card-name">波伏娃</div>
+            <div class="card-role">存在·处境</div>
+          </div>
+        </div>
+        <div class="card-body">
+          <p>"丧我"太过高蹈，"成为我"太过浪漫。庄周与尼采都绕开了最棘手的问题：这个"我"——是谁给的定义？</p>
+          <div class="quote">"定义我的不是我，而是我的处境与我的行动之间的持续对话。"</div>
+          <p>自由不是起点也不是终点——它发生在每一次"拒绝"之中：拒绝被定义，拒绝接受既定的意义。</p>
+        </div>
+        <div class="card-stance">立场：自由在拒绝中被创造，在行动中实现</div>
+      </div>
+    </div>
+
+    <aside class="sidebar">
+      <h3>思想张力</h3>
+      <div class="heatmap-bar">
+        <div class="heatmap-label"><span>庄周 · 丧我</span><span>82%</span></div>
+        <div class="heatmap-track"><div class="heatmap-fill gold" style="width:82%"></div></div>
+      </div>
+      <div class="heatmap-bar">
+        <div class="heatmap-label"><span>尼采 · 成为我</span><span>95%</span></div>
+        <div class="heatmap-track"><div class="heatmap-fill red" style="width:95%"></div></div>
+      </div>
+      <div class="heatmap-bar">
+        <div class="heatmap-label"><span>波伏娃 · 拒绝</span><span>68%</span></div>
+        <div class="heatmap-track"><div class="heatmap-fill blue" style="width:68%"></div></div>
+      </div>
+      <div class="insight-box">
+        <strong>暗室锐评</strong><br>
+        "丧我"与"成为我"——东西方关于"自我"的最根本分歧。一个要消解，一个要张扬。波伏娃在二者之间开辟了第三条路：自我不是本质，而是行动。
+      </div>
+    </aside>
+  </div>
+</div>
+</body>
+</html>

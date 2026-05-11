@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>星图·思网 — 三Agent辩论场</title>
+<link href="https://fonts.googleapis.com/css2?family=ZCOOL+KuaiLe&family=Noto+Serif+SC:wght@300;400&display=swap" rel="stylesheet">
+<style>
+:root {
+  --sky-top: #1a1040;
+  --sky-mid: #1e1a4a;
+  --sky-low: #281e50;
+  --star-warm: rgba(255,220,180,0.7);
+  --star-cool: rgba(200,210,255,0.6);
+  --zhuangzi: #6dbe8a;
+  --zhuangzi-glow: rgba(109,190,138,0.5);
+  --nietzsche: #e8735a;
+  --nietzsche-glow: rgba(232,115,90,0.5);
+  --beauvoir: #6ca8e8;
+  --beauvoir-glow: rgba(108,168,232,0.5);
+  --text: #e0ddec;
+  --text-dim: #9890b8;
+  --font-title: 'ZCOOL KuaiLe', cursive;
+  --font-body: 'Noto Serif SC', serif;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{
+  background: linear-gradient(180deg, var(--sky-top) 0%, var(--sky-mid) 40%, var(--sky-low) 100%);
+  font-family: var(--font-body);
+  color: var(--text);
+  width: 100vw; height: 100vh;
+  overflow: hidden;
+  cursor: default;
+  position: relative;
+}
+
+/* ── 星空背景: 三层星星 ── */
+.stars-layer {
+  position: fixed; inset: 0; z-index: 0; pointer-events: none;
+}
+.star {
+  position: absolute;
+  border-radius: 50%;
+  background: white;
+  animation: twinkle var(--dur) ease-in-out infinite;
+  animation-delay: var(--delay);
+}
+@keyframes twinkle {
+  0%,100%{ opacity: var(--op-min); transform: scale(1); }
+  50%{ opacity: var(--op-max); transform: scale(1.4); }
+}
+/* 一颗大暖星 — 像小王子的星球在远处 */
+.big-warm-star {
+  position: fixed;
+  width: 120px; height: 120px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 35%, rgba(255,230,200,0.15), rgba(255,200,150,0.03) 60%, transparent 70%);
+  pointer-events: none; z-index: 0;
+  animation: warmPulse 6s ease-in-out infinite;
+}
+@keyframes warmPulse {
+  0%,100%{ opacity: 0.6; }
+  50%{ opacity: 1; }
+}
+
+/* ── 主容器 ── */
+.main {
+  position: relative; z-index: 1;
+  width: 100%; height: 100%;
+  display: flex; flex-direction: column; align-items: center;
+}
+
+/* ── 标题 ── */
+.title-area {
+  text-align: center; padding: 36px 20px 0;
+  z-index: 2;
+}
+.title-area h1 {
+  font-family: var(--font-title);
+  font-size: 1.8rem;
+  font-weight: 400;
+  letter-spacing: 0.08em;
+  color: #fff;
+  text-shadow: 0 0 40px rgba(200,180,255,0.3);
+  margin-bottom: 4px;
+}
+.title-area .sub {
+  font-size: 0.7rem; color: var(--text-dim);
+  letter-spacing: 0.1em;
+}
+
+/* ── 话题标签 ── */
+.topic-tags {
+  display: flex; gap: 10px; justify-content: center;
+  padding: 12px 0; z-index: 2; flex-wrap: wrap;
+}
+.topic-tag {
+  font-family: var(--font-title);
+  font-size: 0.72rem;
+  padding: 6px 18px;
+  border-radius: 20px;
+  border: 1px solid rgba(255,255,255,0.1);
+  background: rgba(255,255,255,0.04);
+  color: var(--text-dim);
+  cursor: pointer;
+  transition: all 0.3s;
+}
+.topic-tag:hover, .topic-tag.active {
+  background: rgba(255,255,255,0.1);
+  border-color: rgba(255,255,255,0.25);
+  color: #fff;
+}
+
+/* ── 星球区域 ── */
+.planets-zone {
+  flex: 1; width: 100%;
+  position: relative;
+  display: flex; align-items: center; justify-content: center;
+  z-index: 1;
+}
+
+/* ── 星球容器: 三角形布局 ── */
+.planet {
+  position: absolute;
+  display: flex; flex-direction: column; align-items: center;
+  cursor: pointer;
+  transition: transform 0.4s cubic-bezier(0.34,1.56,0.64,1);
+  z-index: 2;
+}
+.planet:hover {
+  transform: scale(1.08);
+  z-index: 10;
+}
+/* 庄周 - 左上 */
+.planet-zhuangzi { left: 8%; top: 5%; }
+/* 尼采 - 右上 */
+.planet-nietzsche { right: 8%; top: 5%; }
+/* 波伏娃 - 底部中央 */
+.planet-beauvoir { left: 50%; bottom: 5%; transform: translateX(-50%); }
+.planet-beauvoir:hover { transform: translateX(-50%) scale(1.08); }
+
+/* ── 星球本体: 水彩光晕球 ── */
+.planet-body {
+  width: 80px; height: 80px;
+  border-radius: 50%;
+  position: relative;
+  transition: all 0.4s;
+}
+.planet-body::after {
+  content: '';
+  position: absolute; inset: -15px;
+  border-radius: 50%;
+  opacity: 0;
+  transition: opacity 0.4s;
+}
+.planet:hover .planet-body::after {
+  opacity: 1;
+}
+.planet-body.zhuangzi {
+  background: radial-gradient(circle at 40% 35%, rgba(180,240,200,0.6), rgba(109,190,138,0.3) 50%, rgba(50,100,70,0.1) 100%);
+  box-shadow: 0 0 40px var(--zhuangzi-glow), 0 0 80px rgba(109,190,138,0.2);
+}
+.planet-body.zhuangzi::after {
+  background: radial-gradient(circle, rgba(109,190,138,0.25), transparent 70%);
+}
+.planet-body.nietzsche {
+  background: radial-gradient(circle at 40% 35%, rgba(255,180,140,0.6), rgba(232,115,90,0.3) 50%, rgba(120,50,30,0.1) 100%);
+  box-shadow: 0 0 40px var(--nietzsche-glow), 0 0 80px rgba(232,115,90,0.2);
+}
+.planet-body.nietzsche::after {
+  background: radial-gradient(circle, rgba(232,115,90,0.25), transparent 70%);
+}
+.planet-body.beauvoir {
+  background: radial-gradient(circle at 40% 35%, rgba(170,210,255,0.6), rgba(108,168,232,0.3) 50%, rgba(40,70,120,0.1) 100%);
+  box-shadow: 0 0 40px var(--beauvoir-glow), 0 0 80px rgba(108,168,232,0.2);
+}
+.planet-body.beauvoir::after {
+  background: radial-gradient(circle, rgba(108,168,232,0.25), transparent 70%);
+}
+
+/* 星球上的小表情/标记 */
+.planet-mark {
+  position: absolute;
+  top: 50%; left: 50%;
+  transform: translate(-50%,-50%);
+  font-family: var(--font-title);
+  font-size: 1.4rem;
+  color: rgba(255,255,255,0.8);
+  text-shadow: 0 0 8px rgba(255,255,255,0.3);
+  pointer-events: none;
+}
+
+/* 星球名字 */
+.planet-name {
+  font-family: var(--font-title);
+  font-size: 0.8rem;
+  color: #fff;
+  margin-top: 8px;
+  text-shadow: 0 0 12px rgba(255,255,255,0.2);
+  transition: all 0.3s;
+}
+.planet:hover .planet-name {
+  text-shadow: 0 0 20px rgba(255,255,255,0.5);
+}
+
+/* 星球的小卫星 — 像小王子的玫瑰/狐狸 */
+.planet-moon {
+  position: absolute;
+  width: 12px; height: 12px;
+  border-radius: 50%;
+  animation: orbit 8s linear infinite;
+}
+.planet-zhuangzi .planet-moon {
+  background: rgba(180,240,200,0.6);
+  box-shadow: 0 0 8px rgba(109,190,138,0.3);
+  top: -20px; left: 60px;
+  animation-duration: 6s;
+}
+.planet-nietzsche .planet-moon {
+  background: rgba(255,180,140,0.6);
+  box-shadow: 0 0 8px rgba(232,115,90,0.3);
+  top: -15px; left: -20px;
+  animation-duration: 5s;
+}
+.planet-beauvoir .planet-moon {
+  background: rgba(170,210,255,0.6);
+  box-shadow: 0 0 8px rgba(108,168,232,0.3);
+  top: -25px; left: 50px;
+  animation-duration: 7s;
+}
+@keyframes orbit {
+  0%{ transform: rotate(0deg) translateX(45px) rotate(0deg); }
+  100%{ transform: rotate(360deg) translateX(45px) rotate(-360deg); }
+}
+
+/* ── 发言卡片: 从星球展开的水彩对话框 ── */
+.speech-bubble {
+  position: absolute;
+  width: 260px;
+  padding: 18px 20px;
+  border-radius: 20px;
+  background: rgba(30,25,60,0.85);
+  border: 1px solid rgba(255,255,255,0.08);
+  backdrop-filter: blur(8px);
+  font-size: 0.78rem;
+  line-height: 1.7;
+  color: var(--text);
+  opacity: 0;
+  transform: scale(0.9);
+  pointer-events: none;
+  transition: all 0.4s cubic-bezier(0.34,1.56,0.64,1);
+  z-index: 5;
+}
+.planet.active .speech-bubble {
+  opacity: 1;
+  transform: scale(1);
+  pointer-events: auto;
+}
+/* 庄周气泡 — 右下方展开 */
+.planet-zhuangzi .speech-bubble {
+  top: 100px; left: 90px;
+  border-left: 3px solid var(--zhuangzi);
+}
+/* 尼采气泡 — 左下方展开 */
+.planet-nietzsche .speech-bubble {
+  top: 100px; right: 90px;
+  border-left: 3px solid var(--nietzsche);
+}
+/* 波伏娃气泡 — 上方展开 */
+.planet-beauvoir .speech-bubble {
+  bottom: 110px; left: 50%; transform: translateX(-50%) translateY(10px);
+  width: 320px;
+  border-left: 3px solid var(--beauvoir);
+}
+.planet-beauvoir.active .speech-bubble {
+  transform: translateX(-50%) translateY(0);
+}
+
+.speech-bubble .speaker-name {
+  font-family: var(--font-title);
+  font-size: 0.75rem;
+  margin-bottom: 6px;
+  opacity: 0.8;
+}
+.speech-bubble .speaker-name.zhuangzi { color: var(--zhuangzi); }
+.speech-bubble .speaker-name.nietzsche { color: var(--nietzsche); }
+.speech-bubble .speaker-name.beauvoir { color: var(--beauvoir); }
+
+/* ── 底部提示 ── */
+.hint {
+  text-align: center; padding: 12px;
+  font-size: 0.65rem; color: var(--text-dim);
+  z-index: 2;
+  opacity: 0.7;
+}
+
+/* ── 流星光点 ── */
+.shooting-star {
+  position: fixed;
+  width: 2px; height: 2px;
+  background: white;
+  border-radius: 50%;
+  z-index: 0;
+  pointer-events: none;
+  animation: Shoot 3s linear infinite;
+}
+.shooting-star::after {
+  content: '';
+  position: absolute;
+  top: 0; left: 0;
+  width: 60px; height: 1px;
+  background: linear-gradient(90deg, rgba(255,255,255,0.5), transparent);
+  transform: rotate(-30deg);
+}
+@keyframes Shoot {
+  0%{ opacity: 0; transform: translate(0,0); }
+  10%{ opacity: 1; }
+  30%{ opacity: 0; transform: translate(-200px, 100px); }
+  100%{ opacity: 0; transform: translate(-200px, 100px); }
+}
+</style>
+</head>
+<body>
+
+<!-- 星空背景 -->
+<div class="stars-layer" id="stars"></div>
+
+<!-- 远处暖星 -->
+<div class="big-warm-star" style="top:15%;right:12%"></div>
+<div class="big-warm-star" style="top:50%;left:5%;width:80px;height:80px"></div>
+
+<!-- 流星 -->
+<div class="shooting-star" style="top:20%;left:70%;animation-delay:0s"></div>
+<div class="shooting-star" style="top:40%;left:30%;animation-delay:5s;animation-duration:4s"></div>
+
+<div class="main">
+  <div class="title-area">
+    <h1>星图 · 思网</h1>
+    <p class="sub">—— 在星空下，听他们谈论自由 ——</p>
+  </div>
+
+  <div class="topic-tags" id="topicTags">
+    <span class="topic-tag active" data-topic="free">自由是什么</span>
+    <span class="topic-tag" data-topic="pain">痛苦有价值吗</span>
+    <span class="topic-tag" data-topic="equal">平等可能吗</span>
+  </div>
+
+  <div class="planets-zone">
+    <!-- 庄周 -->
+    <div class="planet planet-zhuangzi active" onclick="togglePlanet(this)" data-agent="zhuangzi">
+      <div class="planet-body zhuangzi">
+        <span class="planet-mark">梦</span>
+      </div>
+      <div class="planet-moon"></div>
+      <div class="planet-name">庄周</div>
+      <div class="speech-bubble">
+        <div class="speaker-name zhuangzi">庄周 · 第一轮</div>
+        （轻笑）自由？请循其本——昨夜我梦见自己化作蝴蝶，栩栩然不知有庄周。俄然觉，则蘧蘧然周也。不知周之梦为蝴蝶与，蝴蝶之梦为周与？<br><br>你们说"成为自己"、"创造自由"——可连"自己"尚且是一场梦，又何必执于一端？以道观之，鹏鸟扶摇九万里，蜩鸠抢榆枋，各适其性而已。风不追求方向，水不追求形状——它们何曾不自由？
+      </div>
+    </div>
+
+    <!-- 尼采 -->
+    <div class="planet planet-nietzsche" onclick="togglePlanet(this)" data-agent="nietzsche">
+      <div class="planet-body nietzsche">
+        <span class="planet-mark">⚡</span>
+      </div>
+      <div class="planet-moon"></div>
+      <div class="planet-name">尼采</div>
+      <div class="speech-bubble">
+        <div class="speaker-name nietzsche">尼采 · 第一轮</div>
+        哈！多么可爱的逃避！你用蝴蝶梦否定自我——但我要告诉你：人是一根绳索，系在动物与超人之间。自由不是消解自我，而是<b>创造自我</b>！<br><br>你说的"风不追求方向"——那是末人的梦呓！风若没有方向，它就不是风，只是空气。权力意志是生命的本质——不是统治别人，是超越自己。上帝已死——现在你必须自己成为上帝！
+      </div>
+    </div>
+
+    <!-- 波伏娃 -->
+    <div class="planet planet-beauvoir" onclick="togglePlanet(this)" data-agent="beauvoir">
+      <div class="planet-body beauvoir">
+        <span class="planet-mark">海</span>
+      </div>
+      <div class="planet-moon"></div>
+      <div class="planet-name">波伏娃</div>
+      <div class="speech-bubble">
+        <div class="speaker-name beauvoir">波伏娃 · 第一轮</div>
+        你的论述很迷人——但让我们看看它掩盖了什么。<br><br>尼采，你说人必须"成为自己"——但让我问你一个具体的问题：一个19世纪的巴黎女工，每天工作14小时，她的孩子在工厂而不是学校，她如何"成为超人"？她的自由在哪里？<br><br>庄子，你的逍遥太轻盈了。你当然可以梦见蝴蝶——因为你是男人，你有闲。处境。一切都在处境之中。
+      </div>
+    </div>
+  </div>
+
+  <div class="hint">点击星球，听他们的声音 · 三颗星球，三种宇宙</div>
+</div>
+
+<script>
+// ── 生成星星 ──
+(function(){
+  const container = document.getElementById('stars');
+  const frag = document.createDocumentFragment();
+  for(let i=0;i<180;i++){
+    const s = document.createElement('div');
+    s.className = 'star';
+    const size = Math.random()*2.5 + 0.5;
+    s.style.cssText = `
+      left:${Math.random()*100}%; top:${Math.random()*100}%;
+      width:${size}px; height:${size}px;
+      --dur:${Math.random()*4+2}s;
+      --delay:${Math.random()*4}s;
+      --op-min:${Math.random()*0.3+0.1};
+      --op-max:${Math.random()*0.5+0.3};
+      background:${Math.random()>0.6?'rgba(255,220,180,0.8)':'rgba(200,210,255,0.7)'};
+    `;
+    frag.appendChild(s);
+  }
+  container.appendChild(frag);
+})();
+
+// ── 点击星球切换活跃 ──
+function togglePlanet(planet) {
+  const isActive = planet.classList.contains('active');
+  // 关闭所有
+  document.querySelectorAll('.planet').forEach(p => p.classList.remove('active'));
+  // 切换当前
+  if(!isActive) planet.classList.add('active');
+}
+
+// ── 话题切换 ──
+document.getElementById('topicTags').addEventListener('click', e => {
+  if(!e.target.classList.contains('topic-tag')) return;
+  document.querySelectorAll('.topic-tag').forEach(t => t.classList.remove('active'));
+  e.target.classList.add('active');
+});
+</script>
+</body>
+</html>

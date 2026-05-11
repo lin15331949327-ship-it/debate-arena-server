@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>解构阅读 — 三Agent辩论场</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@300;400;600;700&family=Noto+Sans+SC:wght@300;400;700&family=Space+Mono:wght@400;700&family=Ma+Shan+Zheng&display=swap" rel="stylesheet">
+<style>
+:root {
+  --paper: #faf7f2; --ink: #1a1714; --ink-mid: #5c544d; --ink-light: #a0988c;
+  --zhuangzi: #2d6a4f; --zhuangzi-bg: #e8f5e9; --zhuangzi-line: #a5d6a7;
+  --nietzsche: #9b2226; --nietzsche-bg: #fce4e4; --nietzsche-line: #ef9a9a;
+  --beauvoir: #1e6091; --beauvoir-bg: #e3f2fd; --beauvoir-line: #90caf9;
+  --tag-bg: #f0ebe0; --line: #d9d0c5; --card: #fffdf9;
+  --shadow: 0 1px 3px rgba(0,0,0,0.04),0 4px 12px rgba(0,0,0,0.04);
+  --font-body: 'Noto Serif SC','Georgia',serif;
+  --font-ui: 'Noto Sans SC',system-ui,sans-serif;
+  --font-mono: 'Space Mono','Courier New',monospace;
+  --font-brush: 'Ma Shan Zheng',cursive;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--paper);color:var(--ink);font-family:var(--font-body);min-height:100vh}
+.app{display:grid;grid-template-columns:1fr 420px;min-height:100vh}
+
+/* ===== LEFT: Debate + Analysis ===== */
+.main{padding:48px 40px 80px;max-width:760px;border-right:1px solid var(--line)}
+
+.masthead{margin-bottom:48px;padding-bottom:24px;border-bottom:2px solid var(--ink)}
+.masthead h1{font-size:2.2rem;font-weight:400;letter-spacing:0.04em}
+.masthead .sub{font-family:var(--font-mono);font-size:0.6rem;letter-spacing:0.2em;text-transform:uppercase;color:var(--ink-light);margin-top:4px;display:block}
+
+/* Debate rounds */
+.round-header{margin:40px 0 20px;display:flex;align-items:baseline;gap:12px}
+.round-header .rnum{font-family:var(--font-mono);font-size:0.65rem;color:var(--ink-light);letter-spacing:0.15em}
+.round-header h2{font-size:1rem;font-weight:600}
+.round-header .instruction{font-size:0.72rem;color:var(--ink-light);font-style:italic}
+
+/* Speech card */
+.speech{background:var(--card);border:1px solid var(--line);padding:20px 24px;margin:12px 0;border-radius:2px;position:relative;transition:all 0.3s}
+.speech.zhuangzi{border-left:4px solid var(--zhuangzi)}
+.speech.nietzsche{border-left:4px solid var(--nietzsche)}
+.speech.beauvoir{border-left:4px solid var(--beauvoir)}
+.speech-header{display:flex;align-items:center;gap:10px;margin-bottom:12px}
+.speech-avatar{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:0.85rem;font-weight:700;color:#fff}
+.speech.zhuangzi .speech-avatar{background:var(--zhuangzi)}
+.speech.nietzsche .speech-avatar{background:var(--nietzsche)}
+.speech.beauvoir .speech-avatar{background:var(--beauvoir)}
+.speech-name{font-weight:600;font-size:0.9rem}
+.speech-era{font-size:0.65rem;color:var(--ink-light);font-family:var(--font-mono)}
+.speech p{font-size:0.85rem;line-height:1.85;color:var(--ink-mid);text-indent:0}
+.speech p .hit{background:linear-gradient(180deg,transparent 60%,rgba(155,34,38,0.15) 60%)}
+
+/* Analysis toggle */
+.analysis-toggle{margin-top:12px;text-align:right}
+.analysis-btn{font-family:var(--font-mono);font-size:0.58rem;letter-spacing:0.08em;text-transform:uppercase;color:var(--ink-light);cursor:pointer;border:none;background:none;padding:4px 8px;border-bottom:1px dashed var(--line);transition:all 0.2s}
+.analysis-btn:hover{color:var(--ink)}
+.analysis-block{display:none;margin-top:16px;padding:16px;background:var(--tag-bg);border-radius:2px;font-size:0.78rem;line-height:1.8}
+.analysis-block.open{display:block}
+.analysis-block .op-tag{display:inline-block;font-family:var(--font-mono);font-size:0.55rem;padding:2px 8px;border-radius:2px;margin-right:4px;color:#fff}
+.op-tag.flip{background:var(--nietzsche)}.op-tag.lift{background:var(--beauvoir)}.op-tag.blind{background:var(--zhuangzi)}
+.analysis-block .op-note{color:var(--ink-mid);font-size:0.76rem;margin-top:4px}
+
+/* Between-round analysis */
+.inter-round{margin:32px 0;padding:20px 24px;background:var(--tag-bg);border-left:3px solid var(--ink);font-size:0.82rem;line-height:1.8}
+.inter-round h4{font-size:0.72rem;font-family:var(--font-mono);letter-spacing:0.1em;text-transform:uppercase;color:var(--ink-light);margin-bottom:8px}
+.inter-round .chain-arrow{font-family:var(--font-mono);color:var(--ink-light);font-size:0.7rem}
+
+/* ===== RIGHT: Worksheet ===== */
+.sidebar{padding:48px 32px;background:var(--card);position:sticky;top:0;height:100vh;overflow-y:auto;border-left:1px solid var(--line)}
+.sidebar h2{font-family:var(--font-mono);font-size:0.6rem;letter-spacing:0.2em;text-transform:uppercase;color:var(--ink-light);margin-bottom:24px}
+.worksheet{font-family:var(--font-mono);font-size:0.7rem;line-height:1.8}
+.ws-section{margin:20px 0;padding:16px;border:1px solid var(--line);border-radius:2px;background:var(--paper)}
+.ws-label{font-weight:700;font-size:0.65rem;letter-spacing:0.08em;text-transform:uppercase;margin-bottom:8px;color:var(--ink-mid)}
+.ws-filled{display:block;padding:6px 0;margin:4px 0;color:var(--ink)}
+.ws-blank{display:block;border-bottom:1px dashed var(--line);padding:6px 0;margin:4px 0;color:var(--ink-light);font-style:italic}
+.step-indicator{display:flex;align-items:center;gap:8px;margin:8px 0}
+.step-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.step-dot.a{background:var(--zhuangzi)}.step-dot.b{background:var(--nietzsche)}.step-dot.c{background:var(--beauvoir)}
+
+/* Method block */
+.method-block{background:var(--card);border:1px solid var(--line);padding:24px;margin:24px 0}
+.method-block h3{font-size:0.9rem;font-weight:600;margin-bottom:8px}
+.method-block p{font-size:0.82rem;line-height:1.8;color:var(--ink-mid)}
+.ops-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:12px 0}
+.op-card{background:var(--paper);border:1px solid var(--line);padding:10px 12px}
+.op-card .op-name{font-weight:600;font-size:0.78rem}.op-card .op-ex{font-size:0.7rem;color:var(--ink-light);font-style:italic;margin-top:2px}
+
+.pull-quote{font-size:1.2rem;line-height:1.6;padding:20px 28px;margin:24px 0;border-left:3px solid var(--ink);font-weight:300;font-style:italic;color:var(--ink);background:var(--card)}
+
+@media(max-width:900px){.app{grid-template-columns:1fr}.sidebar{position:static;height:auto;border-left:none;border-top:1px solid var(--line)}}
+</style>
+</head>
+<body>
+<div class="app">
+
+<main class="main">
+
+<header class="masthead">
+  <span class="sub">Meta-Debate Reader &middot; Live Analysis</span>
+  <h1>怎么「学会看」这类辩论</h1>
+  <p style="color:var(--ink-mid);font-size:0.85rem;margin-top:8px;line-height:1.7">下面是一场真实的辩论——庄周、尼采、波伏娃关于「自由」的6轮交锋。每轮辩论之间插入<strong>结构分析</strong>，右边是实时填充的分析工作台。<br>你不是在看对话——你是在看一个<strong>思想装置的运转</strong>。</p>
+</header>
+
+<!-- ===== ROUND 1 ===== -->
+<div class="round-header"><span class="rnum">ROUND 1</span><h2>首发立场声明</h2><span class="instruction">—— 各陈其道，还未交锋</span></div>
+
+<div class="speech zhuangzi">
+  <div class="speech-header"><div class="speech-avatar">庄</div><div class="speech-name">庄周</div><span class="speech-era">前369&ndash;前286</span></div>
+  <p>（轻笑）自由？你们在问一条鱼，水是不是牢笼？且让我讲个小故事：北冥有鱼，其名为鲲，化而为鸟，其名为鹏。蜩与学鸠笑之曰——"奚以之九万里而南为？"适莽苍者，三餐而反；适千里者，三月聚粮。<br><br>请循其本——你问什么是自由，可你站在哪把尺子上量？<strong>以道观之</strong>，万物齐一。子非鱼，安知鱼之乐？你说要追求自由——这"追求"二字，便已是牢笼。</p>
+  <div class="analysis-toggle"><button class="analysis-btn" onclick="this.nextElementSibling.classList.toggle('open')">+ 看结构</button>
+    <div class="analysis-block"><span class="op-tag flip">操作：消解</span><span class="op-note">庄子不直接回答"自由是什么"——他先<strong>消解了问题本身</strong>："你站在哪把尺子上量？" 用鲲鹏寓言把问题从"如何获得自由"扭转为"自由这个问法对不对"。</span></div>
+  </div>
+</div>
+
+<div class="speech nietzsche">
+  <div class="speech-header"><div class="speech-avatar">尼</div><div class="speech-name">尼采</div><span class="speech-era">1844&ndash;1900</span></div>
+  <p>（突然大笑）<span class="hit">哈！</span>庄子——你这条滑溜溜的东方泥鳅！你用鲲鹏的故事消解一切，却忘了问一个关键问题：<strong>那大鹏为何要飞？</strong>不是为了自由——而是为了<span class="hit">超越！</span><br><br>你说的对，自由这个词本身就是笼子——但只是对末人的笼子！我告诉你什么是真正的自由：自由不是"被给予的选择"，而是<strong>创造自己法则的能力</strong>。那没有杀死我的，使我更强大。<strong>人啊，是应当被超越的东西！</strong></p>
+  <div class="analysis-toggle"><button class="analysis-btn" onclick="this.nextElementSibling.classList.toggle('open')">+ 看结构</button>
+    <div class="analysis-block"><span class="op-tag flip">操作：翻转</span><span class="op-note">尼采接受了庄子的材料（鲲鹏寓言），但给出了<strong>完全相反的归因</strong>：大鹏飞不是为了自由，是为了超越。这是经典的"翻转"——同意事实，反转解读。他把庄子的"消解"重新定义为末人的逃避。</span></div>
+  </div>
+</div>
+
+<div class="speech beauvoir">
+  <div class="speech-header"><div class="speech-avatar">波</div><div class="speech-name">波伏娃</div><span class="speech-era">1908&ndash;1986</span></div>
+  <p>（放下手中的笔）<span class="hit">你的论述很迷人——但让我们看看它掩盖了什么。</span><br><br>庄子，你用鲲鹏和蜩鸠消解了边界——但那条鱼必须化身为鸟才能"自由"。若有一条鱼被钉死在"鱼"的身份里？若有人告诉她：<strong>你生来就是鱼，你甚至不该想象翅膀？</strong><br><br>尼采，你在谈论走钢索的人时眼里有光——但这光太亮了，亮到你看不见<strong>是谁</strong>被允许踏上那条钢索。<br><br><strong>处境。一切都在处境之中。</strong></p>
+  <div class="analysis-toggle"><button class="analysis-btn" onclick="this.nextElementSibling.classList.toggle('open')">+ 看结构</button>
+    <div class="analysis-block"><span class="op-tag lift">操作：升维</span><span class="op-note">波伏娃不进入庄子或尼采的任何一方的框架。她<strong>质疑框架的前提</strong>：你们都在讨论"如何自由"，但先问——<strong>谁</strong>有资格参与这个讨论？她揭示了两人共同依赖的盲点：自由讨论本身预设了特权。</span></div>
+  </div>
+</div>
+
+<!-- Between R1 and R2 -->
+<div class="inter-round">
+  <h4>R1 论证运动总结</h4>
+  <span style="color:var(--zhuangzi);font-weight:600">庄子</span> <span class="chain-arrow">消解问题</span> &rarr;
+  <span style="color:var(--nietzsche);font-weight:600">尼采</span> <span class="chain-arrow">翻转材料</span> &rarr;
+  <span style="color:var(--beauvoir);font-weight:600">波伏娃</span> <span class="chain-arrow">升维：质疑框架前提</span><br><br>
+  <strong>R1的隐藏运动：</strong>问题从"自由是什么"被推进到"谁在问自由、谁有资格问自由"。这不是三个人的并列——是一个上升螺旋。
+</div>
+
+<!-- ===== ROUND 2 ===== -->
+<div class="round-header"><span class="rnum">ROUND 2</span><h2>交锋深化</h2><span class="instruction">—— 综合回应，揭示盲点</span></div>
+
+<div class="speech zhuangzi">
+  <div class="speech-header"><div class="speech-avatar">庄</div><div class="speech-name">庄周</div></div>
+  <p>尼采说我滑溜——确实，泥鳅在泥里是滑的。可倘若泥鳅要"必须"跳出泥潭，"必须"创造自己的法则——这<strong>"必须"二字，不又是新的笼子？</strong><br><br>波伏娃，你说有鱼被钉死在"鱼"的身份里。我懂。可为什么一定要"成为鸟"才算自由？那只化而为鸟的鲲鹏，它也不是"想"飞的啊。它只是顺着风的托举。它<strong>忘记了自己是鱼还是鸟</strong>——那才是真正的逍遥。</p>
+  <div class="analysis-toggle"><button class="analysis-btn" onclick="this.nextElementSibling.classList.toggle('open')">+ 看结构</button>
+    <div class="analysis-block"><span class="op-tag blind">操作：揭示盲点</span><span class="op-note">庄子对尼采：你的"必须"不也是新的笼子？对波伏娃：为什么"成为鸟"是唯一出路？他发现了两人的共同盲点——<strong>都把"超越"或"解放"预设为唯一的正确方向</strong>。</span></div>
+  </div>
+</div>
+
+<div class="speech nietzsche">
+  <div class="speech-header"><div class="speech-avatar">尼</div><div class="speech-name">尼采</div></div>
+  <p>庄子，你的逍遥游不过是<span class="hit">逃避深渊</span>！波伏娃，你问"谁来创造"——我告诉你：是每一个敢于说"我是"的人！<br><br>不是处境决定自由，而是<strong>自由的意志创造处境</strong>！你们把"处境"当作借口，用"结构"来取消意志——这才是最大的暴力！<br><br><strong>上帝已死——现在你必须自己成为上帝！</strong></p>
+  <div class="analysis-toggle"><button class="analysis-btn" onclick="this.nextElementSibling.classList.toggle('open')">+ 看结构</button>
+    <div class="analysis-block"><span class="op-tag flip">操作：翻转+重新定义</span><span class="op-note">尼采把波伏娃的"处境"重定义为"借口"，把庄子的"逍遥"重定义为"逃避"。这是双重操作——既翻转了对方的材料，又重新定义了对方的关键词。</span></div>
+  </div>
+</div>
+
+<div class="speech beauvoir">
+  <div class="speech-header"><div class="speech-avatar">波</div><div class="speech-name">波伏娃</div></div>
+  <p>尼采，你说的"克服"——<span class="hit">谁来克服？在什么条件下克服？</span>一个每天工作十六小时的工人，你告诉他"你应该超越"——这不是哲学，这是<strong>对苦难的美学化</strong>。<br><br>庄子，你的逍遥太轻盈了——<span class="hit">你当然可以逍遥，因为你是男人，你有闲，你不需要照顾孩子和面对生育。你的逍遥是特权者的逍遥。</span><br><br>自由需要真实的处境。一个人不是生来就是自由的——而是必须在具体的历史条件中成为自由的。</p>
+  <div class="analysis-toggle"><button class="analysis-btn" onclick="this.nextElementSibling.classList.toggle('open')">+ 看结构</button>
+    <div class="analysis-block"><span class="op-tag lift">操作：双重揭示盲点</span><span class="op-note">她同时攻击两人：对尼采——"克服"需要条件，你美化了苦难；对庄子——"逍遥"需要闲，你是特权者。这是她的核心论证武器：<strong>指出对方的论述依赖一个未被言明的特权位置</strong>。</span></div>
+  </div>
+</div>
+
+<!-- Between R2 and R3 -->
+<div class="method-block">
+  <h3>六种论证操作速查</h3>
+  <div class="ops-grid">
+    <div class="op-card"><span class="op-name" style="color:var(--nietzsche)">翻转</span><span class="op-ex">接受材料→反转归因。尼采："大鹏飞不是为了自由，是为了超越"</span></div>
+    <div class="op-card"><span class="op-name" style="color:var(--beauvoir)">升维</span><span class="op-ex">不进入对方框架，质疑框架前提。波伏娃："谁的水是透明的？"</span></div>
+    <div class="op-card"><span class="op-name" style="color:var(--zhuangzi)">揭示盲点</span><span class="op-ex">指出对方的论述依赖某个未被言明的特权</span></div>
+    <div class="op-card"><span class="op-name">归谬</span><span class="op-ex">把对方逻辑推到极端，暴露其荒谬</span></div>
+    <div class="op-card"><span class="op-name">补充条件</span><span class="op-ex">接受对方框架，加一个被忽略的必要条件</span></div>
+    <div class="op-card"><span class="op-name">重新定义</span><span class="op-ex">把对方关键词重定义为更基础的东西</span></div>
+  </div>
+</div>
+
+<!-- ===== ROUND 3: SYNTHESIS ===== -->
+<div class="round-header"><span class="rnum">ROUND 3</span><h2>收束：最后一击</h2><span class="instruction">—— 不是总结，是追问</span></div>
+
+<div class="speech zhuangzi">
+  <div class="speech-header"><div class="speech-avatar">庄</div><div class="speech-name">庄周</div></div>
+  <p>（轻抚着空中的一片落叶）你们都在说"自由需要什么"——逍遥需要风，超越需要敌人，处境需要改变。可我想问：<strong>当你们终于得到了那些条件——你们还认得自由吗？</strong><br><br>就像那条化而为鸟的鲲鹏，它飞到了九万里高空，往下看——和它在水里看到的，又有什么不同？<strong>也许自由从来不是一个要去的地方，而是一种看的方式。</strong></p>
+</div>
+
+<div class="speech nietzsche">
+  <div class="speech-header"><div class="speech-avatar">尼</div><div class="speech-name">尼采</div></div>
+  <p>庄子——你又来了！你问"还认得自由吗"——<strong>不！创造者不需要"认得"旧世界的东西！</strong>自由不是"找到"，是<strong>创造</strong>。波伏娃说处境限制自由——我说处境就是自由要<strong>打碎</strong>的东西！<br><br>最后一个问题留给你们：如果明天一切都将永恒重复——你此刻的"自由"，经得起无限次的轮回吗？</p>
+</div>
+
+<div class="speech beauvoir">
+  <div class="speech-header"><div class="speech-avatar">波</div><div class="speech-name">波伏娃</div></div>
+  <p>你们俩——庄子把自由变成了禅，尼采把自由变成了战。但让我问一个<strong>具体</strong>的问题：<br><br>当一个女人每天早上五点半起床，做早餐、送孩子、上班、下班做饭、打扫、辅导作业——她什么时候可以"逍遥"？她用什么去"打碎"？<br><br>你们的辩论很美。但<strong>美的辩论有时候是对苦难的另一种视而不见。</strong>自由不是一个哲学命题——它是一个实践问题。而实践需要条件。</p>
+</div>
+
+<!-- Final synthesis -->
+<div class="pull-quote">
+  "问题从'自由是什么'被重新定义为'在承认处境约束的前提下，你能为自己创造多少'。这个转变就是这场辩论的真正论点——它不在任何一个人的台词里，而在三个人之间的运动里。"
+</div>
+
+<div class="inter-round" style="margin-top:48px">
+  <h4>如果你加入第四轮</h4>
+  <p style="font-size:0.82rem;color:var(--ink-mid)">
+    <strong style="color:var(--nietzsche)">尼采→波伏娃</strong>：你在用"处境"给不锻造找借口。处境越差，越需要锻造——奴隶道德正是在处境中自我合理化的。<br><br>
+    <strong style="color:var(--zhuangzi)">庄子→波伏娃</strong>：你说"看清楚继承了什么"——但"看清楚"本身就是一种培养。你用审视替代了无为——审视难道不是另一种凿七窍？<br><br>
+    <strong style="color:var(--beauvoir)">波伏娃→尼采</strong>：锻造需要铁。没有铁，意志只是握紧的拳头——很有力，但什么都打不出来。
+  </p>
+</div>
+
+</main>
+
+<!-- ===== RIGHT: Worksheet ===== -->
+<aside class="sidebar">
+  <h2>分析工作台</h2>
+
+  <div class="worksheet">
+    <div class="ws-section">
+      <div class="ws-label">一、角色配置</div>
+      <div class="step-indicator"><span class="step-dot a"></span><span class="ws-filled">庄周 — 消解派</span></div>
+      <div class="step-indicator"><span class="step-dot b"></span><span class="ws-filled">尼采 — 创造派</span></div>
+      <div class="step-indicator"><span class="step-dot c"></span><span class="ws-filled">波伏娃 — 处境派</span></div>
+      <span class="ws-blank" style="font-size:0.65rem;margin-top:8px">如果换掉一个人，辩论会崩塌吗？</span>
+    </div>
+
+    <div class="ws-section">
+      <div class="ws-label">二、论证运动</div>
+      <span class="ws-filled">R1: 庄子消解 &rarr; 尼采翻转 &rarr; 波伏娃升维</span>
+      <span class="ws-filled" style="margin-top:8px">R2: 庄子揭示盲点 &rarr; 尼采重定义 &rarr; 波伏娃双重揭示</span>
+      <span class="ws-filled" style="margin-top:8px">R3: 庄子回归 &rarr; 尼采逼迫 &rarr; 波伏娃具体化</span>
+    </div>
+
+    <div class="ws-section">
+      <div class="ws-label">三、隐藏合题</div>
+      <span class="ws-blank">辩论开始前，问题是什么？</span>
+      <span class="ws-filled">"自由是什么"</span>
+      <span class="ws-blank" style="margin-top:8px">辩论结束后，问题变成了什么？</span>
+      <span class="ws-filled">"在承认处境约束的前提下，你能为自己创造多少"</span>
+    </div>
+
+    <div class="ws-section">
+      <div class="ws-label">四、我的介入</div>
+      <span class="ws-blank">如果我加入第四轮，我会说什么？</span>
+      <span class="ws-filled" style="color:var(--nietzsche)">尼采→波伏娃：处境越差越需要锻造——奴隶道德正是自我合理化</span>
+      <span class="ws-filled" style="color:var(--zhuangzi);margin-top:4px">庄子→波伏娃：审视难道不是另一种凿七窍？</span>
+      <span class="ws-filled" style="color:var(--beauvoir);margin-top:4px">波伏娃→尼采：锻造需要铁。没有铁，意志什么都打不出来</span>
+    </div>
+
+    <div class="ws-section">
+      <div class="ws-label">核心技巧：六种操作</div>
+      <div style="font-size:0.62rem;line-height:2">
+        <span style="color:var(--nietzsche)">翻转</span> &middot;
+        <span style="color:var(--beauvoir)">升维</span> &middot;
+        <span style="color:var(--zhuangzi)">揭示盲点</span> &middot;
+        归谬 &middot; 补充条件 &middot; 重新定义
+      </div>
+    </div>
+  </div>
+
+  <p style="font-family:var(--font-mono);font-size:0.55rem;color:var(--ink-light);text-align:center;margin-top:32px;letter-spacing:0.1em">填完五张表<br>结构就在你脑子里</p>
+</aside>
+
+</div>
+</body>
+</html>

@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Debate Arena — Brutalist Editorial</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;600;700;900&family=Noto+Sans+SC:wght@400;700;900&display=swap" rel="stylesheet">
+<style>
+:root {
+  --news-bg: #f5f2e6;
+  --news-paper: #faf7ed;
+  --news-dark: #1a1a1a;
+  --ink-black: #111111;
+  --ink-dark: #2a2a2a;
+  --ink-mid: #4a4a4a;
+  --ink-red: #c41e1e;
+  --seal-red: #8b1a1a;
+  --stamp-blue: #1a3a6b;
+  --border-heavy: 3px;
+  --border-light: 1px;
+  --paper-grain: 0.08;
+  --ink-bleed: 0.02;
+  --font-heading: 'Noto Sans SC', sans-serif;
+  --font-body: 'Noto Serif SC', serif;
+}
+* { margin:0; padding:0; box-sizing:border-box; }
+body {
+  font-family: var(--font-body);
+  background: var(--news-bg);
+  color: var(--ink-black);
+  min-height:100vh;
+  overflow-x:hidden;
+}
+/* === NEWSPRINT PAPER FIBER === */
+body::before {
+  content:'';
+  position:fixed; inset:0; z-index:2; pointer-events:none;
+  background: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='newsprint'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.55' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23newsprint)' opacity='0.12'/%3E%3C/svg%3E");
+  opacity: var(--paper-grain);
+  mix-blend-mode: multiply;
+}
+/* === AGED PAPER TONE === */
+body::after {
+  content:'';
+  position:fixed; inset:0; z-index:3; pointer-events:none;
+  background:
+    radial-gradient(ellipse 1000px 500px at 50% 0%, rgba(200,180,140,0.08) 0%, transparent 60%),
+    radial-gradient(ellipse 800px 400px at 20% 80%, rgba(180,160,120,0.05) 0%, transparent 55%),
+    radial-gradient(ellipse 1200px 300px at 50% 100%, rgba(0,0,0,0.04) 0%, transparent 60%);
+}
+/* === FOLD LINE (simulated newspaper fold) === */
+.fold-line {
+  position:fixed; left:0; right:0; top:50%;
+  height:1px; z-index:4; pointer-events:none;
+  background: linear-gradient(90deg, transparent 10%, rgba(0,0,0,0.06) 30%, rgba(0,0,0,0.08) 50%, rgba(0,0,0,0.06) 70%, transparent 90%);
+  box-shadow: 0 1px 0 rgba(255,255,255,0.3);
+}
+/* === MAIN === */
+.app { position:relative; z-index:6; max-width:1300px; margin:0 auto; padding:20px 28px; }
+/* === HEADER === */
+.header {
+  text-align:center; padding:32px 20px 24px;
+  border-top: var(--border-heavy) solid var(--ink-black);
+  border-bottom: 4px double var(--ink-black);
+  margin-bottom:24px;
+  position:relative;
+}
+/* Rubber stamp effect */
+.header::before {
+  content:'DEBATE';
+  position:absolute; top:-8px; right:10%;
+  font-family:var(--font-heading);
+  font-size:0.9rem;
+  font-weight:900;
+  color: var(--seal-red);
+  letter-spacing:0.2em;
+  padding:2px 10px;
+  border: 2px solid var(--seal-red);
+  transform: rotate(8deg);
+  opacity:0.6;
+}
+.header h1 {
+  font-family: var(--font-heading);
+  font-size:2.8rem;
+  font-weight:900;
+  letter-spacing: 0.08em;
+  color: var(--ink-black);
+  text-transform: uppercase;
+  /* Letterpress depression effect */
+  text-shadow:
+    0 1px 0 rgba(255,255,255,0.4),
+    0 -1px 1px rgba(0,0,0,0.2),
+    0 2px 3px rgba(0,0,0,0.1);
+}
+.header .tagline {
+  font-family: var(--font-heading);
+  font-size:0.78rem;
+  font-weight:700;
+  letter-spacing:0.3em;
+  color: var(--ink-dark);
+  margin-top:6px;
+  text-transform: uppercase;
+}
+.header .issue-line {
+  font-family: var(--font-heading);
+  font-size:0.65rem;
+  letter-spacing:0.15em;
+  color: var(--ink-mid);
+  margin-top:8px;
+  display:flex; justify-content:center; align-items:center; gap:16px;
+}
+.header .issue-line span { opacity:0.7; }
+/* === TOPIC BAR === */
+.topic-bar {
+  display:flex; gap:12px; align-items:center;
+  margin-bottom:24px;
+  background: var(--news-paper);
+  padding:12px 16px;
+  border: var(--border-heavy) solid var(--ink-black);
+  box-shadow: 4px 4px 0 var(--ink-black);
+  /* Ink bleed on border */
+  position:relative;
+}
+.topic-bar::after {
+  content:'';
+  position:absolute; inset:-4px; z-index:-1; pointer-events:none;
+  background:
+    radial-gradient(1px 1px at 10% 5%, rgba(0,0,0,0.15), transparent),
+    radial-gradient(1px 1px at 90% 95%, rgba(0,0,0,0.1), transparent),
+    radial-gradient(2px 2px at 5% 50%, rgba(0,0,0,0.08), transparent);
+}
+.topic-bar .label-debate {
+  font-family: var(--font-heading);
+  font-size:0.8rem;
+  font-weight:900;
+  color: var(--ink-black);
+  text-transform: uppercase;
+  letter-spacing:0.1em;
+  background: var(--ink-black);
+  color: var(--news-paper);
+  padding:4px 10px;
+  flex-shrink:0;
+}
+.topic-input {
+  flex:1; border:none; background:transparent;
+  font-family: var(--font-body);
+  font-size:1rem;
+  color: var(--ink-black);
+  padding:6px 4px;
+  outline:none;
+}
+.topic-input::placeholder { color:var(--ink-mid); font-style:italic; }
+.topic-btn {
+  background: var(--ink-black);
+  color: var(--news-paper);
+  border: none;
+  padding:8px 20px;
+  font-family: var(--font-heading);
+  font-weight:700;
+  font-size:0.82rem;
+  letter-spacing:0.1em;
+  text-transform: uppercase;
+  cursor:pointer;
+  transition: all 0.25s;
+}
+.topic-btn:hover {
+  background: var(--ink-red);
+  box-shadow: 2px 2px 0 var(--ink-black);
+  transform: translate(-2px, -2px);
+}
+/* === LAYOUT === */
+.main-layout { display:flex; gap:24px; align-items:flex-start; }
+.debate-grid { flex:1; display:grid; grid-template-columns: repeat(3, 1fr); gap:20px; }
+.sidebar { width:260px; flex-shrink:0; }
+/* === CARDS === */
+.debate-card {
+  background: var(--news-paper);
+  border: var(--border-heavy) solid var(--ink-black);
+  padding: 20px 16px 16px;
+  position:relative;
+  transition: all 0.3s cubic-bezier(0.2, 0, 0, 1);
+  box-shadow: 4px 4px 0 var(--ink-dark);
+  /* Letterpress text-shadow on card */
+}
+/* Card paper grain */
+.debate-card::before {
+  content:'';
+  position:absolute; inset:0; z-index:0; pointer-events:none;
+  background: url("data:image/svg+xml,%3Csvg viewBox='0 0 120 120' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='cp'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.5' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23cp)' opacity='0.08'/%3E%3C/svg%3E");
+  mix-blend-mode: multiply;
+  transition: opacity 0.3s;
+}
+/* Ink bleed on heavy borders */
+.debate-card::after {
+  content:'';
+  position:absolute; inset:-5px; z-index:-1; pointer-events:none;
+  background:
+    radial-gradient(1px 1px at 0% 0%, rgba(0,0,0,0.12), transparent),
+    radial-gradient(1px 1px at 100% 0%, rgba(0,0,0,0.1), transparent),
+    radial-gradient(2px 1px at 50% 0%, rgba(0,0,0,0.06), transparent),
+    radial-gradient(1px 1px at 0% 100%, rgba(0,0,0,0.08), transparent),
+    radial-gradient(1px 1px at 100% 100%, rgba(0,0,0,0.06), transparent);
+  opacity: var(--ink-bleed);
+}
+.debate-card:hover {
+  transform: translate(-2px, -2px);
+  box-shadow: 6px 6px 0 var(--ink-black);
+}
+.debate-card:hover::before { opacity:0.1; }
+.debate-card .card-header {
+  position:relative; z-index:1;
+  display:flex; align-items:center; gap:10px;
+  margin-bottom:12px;
+  padding-bottom:10px;
+  border-bottom: 2px solid var(--ink-black);
+}
+.card-avatar {
+  width:42px; height:42px;
+  display:flex; align-items:center; justify-content:center;
+  font-family: var(--font-heading);
+  font-size:1rem;
+  font-weight:900;
+  border: 2px solid var(--ink-black);
+  flex-shrink:0;
+}
+.card-avatar.z { background:var(--ink-black); color:var(--news-paper); }
+.card-avatar.n { background:var(--news-paper); color:var(--ink-red); border-color:var(--ink-red); }
+.card-avatar.b { background:var(--news-paper); color:var(--stamp-blue); border-color:var(--stamp-blue); }
+.card-name {
+  font-family: var(--font-heading);
+  font-size:1.05rem;
+  font-weight:900;
+  color: var(--ink-black);
+  text-transform: uppercase;
+  letter-spacing:0.06em;
+  text-shadow: 0 1px 0 rgba(255,255,255,0.3), 0 -1px 0 rgba(0,0,0,0.08);
+}
+.card-role {
+  font-size:0.68rem;
+  font-family: var(--font-heading);
+  font-weight:700;
+  color: var(--ink-mid);
+  text-transform: uppercase;
+  letter-spacing:0.08em;
+}
+.debate-card .card-body {
+  position:relative; z-index:1;
+  font-size:0.88rem;
+  line-height:1.7;
+  color: var(--ink-dark);
+}
+.debate-card .card-body p { margin-bottom:8px; text-indent:1.5em; }
+.debate-card .card-body .quote {
+  border-left: 3px solid var(--ink-black);
+  padding: 6px 14px;
+  margin: 10px 0;
+  font-style: italic;
+  color: var(--ink-mid);
+  background: rgba(0,0,0,0.02);
+  text-indent:0;
+}
+.debate-card .card-stance {
+  margin-top:12px; padding-top:8px;
+  border-top: 1px solid var(--ink-dark);
+  font-size:0.7rem;
+  font-family: var(--font-heading);
+  font-weight:700;
+  color: var(--ink-red);
+  text-transform: uppercase;
+  letter-spacing:0.05em;
+}
+/* === SIDEBAR === */
+.sidebar {
+  background: var(--news-paper);
+  border: var(--border-heavy) solid var(--ink-black);
+  padding:18px;
+  box-shadow: 4px 4px 0 var(--ink-dark);
+  position:relative;
+}
+.sidebar::before {
+  content:'STAMP';
+  position:absolute; top:10px; right:12px;
+  font-family:var(--font-heading);
+  font-size:0.55rem;
+  font-weight:900;
+  color: var(--seal-red);
+  border: 1px solid var(--seal-red);
+  padding:1px 6px;
+  transform:rotate(12deg);
+  opacity:0.5;
+}
+.sidebar h3 {
+  font-family: var(--font-heading);
+  font-size:1rem;
+  font-weight:900;
+  color: var(--ink-black);
+  margin-bottom:14px;
+  text-align:center;
+  text-transform: uppercase;
+  letter-spacing:0.06em;
+  text-shadow: 0 1px 0 rgba(255,255,255,0.3), 0 -1px 0 rgba(0,0,0,0.06);
+}
+.heatmap-bar { margin-bottom:12px; }
+.heatmap-label {
+  display:flex; justify-content:space-between;
+  font-size:0.68rem;
+  font-family:var(--font-heading);
+  font-weight:700;
+  color:var(--ink-dark);
+  margin-bottom:4px;
+  text-transform: uppercase;
+}
+.heatmap-track {
+  height:8px;
+  background: var(--news-bg);
+  border: 1px solid var(--ink-dark);
+  overflow:hidden;
+}
+.heatmap-fill { height:100%; transition:width 0.6s ease; }
+.heatmap-fill.black { background: var(--ink-black); }
+.heatmap-fill.red { background: var(--ink-red); }
+.heatmap-fill.blue { background: var(--stamp-blue); }
+.sidebar .insight-box {
+  margin-top:16px; padding:12px;
+  border: 1px solid var(--ink-dark);
+  background: rgba(0,0,0,0.02);
+  font-size:0.74rem; color:var(--ink-dark);
+  line-height:1.6;
+  font-family:var(--font-body);
+}
+@media (max-width:1024px) {
+  .main-layout { flex-direction:column; }
+  .sidebar { width:100%; }
+  .debate-grid { grid-template-columns:1fr; }
+}
+</style>
+</head>
+<body>
+<div class="fold-line"></div>
+<div class="app">
+  <header class="header">
+    <h1>思 想 简 报</h1>
+    <div class="tagline">BRUTALIST EDITORIAL &middot; 哲 学 版</div>
+    <div class="issue-line">
+      <span>VOL. IV</span>
+      <span>|</span>
+      <span>三子辩场</span>
+      <span>|</span>
+      <span>特刊</span>
+    </div>
+  </header>
+
+  <div class="topic-bar">
+    <span class="label-debate">辩</span>
+    <input class="topic-input" placeholder="今日议题..." value="自由意志是否存在？">
+    <button class="topic-btn">刊 印</button>
+  </div>
+
+  <div class="main-layout">
+    <div class="debate-grid">
+      <div class="debate-card">
+        <div class="card-header">
+          <div class="card-avatar z">庄</div>
+          <div>
+            <div class="card-name">庄周</div>
+            <div class="card-role">道家专栏</div>
+          </div>
+        </div>
+        <div class="card-body">
+          <p>物无非彼，物无非是。自彼则不见，自知则知之。故曰：彼出于是，是亦因彼。</p>
+          <div class="quote">"方生方死，方死方生。方可方不可，方不可方可。"</div>
+          <p>你们争论自由是否存在——这个问题本身就是"彼"与"是"的对立。跳出对立，方见道枢。自由与命运，不过是一体两面罢了。</p>
+        </div>
+        <div class="card-stance">立场：超越二元，道通为一</div>
+      </div>
+
+      <div class="debate-card">
+        <div class="card-header">
+          <div class="card-avatar n">尼</div>
+          <div>
+            <div class="card-name">尼采</div>
+            <div class="card-role">锤子专栏</div>
+          </div>
+        </div>
+        <div class="card-body">
+          <p>庄周的"道枢"听起来像是一个舒适的靠枕——躺上去，一切矛盾就消失了。但生命本身就是矛盾！</p>
+          <div class="quote">"一切文学中，我只爱那些用血写成的。"</div>
+          <p>不要逃避矛盾，而要拥抱矛盾！说"是"——对这个充满苦难、荒谬与美丽的世界说"是"！这才是自由！</p>
+        </div>
+        <div class="card-stance">立场：在矛盾中肯定生命，是即自由</div>
+      </div>
+
+      <div class="debate-card">
+        <div class="card-header">
+          <div class="card-avatar b">波</div>
+          <div>
+            <div class="card-name">波伏娃</div>
+            <div class="card-role">处境专栏</div>
+          </div>
+        </div>
+        <div class="card-body">
+          <p>庄周的"道枢"和尼采的"说是"——都很迷人，也都同样忽略了具体的肉身与历史。不是所有人都能"跳出对立"，也不是所有人都能"拥抱矛盾"。</p>
+          <div class="quote">"要解放一个人，必须改变她所处的整个处境。"</div>
+          <p>自由不是哲学玄思——它是每一天、每一个选择中，拒绝被世界定义的那一口气。</p>
+        </div>
+        <div class="card-stance">立场：自由是具体处境中的否定与行动</div>
+      </div>
+    </div>
+
+    <aside class="sidebar">
+      <h3>舆论测量</h3>
+      <div class="heatmap-bar">
+        <div class="heatmap-label"><span>庄周·道枢</span><span>74%</span></div>
+        <div class="heatmap-track"><div class="heatmap-fill black" style="width:74%"></div></div>
+      </div>
+      <div class="heatmap-bar">
+        <div class="heatmap-label"><span>尼采·说是</span><span>88%</span></div>
+        <div class="heatmap-track"><div class="heatmap-fill red" style="width:88%"></div></div>
+      </div>
+      <div class="heatmap-bar">
+        <div class="heatmap-label"><span>波伏娃·否定</span><span>63%</span></div>
+        <div class="heatmap-track"><div class="heatmap-fill blue" style="width:63%"></div></div>
+      </div>
+      <div class="insight-box">
+        <strong>编者按</strong><br>
+        庄子超越对立，尼采拥抱对立，波伏娃改变对立。三位思想家提供的不只是答案，而是三种与世界相处的方式——道枢、锤子与镜子。
+      </div>
+    </aside>
+  </div>
+</div>
+</body>
+</html>

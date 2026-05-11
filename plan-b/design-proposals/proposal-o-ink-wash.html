@@ -1,0 +1,917 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>墨韵·深远 — 三子辩</title>
+<style>
+/* ============================================
+   Proposal O: 墨韵·深远 (Ink Wash Cinematic)
+   参考: 张艺谋《英雄》《影》, 南宋马远夏圭
+   角色: 庄周 / 尼采 / 波伏娃
+   ============================================ */
+
+@import url('https://fonts.googleapis.com/css2?family=ZCOOL+KuaiLe&family=Ma+Shan+Zheng&family=Noto+Serif+SC:wght@300;400;600;700&display=swap');
+
+:root {
+  --paper: #f5f0e8;
+  --ink-deep: #1a1a1a;
+  --ink-mid: #3a3530;
+  --ink-light: #8a8580;
+  --ink-fade: #c4bfb8;
+  --seal-red: #c23a2b;
+  --seal-red-dark: #8b1a1a;
+  --mist-white: rgba(255,255,255,0.7);
+  --mountain-far: rgba(60,55,50,0.08);
+  --mountain-mid: rgba(60,55,50,0.15);
+  --mountain-near: rgba(50,45,40,0.25);
+  --bamboo: #4a6741;
+  --bamboo-light: #7a9a6a;
+  --water: rgba(180,200,210,0.3);
+  --title-font: 'ZCOOL KuaiLe', 'Ma Shan Zheng', cursive;
+  --body-font: 'Noto Serif SC', 'SimSun', serif;
+  --scene1-tint: rgba(60,80,70,0.06);
+  --scene2-tint: rgba(160,120,80,0.08);
+  --scene3-tint: rgba(40,80,120,0.07);
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  font-family: var(--body-font);
+  background: var(--paper);
+  color: var(--ink-deep);
+  overflow-x: hidden;
+  min-height: 100vh;
+  cursor: default;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ============================================
+   LAYER 1: 宣纸底纹 (Rice Paper Texture)
+   ============================================ */
+.paper-layer {
+  position: fixed; inset: 0; z-index: 0;
+  background:
+    radial-gradient(ellipse at 20% 50%, rgba(210,190,150,0.15) 0%, transparent 70%),
+    radial-gradient(ellipse at 80% 30%, rgba(180,160,130,0.1) 0%, transparent 60%),
+    radial-gradient(ellipse at 50% 80%, rgba(200,180,140,0.08) 0%, transparent 50%),
+    var(--paper);
+}
+
+/* Fiber texture via SVG filter */
+.paper-layer::before {
+  content: '';
+  position: absolute; inset: 0;
+  filter: url(#paperFiber);
+  opacity: 0.12;
+  pointer-events: none;
+}
+
+/* Age spots */
+.paper-layer::after {
+  content: '';
+  position: absolute; inset: 0;
+  background:
+    radial-gradient(circle at 15% 25%, rgba(180,150,100,0.12) 0%, transparent 3%),
+    radial-gradient(circle at 72% 18%, rgba(160,130,90,0.1) 0%, transparent 4%),
+    radial-gradient(circle at 45% 72%, rgba(170,140,100,0.09) 0%, transparent 3%),
+    radial-gradient(circle at 88% 65%, rgba(180,150,110,0.11) 0%, transparent 5%),
+    radial-gradient(circle at 30% 55%, rgba(165,135,95,0.08) 0%, transparent 2%);
+  pointer-events: none;
+}
+
+/* ============================================
+   LAYER 2: 远山轮廓 (Distant Mountains)
+   ============================================ */
+.mountains-layer {
+  position: fixed; inset: 0; z-index: 1;
+  pointer-events: none;
+}
+
+.mountain {
+  position: absolute;
+  background: var(--mountain-far);
+}
+
+/* Far mountains - 高远景深 */
+.mountain-1 {
+  bottom: 35%; left: 5%; width: 30%; height: 25%;
+  clip-path: polygon(0% 100%, 10% 40%, 25% 20%, 40% 35%, 55% 15%, 70% 45%, 85% 30%, 100% 60%, 100% 100%);
+  opacity: 0.6;
+}
+
+.mountain-2 {
+  bottom: 38%; right: 3%; width: 35%; height: 22%;
+  clip-path: polygon(0% 70%, 15% 35%, 30% 50%, 45% 25%, 60% 40%, 75% 20%, 90% 45%, 100% 65%, 100% 100%);
+  opacity: 0.5;
+}
+
+.mountain-3 {
+  bottom: 30%; left: 30%; width: 40%; height: 20%;
+  clip-path: polygon(0% 80%, 20% 50%, 35% 35%, 50% 55%, 65% 30%, 80% 50%, 100% 75%, 100% 100%);
+  opacity: 0.4;
+}
+
+/* Mid-ground mountains */
+.mountain-4 {
+  bottom: 25%; left: 10%; width: 25%; height: 18%;
+  clip-path: polygon(0% 100%, 5% 40%, 20% 60%, 35% 25%, 50% 45%, 70% 30%, 85% 55%, 100% 80%, 100% 100%);
+  background: var(--mountain-mid);
+  opacity: 0.7;
+}
+
+.mountain-5 {
+  bottom: 28%; right: 0; width: 30%; height: 16%;
+  clip-path: polygon(0% 65%, 12% 35%, 28% 50%, 40% 28%, 55% 42%, 70% 22%, 85% 40%, 100% 55%, 100% 100%);
+  background: var(--mountain-mid);
+  opacity: 0.65;
+}
+
+/* ============================================
+   LAYER 3: 中景云雾 (Mid-ground Mist)
+   ============================================ */
+.mist-layer {
+  position: fixed; inset: 0; z-index: 2;
+  pointer-events: none;
+}
+
+.mist {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(40px);
+}
+
+.mist-1 {
+  bottom: 20%; left: 10%; width: 50%; height: 30%;
+  background: radial-gradient(ellipse at center, rgba(255,255,255,0.5) 0%, rgba(255,255,255,0.2) 40%, transparent 70%);
+}
+
+.mist-2 {
+  bottom: 15%; right: 5%; width: 40%; height: 25%;
+  background: radial-gradient(ellipse at center, rgba(255,255,255,0.4) 0%, rgba(255,255,255,0.15) 35%, transparent 65%);
+}
+
+.mist-3 {
+  top: 25%; left: 20%; width: 60%; height: 15%;
+  background: radial-gradient(ellipse at center, rgba(255,255,255,0.3) 0%, transparent 60%);
+}
+
+.mist-4 {
+  bottom: 35%; left: 30%; width: 45%; height: 12%;
+  background: radial-gradient(ellipse at center, rgba(255,255,255,0.35) 0%, transparent 55%);
+}
+
+/* Mist drift animation */
+.mist-1 { animation: mistDrift 20s ease-in-out infinite; }
+.mist-2 { animation: mistDrift 25s ease-in-out infinite reverse; }
+.mist-3 { animation: mistDrift 30s ease-in-out infinite; }
+.mist-4 { animation: mistDrift 22s ease-in-out infinite reverse; }
+
+@keyframes mistDrift {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(3%); }
+  50% { transform: translateX(-2%); }
+  75% { transform: translateX(2%); }
+}
+
+/* ============================================
+   LAYER 4: 近景水墨笔触 (Near-ground Ink Strokes)
+   ============================================ */
+.ink-strokes-layer {
+  position: fixed; inset: 0; z-index: 3;
+  pointer-events: none;
+}
+
+.ink-stroke {
+  position: absolute;
+  opacity: 0.06;
+}
+
+.ink-stroke-1 {
+  bottom: 15%; left: 3%; width: 20%; height: 40%;
+  background: radial-gradient(ellipse 120% 60% at 50% 70%, #2a2520 0%, transparent 70%);
+  clip-path: ellipse(50% 35% at 50% 65%);
+}
+
+.ink-stroke-2 {
+  bottom: 12%; right: 8%; width: 18%; height: 35%;
+  background: radial-gradient(ellipse 100% 50% at 40% 60%, #2a2520 0%, transparent 65%);
+  clip-path: ellipse(45% 30% at 40% 55%);
+}
+
+/* Bamboo sketch */
+.ink-stroke-3 {
+  top: 12%; left: 6%;
+  width: 3px; height: 80px;
+  background: linear-gradient(to bottom, transparent, rgba(74,103,65,0.15), rgba(74,103,65,0.08));
+  transform: rotate(-5deg);
+}
+
+.ink-stroke-4 {
+  top: 8%; left: 8%;
+  width: 2px; height: 65px;
+  background: linear-gradient(to bottom, transparent, rgba(74,103,65,0.12), transparent);
+  transform: rotate(3deg);
+}
+
+/* ============================================
+   SVG Filters
+   ============================================ */
+.svg-defs {
+  position: fixed; width: 0; height: 0; overflow: hidden;
+}
+
+/* ============================================
+   HEADER: 竖排标题 (Vertical Calligraphy Title)
+   ============================================ */
+.header {
+  position: fixed; top: 30px; right: 40px; z-index: 10;
+  writing-mode: vertical-rl;
+  text-orientation: mixed;
+  font-family: var(--title-font);
+  font-size: 28px;
+  color: var(--ink-deep);
+  letter-spacing: 8px;
+  line-height: 1.8;
+  text-shadow:
+    0 1px 0 rgba(0,0,0,0.1),
+    0 0 30px rgba(0,0,0,0.05);
+  opacity: 0.85;
+}
+
+.header .subtitle {
+  font-size: 14px;
+  color: var(--ink-light);
+  letter-spacing: 4px;
+  margin-top: 10px;
+}
+
+/* ============================================
+   MAIN ARENA: 论辩空间
+   ============================================ */
+.arena {
+  position: relative; z-index: 5;
+  min-height: 100vh;
+  padding: 40px 20px 80px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+/* ============================================
+   SCENE INDICATOR (Round Badge)
+   ============================================ */
+.scene-indicator {
+  position: fixed; top: 40px; left: 40px; z-index: 10;
+  display: flex; flex-direction: column; align-items: center;
+  gap: 12px;
+}
+
+.scene-dot {
+  width: 12px; height: 12px;
+  border-radius: 50%;
+  border: 1.5px solid var(--ink-mid);
+  background: transparent;
+  transition: all 0.8s ease;
+}
+
+.scene-dot.active {
+  background: var(--ink-deep);
+  box-shadow: 0 0 12px rgba(0,0,0,0.15);
+  transform: scale(1.2);
+}
+
+.scene-label {
+  font-size: 11px;
+  color: var(--ink-light);
+  writing-mode: vertical-rl;
+  text-orientation: mixed;
+  letter-spacing: 3px;
+}
+
+/* ============================================
+   DEBATE ROUNDS CONTAINER
+   ============================================ */
+.rounds-container {
+  position: relative;
+  width: 100%;
+  min-height: 100vh;
+}
+
+.round {
+  position: relative;
+  min-height: 100vh;
+  padding: 80px 0 60px;
+  transition: opacity 0.8s ease;
+}
+
+/* Scene-specific tints */
+.round-1 {
+  background:
+    radial-gradient(ellipse at 30% 40%, var(--scene1-tint) 0%, transparent 70%),
+    radial-gradient(ellipse at 70% 70%, rgba(40,60,50,0.04) 0%, transparent 50%);
+}
+
+.round-2 {
+  background:
+    radial-gradient(ellipse at 60% 30%, var(--scene2-tint) 0%, transparent 70%),
+    radial-gradient(ellipse at 30% 60%, rgba(140,100,60,0.06) 0%, transparent 50%);
+}
+
+.round-3 {
+  background:
+    radial-gradient(ellipse at 40% 35%, var(--scene3-tint) 0%, transparent 70%),
+    radial-gradient(ellipse at 70% 50%, rgba(30,60,100,0.05) 0%, transparent 55%);
+}
+
+/* Separator: cloud mist transition between rounds */
+.round-separator {
+  position: relative;
+  height: 80px;
+  background: linear-gradient(to bottom,
+    transparent 0%,
+    rgba(255,255,255,0.4) 30%,
+    rgba(255,255,255,0.6) 50%,
+    rgba(255,255,255,0.4) 70%,
+    transparent 100%
+  );
+  filter: blur(8px);
+  pointer-events: none;
+}
+
+/* ============================================
+   SPEECH CARD — 散点透视布局
+   Each character positioned at different spots
+   ============================================ */
+.speech {
+  position: absolute;
+  max-width: 340px;
+  padding: 28px 24px 36px;
+  background: rgba(245,240,232,0.85);
+  transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+  cursor: pointer;
+}
+
+/* Ink wash card border effect */
+.speech::before {
+  content: '';
+  position: absolute; inset: 0;
+  border: 1px solid rgba(0,0,0,0.08);
+  pointer-events: none;
+  transition: border-color 0.6s ease;
+}
+
+.speech:hover::before {
+  border-color: rgba(0,0,0,0.18);
+}
+
+/* 庄周: 左上方，竹叶旁 — 高远 */
+.speech-zhuangzi {
+  top: 6%; left: 5%;
+  border-radius: 2px 16px 8px 4px;
+}
+
+.speech-zhuangzi .role-tag {
+  color: var(--bamboo);
+}
+
+.speech-zhuangzi .seal {
+  clip-path: circle(50% at 50% 50%);
+}
+
+/* 尼采: 右中方，瀑布边 — 深远 */
+.speech-nietzsche {
+  top: 35%; right: 4%;
+  border-radius: 12px 2px 4px 12px;
+}
+
+.speech-nietzsche .role-tag {
+  color: #6b3a2a;
+}
+
+.speech-nietzsche .seal {
+  border-radius: 2px;
+}
+
+/* 波伏娃: 下方，水面之上 — 平远 */
+.speech-beauvoir {
+  bottom: 10%; left: 20%;
+  border-radius: 4px 4px 16px 16px;
+}
+
+.speech-beauvoir .role-tag {
+  color: #3a5a8c;
+}
+
+.speech-beauvoir .seal {
+  clip-path: ellipse(48% 45% at 50% 50%);
+}
+
+/* Card hover: ink spread effect */
+.speech:hover {
+  background: rgba(245,240,232,0.92);
+  box-shadow:
+    0 4px 30px rgba(0,0,0,0.06),
+    0 1px 3px rgba(0,0,0,0.04);
+  transform: translateY(-2px);
+}
+
+/* Ink bleed on hover */
+.speech:hover::after {
+  content: '';
+  position: absolute;
+  bottom: -8px; left: 10%; width: 80%; height: 12px;
+  background: radial-gradient(ellipse at center, rgba(0,0,0,0.06) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+/* ============================================
+   ROLE TAG (角色标识)
+   ============================================ */
+.role-tag {
+  display: block;
+  font-family: var(--title-font);
+  font-size: 22px;
+  letter-spacing: 4px;
+  margin-bottom: 12px;
+  position: relative;
+  padding-bottom: 10px;
+}
+
+.role-tag::after {
+  content: '';
+  position: absolute;
+  bottom: 0; left: 0;
+  width: 40px; height: 1.5px;
+  background: currentColor;
+  opacity: 0.4;
+}
+
+/* ============================================
+   SPEECH TEXT — 飞白与浓淡
+   ============================================ */
+.speech-text {
+  font-size: 15px;
+  line-height: 2;
+  letter-spacing: 0.5px;
+}
+
+/* Key phrases: dark & bold */
+.speech-text .ink-heavy {
+  color: var(--ink-deep);
+  font-weight: 600;
+  text-shadow: 0 0 2px rgba(0,0,0,0.15);
+}
+
+/* Transitional phrases: light & fading */
+.speech-text .ink-light {
+  color: var(--ink-fade);
+  font-weight: 300;
+  opacity: 0.7;
+}
+
+.speech-text .ink-mid {
+  color: var(--ink-mid);
+  font-weight: 400;
+}
+
+/* ============================================
+   SEAL STAMP (印章落款)
+   ============================================ */
+.seal {
+  position: absolute;
+  bottom: 8px; right: 12px;
+  width: 28px; height: 28px;
+  background: var(--seal-red);
+  display: flex; align-items: center; justify-content: center;
+  font-family: var(--title-font);
+  font-size: 10px;
+  color: rgba(255,255,255,0.9);
+  opacity: 0.7;
+  transition: opacity 0.4s ease;
+}
+
+.speech:hover .seal {
+  opacity: 0.9;
+}
+
+.seal::after {
+  content: '';
+  position: absolute; inset: 2px;
+  border: 1px solid rgba(200,180,160,0.3);
+  pointer-events: none;
+}
+
+/* ============================================
+   COLLISION ZONE (碰撞区域)
+   ============================================ */
+.collision-zone {
+  position: absolute;
+  left: 50%; top: 45%;
+  transform: translate(-50%, -50%);
+  width: 200px; height: 200px;
+  display: flex; align-items: center; justify-content: center;
+  pointer-events: none;
+}
+
+.collision-glyph {
+  font-family: var(--title-font);
+  font-size: 48px;
+  color: rgba(0,0,0,0.04);
+  animation: glyphPulse 6s ease-in-out infinite;
+}
+
+@keyframes glyphPulse {
+  0%, 100% { opacity: 0.03; transform: scale(1); }
+  50% { opacity: 0.08; transform: scale(1.1); }
+}
+
+/* ============================================
+   BAMBOO DECORATION (竹)
+   ============================================ */
+.bamboo-decoration {
+  position: fixed; top: 8%; left: 2%; z-index: 4;
+  pointer-events: none;
+  opacity: 0.15;
+}
+
+.bamboo-stalk {
+  width: 2px;
+  background: linear-gradient(to bottom,
+    transparent 0%,
+    var(--bamboo) 10%,
+    var(--bamboo-light) 30%,
+    var(--bamboo) 50%,
+    var(--bamboo-light) 70%,
+    var(--bamboo) 90%,
+    transparent 100%
+  );
+}
+
+.bamboo-stalk-1 { height: 140px; margin-left: 10px; }
+.bamboo-stalk-2 { height: 110px; margin-left: 25px; }
+
+.bamboo-leaf {
+  position: absolute;
+  width: 20px; height: 6px;
+  background: var(--bamboo);
+  border-radius: 0 80% 0 80%;
+  transform-origin: left center;
+}
+
+.leaf-1 { top: 30px; left: 10px; transform: rotate(-30deg); }
+.leaf-2 { top: 40px; left: 10px; transform: rotate(-10deg); }
+.leaf-3 { top: 55px; left: 25px; transform: rotate(-25deg); }
+
+/* ============================================
+   WATERFALL DECORATION (瀑)
+   ============================================ */
+.waterfall-decoration {
+  position: fixed; top: 10%; right: 3%; z-index: 4;
+  pointer-events: none;
+  width: 30px; height: 180px;
+  background: linear-gradient(to bottom,
+    rgba(160,190,210,0.08) 0%,
+    rgba(160,190,210,0.12) 20%,
+    rgba(160,190,210,0.18) 40%,
+    rgba(160,190,210,0.25) 60%,
+    rgba(160,190,210,0.15) 80%,
+    transparent 100%
+  );
+  clip-path: polygon(20% 0%, 80% 0%, 70% 30%, 85% 50%, 65% 70%, 80% 85%, 60% 100%, 40% 100%);
+}
+
+/* ============================================
+   WATER SURFACE (水面)
+   ============================================ */
+.water-surface {
+  position: fixed; bottom: 0; left: 0; right: 0; z-index: 4;
+  height: 80px;
+  background: linear-gradient(to bottom,
+    transparent 0%,
+    rgba(170,195,210,0.06) 30%,
+    rgba(170,195,210,0.1) 60%,
+    rgba(170,195,210,0.15) 100%
+  );
+  pointer-events: none;
+}
+
+/* Water ripple lines */
+.water-surface::before {
+  content: '';
+  position: absolute; top: 20px; left: 0; right: 0;
+  height: 1px;
+  background: linear-gradient(to right,
+    transparent 5%,
+    rgba(0,0,0,0.04) 15%,
+    transparent 25%,
+    rgba(0,0,0,0.04) 40%,
+    transparent 50%,
+    rgba(0,0,0,0.03) 65%,
+    transparent 75%,
+    rgba(0,0,0,0.04) 88%,
+    transparent 100%
+  );
+}
+
+/* ============================================
+   FOOTER COLOPHON (题跋底部)
+   ============================================ */
+.footer-colophon {
+  position: fixed; bottom: 25px; left: 30px; z-index: 10;
+  font-size: 11px;
+  color: var(--ink-fade);
+  letter-spacing: 2px;
+  writing-mode: horizontal-tb;
+  opacity: 0.5;
+}
+
+/* ============================================
+   RESPONSIVE
+   ============================================ */
+@media (max-width: 768px) {
+  .header {
+    top: 15px; right: 15px;
+    font-size: 20px;
+    letter-spacing: 4px;
+  }
+
+  .scene-indicator {
+    top: 20px; left: 15px;
+  }
+
+  .speech {
+    position: relative !important;
+    max-width: 100%;
+    margin: 20px 0;
+    top: auto !important; right: auto !important;
+    bottom: auto !important; left: auto !important;
+    padding: 20px 18px 30px;
+  }
+
+  .speech-zhuangzi { border-radius: 2px 12px 6px 3px; }
+  .speech-nietzsche { border-radius: 10px 2px 3px 10px; }
+  .speech-beauvoir { border-radius: 3px 3px 12px 12px; }
+
+  .round {
+    padding: 20px 0 30px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .bamboo-decoration,
+  .waterfall-decoration { display: none; }
+
+  .collision-zone {
+    position: relative;
+    left: auto; top: auto;
+    transform: none;
+    margin: 10px auto;
+    height: 80px;
+  }
+
+  .water-surface { height: 40px; }
+}
+
+@media (max-width: 480px) {
+  .speech { padding: 16px 14px 26px; }
+  .speech-text { font-size: 13px; line-height: 1.8; }
+  .role-tag { font-size: 18px; }
+}
+</style>
+</head>
+<body>
+
+<!-- SVG Definitions -->
+<svg class="svg-defs" aria-hidden="true">
+  <defs>
+    <filter id="paperFiber" x="0" y="0" width="100%" height="100%">
+      <feTurbulence type="fractalNoise" baseFrequency="0.65 0.02" numOctaves="4" seed="3" result="noise"/>
+      <feColorMatrix type="saturate" values="0" in="noise" result="grayNoise"/>
+      <feBlend in="SourceGraphic" in2="grayNoise" mode="multiply" result="blended"/>
+    </filter>
+    <filter id="inkBleed" x="-10%" y="-10%" width="120%" height="120%">
+      <feTurbulence type="fractalNoise" baseFrequency="0.04" numOctaves="3" seed="7" result="noise"/>
+      <feDisplacementMap in="SourceGraphic" in2="noise" scale="3" xChannelSelector="R" yChannelSelector="G"/>
+    </filter>
+    <filter id="brushStroke">
+      <feTurbulence type="turbulence" baseFrequency="0.5 0.02" numOctaves="2" seed="5" result="t"/>
+      <feDisplacementMap in="SourceGraphic" in2="t" scale="6" xChannelSelector="R" yChannelSelector="G"/>
+    </filter>
+  </defs>
+</svg>
+
+<!-- Background Layers -->
+<div class="paper-layer"></div>
+<div class="mountains-layer">
+  <div class="mountain mountain-1"></div>
+  <div class="mountain mountain-2"></div>
+  <div class="mountain mountain-3"></div>
+  <div class="mountain mountain-4"></div>
+  <div class="mountain mountain-5"></div>
+</div>
+<div class="mist-layer">
+  <div class="mist mist-1"></div>
+  <div class="mist mist-2"></div>
+  <div class="mist mist-3"></div>
+  <div class="mist mist-4"></div>
+</div>
+<div class="ink-strokes-layer">
+  <div class="ink-stroke ink-stroke-1"></div>
+  <div class="ink-stroke ink-stroke-2"></div>
+  <div class="ink-stroke ink-stroke-3"></div>
+  <div class="ink-stroke ink-stroke-4"></div>
+</div>
+
+<!-- Decorative Elements -->
+<div class="bamboo-decoration">
+  <div class="bamboo-stalk bamboo-stalk-1"></div>
+  <div class="bamboo-stalk bamboo-stalk-2"></div>
+  <div class="bamboo-leaf leaf-1"></div>
+  <div class="bamboo-leaf leaf-2"></div>
+  <div class="bamboo-leaf leaf-3"></div>
+</div>
+<div class="waterfall-decoration"></div>
+<div class="water-surface"></div>
+
+<!-- Header -->
+<header class="header">
+  三子辩
+  <span class="subtitle">论道</span>
+</header>
+
+<!-- Scene Indicator -->
+<div class="scene-indicator">
+  <div class="scene-dot active" title="第一辩"></div>
+  <span class="scene-label">初辩</span>
+  <div class="scene-dot" title="第二辩"></div>
+  <span class="scene-label">激辩</span>
+  <div class="scene-dot" title="第三辩"></div>
+  <span class="scene-label">论定</span>
+</div>
+
+<!-- Main Arena -->
+<main class="arena">
+  <div class="rounds-container">
+
+    <!-- ROUND 1: 墨黑+微青, 主题: 自由 -->
+    <section class="round round-1">
+      <div class="speech speech-zhuangzi">
+        <span class="role-tag">庄周</span>
+        <p class="speech-text">
+          <span class="ink-heavy">北冥有鱼，其名为鲲。</span>
+          <span class="ink-mid">化而为鸟，其名为鹏。鹏之背，不知其几千里也；怒而飞，其翼若垂天之云。</span>
+          <span class="ink-light">是鸟也，海运则将徙于南冥。南冥者，天池也。</span>
+        </p>
+        <p class="speech-text" style="margin-top:10px;">
+          <span class="ink-heavy">若夫乘天地之正，而御六气之辩，以游无穷者，</span>
+          <span class="ink-mid">彼且恶乎待哉？故曰：</span>
+          <span class="ink-light">至人无己，神人无功，圣人无名。</span>
+        </p>
+        <div class="seal">庄</div>
+      </div>
+
+      <div class="speech speech-nietzsche">
+        <span class="role-tag">尼采</span>
+        <p class="speech-text">
+          <span class="ink-heavy">人是一根系在动物与超人之间的绳索——一根悬于深渊之上的绳索。</span>
+        </p>
+        <p class="speech-text" style="margin-top:10px;">
+          <span class="ink-mid">人之伟大，在于其为桥梁而非目的；人之可爱，在于其为过渡与没落。</span>
+          <span class="ink-light">我爱那些除非作为没落者便不知如何生活的人，因为他们是那过渡者。</span>
+        </p>
+        <div class="seal">尼</div>
+      </div>
+
+      <div class="collision-zone">
+        <span class="collision-glyph">逍</span>
+      </div>
+    </section>
+
+    <div class="round-separator"></div>
+
+    <!-- ROUND 2: 赭石暖, 主题: 存在 -->
+    <section class="round round-2">
+      <div class="speech speech-zhuangzi" style="top:5%;left:6%;">
+        <span class="role-tag">庄周</span>
+        <p class="speech-text">
+          <span class="ink-heavy">昔者庄周梦为蝴蝶，栩栩然蝴蝶也。</span>
+          <span class="ink-mid">自喻适志与，不知周也。俄然觉，则蘧蘧然周也。</span>
+          <span class="ink-light">不知周之梦为蝴蝶与？蝴蝶之梦为周与？周与蝴蝶则必有分矣。此之谓物化。</span>
+        </p>
+        <div class="seal">庄</div>
+      </div>
+
+      <div class="speech speech-beauvoir" style="bottom:8%;left:18%;">
+        <span class="role-tag">波伏娃</span>
+        <p class="speech-text">
+          <span class="ink-heavy">女人不是天生的，而是后天成为的。</span>
+        </p>
+        <p class="speech-text" style="margin-top:10px;">
+          <span class="ink-mid">一个自由之人，处于一个被给定的世界中，</span>
+          <span class="ink-mid">必须通过行动来为自身的存在赋予意义。</span>
+          <span class="ink-light">存在的先于本质的——但成为什么，由自己选择。</span>
+        </p>
+        <div class="seal">波</div>
+      </div>
+
+      <div class="collision-zone">
+        <span class="collision-glyph">化</span>
+      </div>
+    </section>
+
+    <div class="round-separator"></div>
+
+    <!-- ROUND 3: 花青冷, 主题: 意志与超越 -->
+    <section class="round round-3">
+      <div class="speech speech-nietzsche" style="top:20%;right:5%;">
+        <span class="role-tag">尼采</span>
+        <p class="speech-text">
+          <span class="ink-heavy">上帝已死。而我们杀死了他。</span>
+        </p>
+        <p class="speech-text" style="margin-top:10px;">
+          <span class="ink-mid">这最伟大的事迹，难道不是太过伟大了吗？</span>
+          <span class="ink-heavy">我们必须自己成为神，</span>
+          <span class="ink-light">才能配得上这一行为。</span>
+        </p>
+        <div class="seal">尼</div>
+      </div>
+
+      <div class="speech speech-beauvoir" style="bottom:12%;left:25%;">
+        <span class="role-tag">波伏娃</span>
+        <p class="speech-text">
+          <span class="ink-heavy">一个人不是生而为女人，而是成为女人。</span>
+          <span class="ink-mid">同样地，一个人也不是生而自由——自由是被争取的。</span>
+        </p>
+        <p class="speech-text" style="margin-top:10px;">
+          <span class="ink-light">每一个主体都是通过谋划——作为超越性的运动——来具体地确立自身为自由的。</span>
+        </p>
+        <div class="seal">波</div>
+      </div>
+
+      <div class="speech speech-zhuangzi" style="top:50%;left:8%;">
+        <span class="role-tag">庄周</span>
+        <p class="speech-text">
+          <span class="ink-heavy">天地与我并生，而万物与我为一。</span>
+        </p>
+        <p class="speech-text" style="margin-top:10px;">
+          <span class="ink-mid">既已为一矣，且得有言乎？既已谓之一矣，且得无言乎？</span>
+          <span class="ink-light">一与言为二，二与一为三。自此以往，巧历不能得，而况其凡乎！</span>
+        </p>
+        <div class="seal">庄</div>
+      </div>
+
+      <div class="collision-zone">
+        <span class="collision-glyph">一</span>
+      </div>
+    </section>
+
+  </div>
+</main>
+
+<!-- Footer Colophon -->
+<div class="footer-colophon">
+  墨韵·深远 / 三子辩 论道场
+</div>
+
+<script>
+/* ============================================
+   Minimal JS: Scene dot interaction & scroll observation
+   ============================================ */
+(function() {
+  const dots = document.querySelectorAll('.scene-dot');
+  const rounds = document.querySelectorAll('.round');
+
+  function updateActiveDot() {
+    let activeIdx = 0;
+    const scrollY = window.scrollY + window.innerHeight / 3;
+
+    rounds.forEach((round, i) => {
+      const rect = round.getBoundingClientRect();
+      const roundTop = rect.top + window.scrollY;
+      if (scrollY >= roundTop) {
+        activeIdx = i;
+      }
+    });
+
+    dots.forEach((dot, i) => {
+      dot.classList.toggle('active', i === activeIdx);
+    });
+  }
+
+  window.addEventListener('scroll', updateActiveDot, { passive: true });
+  updateActiveDot();
+
+  /* Card hover: subtle ink spread */
+  const speeches = document.querySelectorAll('.speech');
+  speeches.forEach(card => {
+    card.addEventListener('mouseenter', function() {
+      this.style.transition = 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)';
+    });
+  });
+})();
+</script>
+
+</body>
+</html>

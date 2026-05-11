@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>知识工坊 — 墨韵书香</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@300;400;500;600;700&family=Source+Serif+4:opsz,wght@8..60,300;8..60,400;8..60,600&display=swap');
+
+:root {
+  --paper: #f7f3eb;
+  --paper-dark: #ede6d8;
+  --ink: #2c2416;
+  --ink-light: #5c5340;
+  --ink-dim: #8a8170;
+  --accent: #8b4513;
+  --accent-light: #c4956a;
+  --border: #d4c9b5;
+  --card-bg: #fffdf7;
+  --card-shadow: 0 2px 16px rgba(44,36,22,0.06);
+  --radius: 8px;
+  --font-display: 'Noto Serif SC', serif;
+  --font-body: 'Source Serif 4', 'Noto Serif SC', serif;
+}
+
+*{margin:0;padding:0;box-sizing:border-box}
+body{
+  background:var(--paper);
+  color:var(--ink);
+  font-family:var(--font-body);
+  min-height:100vh;
+  background-image:
+    radial-gradient(ellipse at 20% 10%, rgba(139,69,19,0.04) 0%, transparent 50%),
+    radial-gradient(ellipse at 80% 90%, rgba(139,69,19,0.03) 0%, transparent 50%),
+    url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.015'/%3E%3C/svg%3E");
+}
+.app{max-width:1200px;margin:0 auto;padding:40px 48px}
+
+/* Header */
+.header{
+  display:flex;align-items:center;gap:24px;padding:32px 0 48px;
+  border-bottom:2px solid var(--border);margin-bottom:40px;
+}
+.header-icon{
+  width:56px;height:56px;border-radius:12px;
+  background:linear-gradient(135deg,var(--accent),var(--accent-light));
+  display:flex;align-items:center;justify-content:center;
+  font-size:1.6rem;color:var(--paper);flex-shrink:0;
+  box-shadow:0 4px 12px rgba(139,69,19,0.2);
+}
+.header h1{
+  font-family:var(--font-display);font-size:2rem;font-weight:500;
+  letter-spacing:0.08em;color:var(--ink);
+}
+.header .subtitle{
+  font-size:0.85rem;color:var(--ink-dim);margin-top:4px;
+  font-style:italic;
+}
+
+/* Upload zone */
+.upload-zone{
+  background:var(--card-bg);border:2px dashed var(--border);
+  border-radius:var(--radius);padding:48px;text-align:center;
+  transition:all 0.3s;cursor:pointer;margin-bottom:32px;
+}
+.upload-zone:hover{border-color:var(--accent);background:#fffdf9;}
+.upload-icon{font-size:2.5rem;margin-bottom:12px;opacity:0.6;}
+.upload-zone h3{font-family:var(--font-display);font-size:1.1rem;font-weight:500;margin-bottom:4px;}
+.upload-zone p{color:var(--ink-dim);font-size:0.85rem;}
+
+/* Two column layout */
+.main-layout{display:grid;grid-template-columns:1fr 1fr;gap:32px;}
+
+/* Mindmap panel */
+.mindmap-panel{
+  background:var(--card-bg);border:1px solid var(--border);
+  border-radius:var(--radius);padding:28px;box-shadow:var(--card-shadow);
+}
+.mindmap-header{
+  display:flex;justify-content:space-between;align-items:center;
+  padding-bottom:16px;border-bottom:1px solid var(--border);margin-bottom:20px;
+}
+.mindmap-header h2{font-family:var(--font-display);font-size:1.1rem;font-weight:500;}
+.mindmap-header .badge{
+  background:var(--paper-dark);color:var(--ink-light);
+  padding:4px 12px;border-radius:20px;font-size:0.75rem;
+}
+
+/* Mindmap tree */
+.tree{margin-left:0;font-size:0.88rem;line-height:1.8;}
+.tree .node{padding:2px 0;position:relative;}
+.tree .node.level-1{font-family:var(--font-display);font-size:1.05rem;font-weight:600;color:var(--ink);margin-top:12px;}
+.tree .node.level-2{font-weight:500;color:var(--ink);padding-left:16px;margin-top:6px;}
+.tree .node.level-3{padding-left:32px;color:var(--ink-light);}
+.tree .node.level-4{padding-left:48px;color:var(--ink-dim);font-size:0.82rem;}
+.tree .node.level-5{padding-left:60px;color:var(--accent);font-weight:500;font-size:0.82rem;margin-top:4px;}
+.tree .leaf{padding-left:76px;color:var(--ink-dim);font-size:0.8rem;}
+.tree .leaf::before{content:'\2014 ';color:var(--accent-light);}
+
+/* Controls panel */
+.controls-panel{
+  display:flex;flex-direction:column;gap:20px;
+}
+
+/* Settings card */
+.settings-card{
+  background:var(--card-bg);border:1px solid var(--border);
+  border-radius:var(--radius);padding:24px;box-shadow:var(--card-shadow);
+}
+.settings-card h3{
+  font-family:var(--font-display);font-size:0.95rem;font-weight:500;
+  margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid var(--border);
+}
+.setting-row{display:flex;align-items:center;justify-content:space-between;padding:8px 0;}
+.setting-row label{font-size:0.85rem;color:var(--ink-light);}
+.setting-row select,.setting-row input{
+  background:var(--paper);border:1px solid var(--border);
+  padding:6px 12px;border-radius:4px;font-family:var(--font-body);
+  font-size:0.82rem;color:var(--ink);outline:none;
+}
+.setting-row select:focus{border-color:var(--accent);}
+
+.btn-generate{
+  width:100%;background:linear-gradient(135deg,var(--accent),#6b3410);
+  color:var(--paper);border:none;padding:14px;border-radius:var(--radius);
+  font-family:var(--font-display);font-size:1rem;font-weight:500;
+  cursor:pointer;letter-spacing:0.06em;margin-top:8px;
+  transition:all 0.3s;
+}
+.btn-generate:hover{transform:translateY(-1px);box-shadow:0 6px 20px rgba(139,69,19,0.25);}
+
+/* Recent mindmaps */
+.recent-card{
+  background:var(--card-bg);border:1px solid var(--border);
+  border-radius:var(--radius);padding:24px;box-shadow:var(--card-shadow);
+}
+.recent-card h3{
+  font-family:var(--font-display);font-size:0.95rem;font-weight:500;
+  margin-bottom:12px;padding-bottom:12px;border-bottom:1px solid var(--border);
+}
+.recent-item{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:10px 0;border-bottom:1px solid var(--border);
+  cursor:pointer;transition:all 0.2s;
+}
+.recent-item:hover{color:var(--accent);}
+.recent-item:last-child{border-bottom:none;}
+.recent-item .name{font-size:0.85rem;}
+.recent-item .meta{font-size:0.72rem;color:var(--ink-dim);}
+
+/* Tabs */
+.tabs{display:flex;gap:0;margin-bottom:24px;border-bottom:2px solid var(--border);}
+.tab{
+  padding:12px 24px;font-family:var(--font-display);font-size:0.9rem;
+  cursor:pointer;color:var(--ink-dim);border-bottom:2px solid transparent;
+  margin-bottom:-2px;transition:all 0.2s;
+}
+.tab.active{color:var(--accent);border-bottom-color:var(--accent);}
+.tab:hover{color:var(--ink-light);}
+
+/* Footer */
+.footer{
+  text-align:center;padding:48px 0 24px;
+  color:var(--ink-dim);font-size:0.8rem;
+  border-top:1px solid var(--border);margin-top:48px;
+}
+.footer quote{font-family:var(--font-display);display:block;font-size:1.1rem;color:var(--ink-light);margin-bottom:8px;}
+</style>
+</head>
+<body>
+<div class="app">
+
+<header class="header">
+  <div class="header-icon">📚</div>
+  <div>
+    <h1>知识工坊</h1>
+    <p class="subtitle">旧书不厌百回读，熟读深思子自知</p>
+  </div>
+</header>
+
+<div class="tabs">
+  <div class="tab active">📊 导图生成</div>
+  <div class="tab">🗄️ 知识仓库</div>
+  <div class="tab">📝 背题刷题</div>
+</div>
+
+<div class="upload-zone">
+  <div class="upload-icon">📄</div>
+  <h3>拖拽或点击上传学习资料</h3>
+  <p>支持 PDF &middot; PPT &middot; DOCX &middot; TXT &middot; 图片 &mdash; 自动识别文档类型</p>
+</div>
+
+<div class="main-layout">
+
+<div class="mindmap-panel">
+  <div class="mindmap-header">
+    <h2>🧬 细胞生物学 &mdash; 思维导图</h2>
+    <span class="badge">教材/教科书</span>
+  </div>
+  <div class="tree">
+    <div class="node level-1">细胞生物学</div>
+    
+    <div class="node level-2">细胞膜</div>
+    <div class="node level-3">化学组成</div>
+    <div class="node level-4">脂质</div>
+    <div class="node level-5">磷脂双分子层是细胞膜的基本骨架</div>
+    <div class="leaf">亲水头部朝外，疏水尾部朝内</div>
+    <div class="leaf">磷脂分子可侧向扩散，荧光漂白恢复实验证明流动性</div>
+    <div class="leaf">胆固醇嵌入双层之间，低温维持流动、高温限制运动</div>
+    
+    <div class="node level-5">膜糖类位于细胞外表面</div>
+    <div class="leaf">以糖蛋白和糖脂形式存在</div>
+    <div class="leaf">参与细胞识别和免疫应答（ABO血型抗原）</div>
+    
+    <div class="node level-4">膜蛋白</div>
+    <div class="node level-5">整合蛋白贯穿脂双层</div>
+    <div class="leaf">多为α-螺旋结构，疏水区与脂双层匹配</div>
+    <div class="leaf">功能：载体蛋白、通道蛋白、受体</div>
+    <div class="node level-5">外周蛋白附着于膜表面</div>
+    <div class="leaf">通过非共价键与整合蛋白或脂质头部结合</div>
+    
+    <div class="node level-3">物质运输</div>
+    <div class="node level-4">被动运输（顺浓度梯度，不耗能）</div>
+    <div class="node level-5">简单扩散</div>
+    <div class="leaf">小分子非极性物质直接穿过磷脂双分子层</div>
+    <div class="leaf">O₂、CO₂、乙醇等可通过</div>
+    <div class="node level-5">协助扩散</div>
+    <div class="leaf">需要通道蛋白或载体蛋白介导</div>
+    <div class="leaf">具有特异性、饱和性、可抑制性</div>
+    
+    <div class="node level-4">主动运输（逆浓度梯度，耗能）</div>
+    <div class="node level-5">钠钾泵（Na⁺/K⁺-ATP酶）</div>
+    <div class="leaf">每泵出3个Na⁺、泵入2个K⁺，消耗1分子ATP</div>
+    <div class="leaf">维持细胞内高K⁺、外高Na⁺</div>
+    
+    <div class="node level-2">细胞器</div>
+    <div class="node level-3">线粒体</div>
+    <div class="node level-5">线粒体是细胞的能量工厂</div>
+    <div class="leaf">有氧呼吸主要场所，通过氧化磷酸化产生ATP</div>
+    <div class="leaf">含自身DNA和核糖体，支持内共生假说</div>
+    <div class="leaf">内膜折叠成嵴，增大反应面积</div>
+    
+    <div class="node level-3">内质网</div>
+    <div class="node level-5">粗面内质网负责蛋白质折叠运输</div>
+    <div class="leaf">表面附着大量核糖体</div>
+    <div class="node level-5">滑面内质网负责脂质合成与解毒</div>
+    <div class="leaf">合成磷脂、胆固醇、类固醇激素</div>
+  </div>
+</div>
+
+<div class="controls-panel">
+  <div class="settings-card">
+    <h3>⚙️ 生成设置</h3>
+    <div class="setting-row">
+      <label>文档类型</label>
+      <select><option>教材/教科书</option><option>课堂笔记/课件</option><option>学术论文</option><option>考试/复习资料</option></select>
+    </div>
+    <div class="setting-row">
+      <label>提取模式</label>
+      <select><option>多阶段提取（高质量）</option><option>单阶段生成（快速）</option></select>
+    </div>
+    <div class="setting-row">
+      <label>额外要求</label>
+      <input placeholder="例如：重点对比有氧和无氧呼吸..." style="width:180px">
+    </div>
+    <button class="btn-generate">生成思维导图</button>
+  </div>
+
+  <div class="recent-card">
+    <h3>📋 最近导图</h3>
+    <div class="recent-item"><span class="name">细胞生物学</span><span class="meta">56节点 &middot; 2h前</span></div>
+    <div class="recent-item"><span class="name">内膜系统</span><span class="meta">77节点 &middot; 昨天</span></div>
+    <div class="recent-item"><span class="name">微管结构</span><span class="meta">39节点 &middot; 昨天</span></div>
+    <div class="recent-item"><span class="name">分子生物学导论</span><span class="meta">89节点 &middot; 3天前</span></div>
+  </div>
+</div>
+
+</div>
+
+<footer class="footer">
+  <quote>"旧书不厌百回读，熟读深思子自知"</quote>
+  知识工坊 &middot; DeepSeek AI 驱动 &middot; 小爪出品
+</footer>
+
+</div>
+</body>
+</html>

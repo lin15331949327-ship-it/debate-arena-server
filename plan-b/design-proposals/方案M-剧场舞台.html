@@ -1,0 +1,899 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>辩论剧场 — 方案 M · 剧场舞台</title>
+<style>
+/* ==========================================
+   方案 M: 剧场舞台 (Grand Theater)
+   设计关键词: 帷幕 · 聚光灯 · 舞台 · 观众席 · 角色入场
+   哲学三人: 庄周(竹叶·水墨·太极) / 尼采(火焰·金属·闪电) / 波伏娃(水滴·玻璃·天平)
+   目标: 25-35KB 单文件 HTML
+   ========================================== */
+
+/* --- CSS Variables --- */
+:root {
+  --curtain-red: #8B1A1A;
+  --curtain-dark: #3D0C0C;
+  --spotlight-warm: 45deg;
+  --stage-floor: #2a1f1a;
+  --stage-edge: #c9a96e;
+  --text-primary: #f0e6d3;
+  --text-secondary: #b8a88a;
+  --bg-audience: #0a0a0a;
+  --gold-accent: #c9a96e;
+  --zhuangzi-wood: #6b8e5a;
+  --zhuangzi-ink: #2c3a2a;
+  --nietzsche-fire: #e85d2c;
+  --nietzsche-metal: #8a8a8a;
+  --beauvoir-glass: #a8d8ea;
+  --beauvoir-blue: #3a5a7c;
+  --transition-speed: 0.6s;
+  --font-display: 'Georgia', 'Noto Serif SC', serif;
+  --font-body: 'Palatino', 'Noto Serif SC', serif;
+}
+
+/* --- Reset & Base --- */
+*, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+html { font-size:16px; scroll-behavior:smooth; }
+body {
+  background: #111;
+  color: var(--text-primary);
+  font-family: var(--font-body);
+  overflow-x: hidden;
+  min-height: 100vh;
+}
+
+/* --- Stage Container --- */
+.theater {
+  position: relative;
+  min-height: 100vh;
+  background:
+    radial-gradient(ellipse at 50% 60%, rgba(201,169,110,0.08) 0%, transparent 70%),
+    linear-gradient(180deg, #050505 0%, #111 30%, var(--stage-floor) 100%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  overflow: hidden;
+}
+
+/* --- Curtain --- */
+.curtain {
+  position: fixed; top:0; left:0; width:100%; height:100%;
+  z-index: 1000; pointer-events: none;
+  transition: transform var(--transition-speed) cubic-bezier(0.4, 0, 0.2, 1);
+}
+.curtain.open { transform: translateY(-105%); }
+.curtain-left, .curtain-right {
+  position: absolute; top:0; width:50%; height:100%;
+  background: linear-gradient(90deg, var(--curtain-dark), var(--curtain-red));
+  transition: transform 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.curtain-right {
+  right:0;
+  background: linear-gradient(270deg, var(--curtain-dark), var(--curtain-red));
+}
+.curtain.open .curtain-left { transform: translateX(-110%); }
+.curtain.open .curtain-right { transform: translateX(110%); }
+.curtain-fold {
+  position: absolute; top:0; width:100%; height:100%;
+  background: repeating-linear-gradient(
+    90deg,
+    transparent 0px,
+    rgba(0,0,0,0.15) 2px,
+    transparent 4px,
+    rgba(0,0,0,0.1) 6px,
+    transparent 8px
+  );
+}
+.curtain-valance {
+  position: absolute; top:0; left:0; width:100%; height:12vh;
+  background: linear-gradient(180deg, var(--curtain-dark), var(--curtain-red), var(--curtain-dark));
+  border-bottom: 3px solid var(--gold-accent);
+  display: flex; align-items: center; justify-content: center;
+  transition: opacity 0.5s;
+}
+.curtain.open .curtain-valance { opacity: 0; }
+.curtain-valance::after {
+  content: ''; position: absolute; bottom:-18px; width:80%;
+  height:36px;
+  background: repeating-conic-gradient(var(--gold-accent) 0% 25%, transparent 0% 50%) 0 0 / 12px 12px;
+  opacity: 0.6;
+}
+
+/* --- Title Marquee --- */
+.marquee {
+  position: relative; z-index: 10;
+  margin-top: 2rem;
+  text-align: center;
+  opacity: 0;
+  transform: translateY(-20px);
+  transition: opacity 0.8s 0.5s, transform 0.8s 0.5s;
+}
+.marquee.visible { opacity: 1; transform: translateY(0); }
+.marquee-title {
+  font-family: var(--font-display);
+  font-size: clamp(2rem, 5vw, 3.5rem);
+  color: var(--gold-accent);
+  text-shadow: 0 0 40px rgba(201,169,110,0.3),
+               0 2px 4px rgba(0,0,0,0.5);
+  letter-spacing: 0.15em;
+}
+.marquee-subtitle {
+  font-size: clamp(0.9rem, 2vw, 1.3rem);
+  color: var(--text-secondary);
+  margin-top: 0.5rem;
+  letter-spacing: 0.3em;
+  font-style: italic;
+}
+
+/* --- Dust Motes in Spotlight --- */
+.dust-motes {
+  position: fixed; top:0; left:0; width:100%; height:100%;
+  pointer-events: none; z-index: 2;
+}
+.dust-mote {
+  position: absolute;
+  width: 3px; height: 3px;
+  background: rgba(255,240,200,0.5);
+  border-radius: 50%;
+  animation: moteDrift linear infinite;
+  filter: blur(0.5px);
+}
+@keyframes moteDrift {
+  0% { transform: translateY(0) translateX(0); opacity:0; }
+  10% { opacity:0.8; }
+  90% { opacity:0.3; }
+  100% { transform: translateY(-100vh) translateX(40px); opacity:0; }
+}
+
+/* --- Stage Floor Texture Overlay --- */
+.stage::after {
+  content: ''; position: absolute; inset: 0; border-radius: 6px;
+  background:
+    radial-gradient(ellipse at 20% 30%, rgba(201,169,110,0.04), transparent 30%),
+    radial-gradient(ellipse at 70% 60%, rgba(201,169,110,0.03), transparent 30%);
+  pointer-events: none;
+}
+
+/* --- Footlights --- */
+.footlights {
+  position: absolute; bottom: -2px; left: 10%; right: 10%;
+  display: flex; justify-content: space-around;
+  z-index: 3; pointer-events: none;
+}
+.footlight {
+  width: 6px; height: 6px;
+  background: var(--gold-accent);
+  border-radius: 50%;
+  box-shadow: 0 0 12px rgba(255,220,150,0.6), 0 0 24px rgba(255,200,120,0.3);
+  animation: footlightGlow 2s ease-in-out infinite;
+}
+.footlight:nth-child(odd) { animation-delay: 1s; }
+@keyframes footlightGlow {
+  0%, 100% { opacity:0.4; box-shadow: 0 0 8px rgba(255,220,150,0.3); }
+  50% { opacity:1; box-shadow: 0 0 18px rgba(255,220,150,0.7); }
+}
+
+/* --- Spotlight System --- */
+.spotlight {
+  position: absolute; top:0; left:50%;
+  width: 300px; height: 100%;
+  transform: translateX(-50%);
+  background: radial-gradient(
+    ellipse at 50% 0%,
+    rgba(255,240,200,0.12) 0%,
+    rgba(255,220,160,0.05) 40%,
+    transparent 70%
+  );
+  pointer-events: none;
+  z-index: 1;
+  animation: spotPulse 4s ease-in-out infinite;
+}
+@keyframes spotPulse {
+  0%, 100% { opacity: 0.8; }
+  50% { opacity: 1; }
+}
+.spotlight-beam {
+  position: absolute; top:-200px; left:50%;
+  width: 4px; height: 300px;
+  transform-origin: bottom center;
+  background: linear-gradient(0deg, rgba(255,240,200,0.6), transparent);
+  filter: blur(2px);
+  animation: beamSway 6s ease-in-out infinite;
+}
+.spotlight-beam:nth-child(2) { left:35%; animation-delay: -1.5s; width:3px; }
+.spotlight-beam:nth-child(3) { left:65%; animation-delay: -3s; width:3px; }
+@keyframes beamSway {
+  0%, 100% { transform: rotate(-5deg); }
+  50% { transform: rotate(5deg); }
+}
+
+/* --- Stage Floor --- */
+.stage {
+  position: relative; z-index: 2;
+  width: min(90vw, 1100px);
+  margin-top: 4rem;
+  padding: 3rem 2rem 4rem;
+  background:
+    linear-gradient(180deg,
+      rgba(42,31,26,0.9) 0%,
+      rgba(42,31,26,0.95) 80%,
+      rgba(20,14,10,0.98) 100%
+    );
+  border-top: 4px solid var(--stage-edge);
+  border-bottom: 4px solid var(--stage-edge);
+  box-shadow:
+    0 0 80px rgba(0,0,0,0.5),
+    0 0 200px rgba(0,0,0,0.3) inset,
+    inset 0 0 30px rgba(201,169,110,0.05);
+  border-radius: 6px;
+}
+/* stage wood grain */
+.stage::before {
+  content: ''; position: absolute; inset: 0; border-radius: 6px;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 2px,
+    rgba(255,255,255,0.01) 2px,
+    rgba(255,255,255,0.01) 4px
+  );
+  pointer-events: none;
+}
+
+/* --- Podiums --- */
+.podiums {
+  display: flex;
+  justify-content: space-around;
+  align-items: flex-end;
+  gap: 2rem;
+  flex-wrap: wrap;
+  padding: 0 1rem;
+}
+.podium {
+  position: relative;
+  flex: 1; min-width: 220px; max-width: 300px;
+  display: flex; flex-direction: column; align-items: center;
+  transition: transform 0.4s, filter 0.4s;
+  cursor: pointer;
+}
+.podium:hover { transform: translateY(-8px); }
+.podium.dim { filter: brightness(0.4) saturate(0.3); }
+.podium.highlight { filter: brightness(1.2); z-index: 5; }
+.podium.highlight::after {
+  content: ''; position: absolute; top:-20px; left:-20px; right:-20px; bottom:-20px;
+  background: radial-gradient(ellipse at center, rgba(255,240,200,0.15), transparent 70%);
+  pointer-events: none;
+}
+
+/* Podium stand */
+.podium-stand {
+  width: 75%; height: 80px;
+  background: linear-gradient(180deg, #5a3a2a, #3a2218);
+  border-radius: 6px 6px 0 0;
+  border: 2px solid var(--stage-edge);
+  border-bottom: none;
+  box-shadow: inset 0 2px 8px rgba(0,0,0,0.3);
+  position: relative;
+}
+.podium-stand::after {
+  content: ''; position: absolute; top:10px; left:10%; right:10%;
+  height: 3px;
+  background: var(--gold-accent);
+  opacity: 0.4;
+}
+
+/* --- Character Avatars (in podium) --- */
+.avatar {
+  position: absolute; top:-60px; left:50%; transform: translateX(-50%);
+  width: 80px; height: 80px;
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  transition: transform 0.5s, box-shadow 0.5s;
+  z-index: 3;
+}
+.podium.highlight .avatar { transform: translateX(-50%) scale(1.15); }
+
+/* Zhuangzi: Bamboo / Ink-wash / Taiji */
+.avatar.zhuangzi {
+  background: radial-gradient(circle at 30% 30%, #7a9a6a, var(--zhuangzi-ink));
+  box-shadow: 0 0 30px rgba(107,142,90,0.5), 0 0 60px rgba(107,142,90,0.2);
+  border: 2px solid #5a7a4a;
+}
+.avatar.zhuangzi .avatar-symbol {
+  font-size: 2.5rem;
+  filter: brightness(1.3);
+}
+.avatar.zhuangzi::before {
+  content: '🎋';
+  position: absolute; top:-12px; right:-8px;
+  font-size: 1.2rem;
+  transform: rotate(15deg);
+  filter: drop-shadow(0 1px 2px rgba(0,0,0,0.4));
+}
+/* bamboo leaf particles */
+.avatar.zhuangzi::after {
+  content: ''; position: absolute; width: 60px; height: 24px;
+  background: conic-gradient(from -30deg at 20% 50%, #5a8a4a 0deg 15deg, transparent 15deg);
+  border-radius: 60% 10%;
+  top: -20px; left: -10px;
+  animation: leafFloat 3s ease-in-out infinite;
+  opacity: 0.6;
+}
+@keyframes leafFloat {
+  0%, 100% { transform: translateY(0) rotate(0deg); opacity:0.4; }
+  50% { transform: translateY(-8px) rotate(10deg); opacity:0.8; }
+}
+
+/* Nietzsche: Flame / Brushed metal / Lightning */
+.avatar.nietzsche {
+  background: radial-gradient(circle at 40% 40%, #f08a4a, #5a1a0a);
+  box-shadow: 0 0 30px rgba(232,93,44,0.6), 0 0 70px rgba(232,93,44,0.25);
+  border: 2px solid #c05030;
+}
+.avatar.nietzsche .avatar-symbol {
+  font-size: 2.5rem;
+  filter: brightness(1.4) saturate(1.3);
+}
+.avatar.nietzsche::before {
+  content: '⚡';
+  position: absolute; top:-16px; right:-6px;
+  font-size: 1.4rem;
+  filter: drop-shadow(0 0 6px rgba(255,200,100,0.8));
+  animation: lightningFlicker 2s ease-in-out infinite;
+}
+@keyframes lightningFlicker {
+  0%, 90%, 100% { opacity: 0.3; }
+  92%, 96% { opacity: 1; }
+}
+/* flame aura */
+.avatar.nietzsche::after {
+  content: ''; position: absolute; inset: -8px; border-radius: 50%;
+  background: radial-gradient(ellipse at 50% 120%, rgba(255,120,40,0.3), transparent 60%);
+  animation: flameLick 1.5s ease-in-out infinite;
+}
+@keyframes flameLick {
+  0%, 100% { transform: scaleY(1) scaleX(1); }
+  50% { transform: scaleY(1.15) scaleX(0.9); }
+}
+
+/* Beauvoir: Water drop / Glass / Scales */
+.avatar.beauvoir {
+  background: radial-gradient(circle at 35% 35%, #c8e8f8, var(--beauvoir-blue));
+  box-shadow: 0 0 25px rgba(168,216,234,0.5), 0 0 50px rgba(168,216,234,0.2);
+  border: 2px solid #6a9abc;
+  backdrop-filter: blur(4px);
+}
+.avatar.beauvoir .avatar-symbol {
+  font-size: 2.5rem;
+  filter: brightness(1.2);
+}
+.avatar.beauvoir::before {
+  content: '💧';
+  position: absolute; top:-10px; right:-10px;
+  font-size: 1.1rem;
+  animation: dropDangle 2.5s ease-in-out infinite;
+}
+@keyframes dropDangle {
+  0%, 100% { transform: translateY(0); opacity:0.6; }
+  50% { transform: translateY(6px); opacity:1; }
+}
+/* glass refractive shimmer */
+.avatar.beauvoir::after {
+  content: ''; position: absolute; inset: 3px; border-radius: 50%;
+  background: radial-gradient(ellipse at 30% 20%, rgba(255,255,255,0.3), transparent 50%);
+  animation: glassRefract 4s linear infinite;
+}
+@keyframes glassRefract {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* --- Character Labels --- */
+.char-label {
+  margin-top: 0.5rem;
+  font-family: var(--font-display);
+  font-size: 1.1rem;
+  color: var(--text-secondary);
+  text-align: center;
+  transition: color 0.4s;
+}
+.char-label small {
+  display: block;
+  font-size: 0.7rem;
+  color: var(--gold-accent);
+  opacity: 0.6;
+  letter-spacing: 0.15em;
+  margin-top: 0.15rem;
+}
+.podium.highlight .char-label { color: var(--text-primary); }
+
+/* --- Debate Content Area --- */
+.debate-stage {
+  width: 100%;
+  margin-top: 3rem;
+  position: relative;
+}
+.round-indicator {
+  text-align: center;
+  font-family: var(--font-display);
+  font-size: 0.85rem;
+  color: var(--gold-accent);
+  letter-spacing: 0.3em;
+  margin-bottom: 1.5rem;
+  opacity: 0.7;
+}
+
+/* Speech Bubbles on stage */
+.speech-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+  margin-bottom: 2rem;
+  opacity: 0;
+  transform: translateY(20px);
+  animation: speechIn 0.6s ease-out forwards;
+}
+@keyframes speechIn {
+  to { opacity:1; transform: translateY(0); }
+}
+.speech-row:nth-child(2) { animation-delay: 0.3s; }
+.speech-row:nth-child(3) { animation-delay: 0.6s; }
+
+.speech-row.left { flex-direction: row; }
+.speech-row.right { flex-direction: row-reverse; text-align: right; }
+
+.speech-bubble {
+  max-width: 55%;
+  padding: 1rem 1.4rem;
+  border-radius: 14px;
+  font-size: 0.95rem;
+  line-height: 1.7;
+  position: relative;
+}
+.speech-bubble.zhuangzi-bubble {
+  background: linear-gradient(135deg, rgba(107,142,90,0.15), rgba(44,58,42,0.2));
+  border: 1px solid rgba(107,142,90,0.3);
+  border-left: 3px solid #5a7a4a;
+  color: #c8d8c0;
+}
+.speech-bubble.nietzsche-bubble {
+  background: linear-gradient(135deg, rgba(232,93,44,0.12), rgba(90,26,10,0.15));
+  border: 1px solid rgba(232,93,44,0.3);
+  border-right: 3px solid #c05030;
+  color: #e8c8b8;
+}
+.speech-bubble.beauvoir-bubble {
+  background: linear-gradient(135deg, rgba(168,216,234,0.1), rgba(58,90,124,0.12));
+  border: 1px solid rgba(168,216,234,0.25);
+  border-left: 3px solid #6a9abc;
+  color: #c8d8e8;
+}
+
+.speech-speaker {
+  font-size: 0.75rem;
+  font-weight: bold;
+  letter-spacing: 0.1em;
+  margin-bottom: 0.4rem;
+  opacity: 0.7;
+}
+.speech-speaker.zhuangzi { color: #9aba8a; }
+.speech-speaker.nietzsche { color: #e8986a; }
+.speech-speaker.beauvoir { color: #8ab8d8; }
+
+/* --- Audience Silhouettes --- */
+.audience {
+  position: fixed; bottom:0; left:0; width:100%; height:18vh;
+  z-index: 0; pointer-events: none;
+  background: linear-gradient(0deg, #050505 40%, transparent 100%);
+  display: flex; align-items: flex-end; justify-content: center;
+  gap: 0.5rem; padding: 0 5% 0.5rem;
+  overflow: hidden;
+}
+.audience-member {
+  width: clamp(20px, 3vw, 40px);
+  height: clamp(30px, 5vh, 60px);
+  background: #1a1a1a;
+  border-radius: 50% 50% 0 0;
+  opacity: 0.3;
+  transition: opacity 2s;
+}
+.audience-member:nth-child(odd) { height: calc(var(--h, 1) * clamp(25px, 4vh, 50px)); }
+.audience-member.applaud {
+  animation: applaud 0.4s ease-in-out;
+  opacity: 0.6;
+}
+@keyframes applaud {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-4px); }
+}
+
+/* --- Control Bar --- */
+.controls {
+  position: fixed; bottom: 1.5rem; right: 1.5rem;
+  z-index: 100;
+  display: flex; gap: 0.5rem;
+}
+.controls button {
+  width: 44px; height: 44px;
+  border-radius: 50%;
+  border: 1px solid var(--gold-accent);
+  background: rgba(20,14,10,0.8);
+  color: var(--gold-accent);
+  font-size: 1.2rem;
+  cursor: pointer;
+  transition: all 0.3s;
+  backdrop-filter: blur(4px);
+}
+.controls button:hover {
+  background: var(--gold-accent);
+  color: #1a1a1a;
+  box-shadow: 0 0 20px rgba(201,169,110,0.3);
+}
+
+/* --- Signature / Footer --- */
+.footer-signature {
+  position: relative; z-index: 10;
+  margin: 3rem 0 1.5rem;
+  text-align: center;
+  font-family: var(--font-display);
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  opacity: 0.4;
+  letter-spacing: 0.2em;
+}
+.footer-signature::before {
+  content: '—';
+  display: block;
+  margin-bottom: 0.5rem;
+  opacity: 0.3;
+}
+
+/* --- Toast / Notification --- */
+.toast {
+  position: fixed; top: 1rem; left: 50%; transform: translateX(-50%);
+  background: rgba(20,14,10,0.9);
+  border: 1px solid var(--gold-accent);
+  color: var(--text-primary);
+  padding: 0.7rem 1.5rem;
+  border-radius: 30px;
+  font-size: 0.85rem;
+  z-index: 2000;
+  opacity: 0;
+  transition: opacity 0.4s;
+  pointer-events: none;
+}
+.toast.show { opacity: 1; }
+
+/* --- Stage Lighting FX --- */
+.stage-lights {
+  position: absolute; top:0; left:0; width:100%; height:100%;
+  pointer-events: none; z-index: 1;
+  background:
+    radial-gradient(ellipse at 25% 0%, rgba(255,200,150,0.06), transparent 50%),
+    radial-gradient(ellipse at 50% 0%, rgba(255,220,180,0.08), transparent 50%),
+    radial-gradient(ellipse at 75% 0%, rgba(255,200,150,0.06), transparent 50%);
+}
+
+/* --- Responsive --- */
+@media (max-width: 768px) {
+  .podiums { gap: 1rem; }
+  .podium { min-width: 100px; max-width: 160px; }
+  .avatar { width: 60px; height: 60px; top:-45px; }
+  .avatar .avatar-symbol { font-size: 1.8rem; }
+  .speech-bubble { max-width: 75%; font-size: 0.85rem; }
+  .curtain-valance { height: 8vh; }
+  .marquee { margin-top: 1rem; }
+  .stage { padding: 2rem 1rem 3rem; margin-top: 2rem; }
+}
+@media (max-width: 480px) {
+  .podium { min-width: 80px; max-width: 110px; }
+  .avatar { width: 50px; height: 50px; top:-35px; }
+  .avatar .avatar-symbol { font-size: 1.4rem; }
+  .speech-bubble { max-width: 85%; }
+  .char-label { font-size: 0.85rem; }
+  .char-label small { font-size: 0.6rem; }
+  .marquee-title { font-size: clamp(1.4rem, 5vw, 2.5rem); }
+}
+</style>
+</head>
+<body>
+
+<div class="theater" id="theater">
+
+  <!-- Curtain -->
+  <div class="curtain" id="curtain">
+    <div class="curtain-valance">
+      <span style="font-family:Georgia,serif;font-size:clamp(1.2rem,3vw,2rem);color:var(--gold-accent);letter-spacing:0.2em;text-shadow:0 0 10px rgba(201,169,110,0.3);">✦ 辩 论 剧 场 ✦</span>
+    </div>
+    <div class="curtain-left"><div class="curtain-fold"></div></div>
+    <div class="curtain-right"><div class="curtain-fold"></div></div>
+  </div>
+
+  <!-- Dust Motes -->
+  <div class="dust-motes" id="dustMotes"></div>
+
+  <!-- Spotlights -->
+  <div class="spotlight">
+    <div class="spotlight-beam"></div>
+    <div class="spotlight-beam"></div>
+    <div class="spotlight-beam"></div>
+  </div>
+  <div class="stage-lights"></div>
+
+  <!-- Marquee -->
+  <div class="marquee" id="marquee">
+    <h1 class="marquee-title">思想的三重奏</h1>
+    <p class="marquee-subtitle">庄子 · 尼采 · 波伏娃 — 跨越千年的对话</p>
+  </div>
+
+  <!-- Stage -->
+  <div class="stage" id="stage">
+
+    <!-- Podiums -->
+    <div class="podiums" id="podiums">
+      <!-- Zhuangzi -->
+      <div class="podium" data-char="zhuangzi" onclick="highlightSpeaker('zhuangzi')">
+        <div class="avatar zhuangzi">
+          <span class="avatar-symbol">☯</span>
+        </div>
+        <div class="podium-stand"></div>
+        <div class="char-label">
+          庄子
+          <small>DAO · 逍遥</small>
+        </div>
+      </div>
+
+      <!-- Nietzsche -->
+      <div class="podium" data-char="nietzsche" onclick="highlightSpeaker('nietzsche')">
+        <div class="avatar nietzsche">
+          <span class="avatar-symbol">🔥</span>
+        </div>
+        <div class="podium-stand"></div>
+        <div class="char-label">
+          尼采
+          <small>ÜBERMENSCH · 权力意志</small>
+        </div>
+      </div>
+
+      <!-- Beauvoir -->
+      <div class="podium" data-char="beauvoir" onclick="highlightSpeaker('beauvoir')">
+        <div class="avatar beauvoir">
+          <span class="avatar-symbol">⚖</span>
+        </div>
+        <div class="podium-stand"></div>
+        <div class="char-label">
+          波伏娃
+          <small>EXISTENCE · 第二性</small>
+        </div>
+      </div>
+    </div>
+
+    <!-- Debate Stage Area -->
+    <div class="debate-stage" id="debateStage">
+      <div class="round-indicator">—— 第一回合 · 自由 ——</div>
+
+      <div class="speech-row left">
+        <div class="speech-bubble zhuangzi-bubble">
+          <div class="speech-speaker zhuangzi">庄周</div>
+          北冥有鱼，其名为鲲……化而为鸟，其名为鹏。鹏之背，不知其几千里也；怒而飞，其翼若垂天之云。是鸟也，海运则将徙于南冥。
+        </div>
+      </div>
+
+      <div class="speech-row right">
+        <div class="speech-bubble nietzsche-bubble">
+          <div class="speech-speaker nietzsche">弗里德里希·尼采</div>
+          人是一根系在动物与超人之间的绳索——一根悬在深渊之上的绳索。人的伟大之处在于，他是一座桥梁而非目的：人的可爱之处在于，他是一种过渡与一种毁灭。
+        </div>
+      </div>
+
+      <div class="speech-row left">
+        <div class="speech-bubble beauvoir-bubble">
+          <div class="speech-speaker beauvoir">西蒙娜·德·波伏娃</div>
+          女人不是天生的，而是后天成为的。任何生理、心理或经济命运都不能决定女性在社会中所呈现的形象；是整个文明塑造了这一介于男性与被阉者之间的、被称为女性的中间产物。
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footlights on Stage -->
+  <div class="footlights">
+    <div class="footlight"></div><div class="footlight"></div><div class="footlight"></div>
+    <div class="footlight"></div><div class="footlight"></div><div class="footlight"></div>
+    <div class="footlight"></div><div class="footlight"></div><div class="footlight"></div>
+  </div>
+
+  <!-- Audience -->
+  <div class="audience" id="audience"></div>
+
+  <!-- Footer -->
+  <div class="footer-signature">辩论剧场 · 方案 M 剧场舞台 · 设计提案</div>
+
+  <!-- Controls -->
+  <div class="controls">
+    <button title="开幕/闭幕" onclick="toggleCurtain()" id="curtainBtn">🎭</button>
+    <button title="切换回合" onclick="nextRound()">🔄</button>
+    <button title="鼓掌" onclick="applaud()">👏</button>
+  </div>
+
+  <!-- Toast -->
+  <div class="toast" id="toast"></div>
+
+</div>
+
+<script>
+// ======== 剧场引擎 ========
+
+// Generate dust motes
+(function buildDustMotes() {
+  const container = document.getElementById('dustMotes');
+  for (let i = 0; i < 30; i++) {
+    const mote = document.createElement('div');
+    mote.className = 'dust-mote';
+    mote.style.left = (20 + Math.random() * 60) + '%';
+    mote.style.top = (60 + Math.random() * 40) + '%';
+    mote.style.animationDuration = (8 + Math.random() * 15) + 's';
+    mote.style.animationDelay = (Math.random() * 10) + 's';
+    mote.style.width = (2 + Math.random() * 3) + 'px';
+    mote.style.height = mote.style.width;
+    container.appendChild(mote);
+  }
+})();
+
+// Generate audience
+(function buildAudience() {
+  const audienceEl = document.getElementById('audience');
+  for (let i = 0; i < 60; i++) {
+    const member = document.createElement('div');
+    member.className = 'audience-member';
+    member.style.setProperty('--h', 0.6 + Math.random() * 0.4);
+    audienceEl.appendChild(member);
+  }
+})();
+
+// Curtain toggle
+let curtainOpen = false;
+function toggleCurtain() {
+  const curtain = document.getElementById('curtain');
+  const marquee = document.getElementById('marquee');
+  curtainOpen = !curtainOpen;
+  if (curtainOpen) {
+    curtain.classList.add('open');
+    setTimeout(() => marquee.classList.add('visible'), 400);
+  } else {
+    curtain.classList.remove('open');
+    marquee.classList.remove('visible');
+  }
+  showToast(curtainOpen ? '大幕拉开，辩论开始！' : '幕间休息……');
+}
+
+// Open curtain on load with delay
+setTimeout(toggleCurtain, 600);
+
+// Highlight speaker
+let currentSpeaker = null;
+function highlightSpeaker(char) {
+  const podiums = document.querySelectorAll('.podium');
+  if (currentSpeaker === char) {
+    // Deselect
+    podiums.forEach(p => p.classList.remove('dim', 'highlight'));
+    currentSpeaker = null;
+    return;
+  }
+  currentSpeaker = char;
+  podiums.forEach(p => {
+    if (p.dataset.char === char) {
+      p.classList.add('highlight');
+      p.classList.remove('dim');
+    } else {
+      p.classList.add('dim');
+      p.classList.remove('highlight');
+    }
+  });
+
+  const names = { zhuangzi:'庄子', nietzsche:'尼采', beauvoir:'波伏娃' };
+  showToast(`🎤 聚光灯对准 ${names[char]} …`);
+}
+
+// Rounds
+const rounds = [
+  {
+    title: '第一回合 · 自由',
+    speeches: [
+      { speaker:'zhuangzi', text:'北冥有鱼，其名为鲲……化而为鸟，其名为鹏。鹏之背，不知其几千里也；怒而飞，其翼若垂天之云。是鸟也，海运则将徙于南冥。', author:'庄周'},
+      { speaker:'nietzsche', text:'人是一根系在动物与超人之间的绳索——一根悬在深渊之上的绳索。人的伟大之处在于，他是一座桥梁而非目的：人的可爱之处在于，他是一种过渡与一种毁灭。', author:'弗里德里希·尼采'},
+      { speaker:'beauvoir', text:'女人不是天生的，而是后天成为的。任何生理、心理或经济命运都不能决定女性在社会中所呈现的形象；是整个文明塑造了这一介于男性与被阉者之间的、被称为女性的中间产物。', author:'西蒙娜·德·波伏娃'}
+    ]
+  },
+  {
+    title: '第二回合 · 权力与自然',
+    speeches: [
+      { speaker:'nietzsche', text:'凡杀不死我的，必使我更强大。你们说，甚至战争也是神圣的，它以善的名义圣化每一个目标。我要告诉你们：那让你们热爱和平的，必是善良的战争，它以善的名义圣化你们的目标。', author:'弗里德里希·尼采'},
+      { speaker:'zhuangzi', text:'泉涸，鱼相与处于陆，相呴以湿，相濡以沫，不如相忘于江湖。与其誉尧而非桀，不如两忘而化其道。', author:'庄周'},
+      { speaker:'beauvoir', text:'一个人的生命之所以有意义，仅在于它对他人的影响程度。我们是被抛入这个世界的——但我们是自由的；我们被判处自由。', author:'西蒙娜·德·波伏娃'}
+    ]
+  },
+  {
+    title: '第三回合 · 存在与超越',
+    speeches: [
+      { speaker:'beauvoir', text:'想要成为主体而非客体，这是人类心底最深切的渴望。但这种渴望不仅仅是个人的——它必须在与他人的关系中得以实现，在相互承认的辩证法中。', author:'西蒙娜·德·波伏娃'},
+      { speaker:'zhuangzi', text:'昔者庄周梦为蝴蝶，栩栩然蝴蝶也，自喻适志与！不知周也。俄然觉，则蘧蘧然周也。不知周之梦为蝴蝶与，蝴蝶之梦为周与？', author:'庄周'},
+      { speaker:'nietzsche', text:'你必须准备好在你自己的火焰中燃烧：你若不先化为灰烬，又怎能重生呢？我告诉你们：人心中必须仍有混沌，才能生出一颗跳舞的星辰。', author:'弗里德里希·尼采'}
+    ]
+  }
+];
+
+let currentRound = 0;
+function nextRound() {
+  currentRound = (currentRound + 1) % rounds.length;
+  const round = rounds[currentRound];
+  const stage = document.getElementById('debateStage');
+
+  // Fade out
+  stage.style.opacity = '0';
+  stage.style.transition = 'opacity 0.4s';
+
+  setTimeout(() => {
+    const html = [
+      `<div class="round-indicator">—— ${round.title} ——</div>`
+    ];
+    round.speeches.forEach((s, i) => {
+      const side = i % 2 === 0 ? 'left' : 'right';
+      html.push(`
+        <div class="speech-row ${side}">
+          <div class="speech-bubble ${s.speaker}-bubble">
+            <div class="speech-speaker ${s.speaker}">${s.author}</div>
+            ${s.text}
+          </div>
+        </div>
+      `);
+    });
+    stage.innerHTML = html.join('');
+    stage.style.opacity = '1';
+  }, 400);
+
+  showToast(`📜 ${round.title}`);
+}
+
+// Applaud
+function applaud() {
+  const members = document.querySelectorAll('.audience-member');
+  members.forEach((m, i) => {
+    setTimeout(() => {
+      m.classList.add('applaud');
+      setTimeout(() => m.classList.remove('applaud'), 400);
+    }, i * 30);
+  });
+  showToast('👏👏👏 观众掌声雷动！');
+}
+
+// Toast
+function showToast(msg) {
+  const toast = document.getElementById('toast');
+  toast.textContent = msg;
+  toast.classList.add('show');
+  clearTimeout(toast._timeout);
+  toast._timeout = setTimeout(() => toast.classList.remove('show'), 2000);
+}
+
+// Keyboard shortcuts
+document.addEventListener('keydown', e => {
+  switch(e.key.toLowerCase()) {
+    case '1': highlightSpeaker('zhuangzi'); break;
+    case '2': highlightSpeaker('nietzsche'); break;
+    case '3': highlightSpeaker('beauvoir'); break;
+    case ' ': e.preventDefault(); nextRound(); break;
+    case 'c': toggleCurtain(); break;
+    case 'a': applaud(); break;
+    case 'escape': highlightSpeaker(null);
+      document.querySelectorAll('.podium').forEach(p => p.classList.remove('dim', 'highlight'));
+      currentSpeaker = null;
+      break;
+  }
+});
+</script>
+
+</body>
+</html>

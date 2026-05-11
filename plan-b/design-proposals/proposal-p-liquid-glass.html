@@ -1,0 +1,812 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>液态玻璃·臻境 — 三子辩</title>
+<style>
+/* ============================================
+   Proposal P: 液态玻璃·臻境 (Liquid Glass Ultimate)
+   参考: Apple Liquid Glass (WWDC 2025), HIG Materials
+   角色: 庄周 / 尼采 / 波伏娃
+   ============================================ */
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500&family=Noto+Sans+SC:wght@200;300;400&display=swap');
+
+:root {
+  --bg-pure: #fafafa;
+  --glass-bg: rgba(255,255,255,0.62);
+  --glass-bg-hover: rgba(255,255,255,0.72);
+  --glass-bg-active: rgba(255,255,255,0.78);
+  --glass-border: rgba(255,255,255,0.5);
+  --glass-border-strong: rgba(0,0,0,0.06);
+  --glass-shadow: rgba(0,0,0,0.04);
+  --glass-shadow-hover: rgba(0,0,0,0.08);
+  --accent: #0071e3;
+  --accent-dim: rgba(0,113,227,0.08);
+  --text-primary: rgba(0,0,0,0.88);
+  --text-secondary: rgba(0,0,0,0.56);
+  --text-tertiary: rgba(0,0,0,0.32);
+  --zhuangzi-line: #4a8c5c;
+  --nietzsche-line: #8c6a5a;
+  --beauvoir-line: #5a6a9c;
+  --zhuangzi-refract: rgba(74,140,92,0.06);
+  --nietzsche-refract: rgba(140,106,90,0.05);
+  --beauvoir-refract: rgba(90,106,156,0.06);
+  --font-display: 'Inter', system-ui, -apple-system, sans-serif;
+  --font-body: 'Noto Sans SC', 'Inter', system-ui, -apple-system, sans-serif;
+  --spring-fast: cubic-bezier(0.25, 0.1, 0.25, 1);
+  --spring-smooth: cubic-bezier(0.42, 0, 0.58, 1);
+  --spring-bounce: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --squircle: 28px;
+  --squircle-sm: 20px;
+  --squircle-xs: 14px;
+  --depth-0: 0px;
+  --depth-1: 1px;
+  --depth-2: 3px;
+  --depth-3: 8px;
+  --space-unit: 8px;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  font-family: var(--font-body);
+  background: var(--bg-pure);
+  color: var(--text-primary);
+  min-height: 100vh;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* ============================================
+   LAYER 0: 纯净白底 + 微妙纹理
+   ============================================ */
+.bg-layer {
+  position: fixed; inset: 0; z-index: 0;
+  background:
+    radial-gradient(ellipse at 30% 20%, rgba(0,113,227,0.015) 0%, transparent 60%),
+    radial-gradient(ellipse at 70% 60%, rgba(0,113,227,0.01) 0%, transparent 50%),
+    linear-gradient(180deg, #fcfcfc 0%, #fafafa 30%, #f8f8f8 100%);
+}
+
+/* Subtle grain */
+.bg-layer::after {
+  content: '';
+  position: absolute; inset: 0;
+  opacity: 0.03;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='grain'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23grain)'/%3E%3C/svg%3E");
+  background-size: 256px;
+  pointer-events: none;
+}
+
+/* ============================================
+   LAYER 1: 微纹玻璃底栏 (Bottom Bar)
+   ============================================ */
+.bottom-bar {
+  position: fixed; bottom: 0; left: 0; right: 0; z-index: 20;
+  height: 56px;
+  background: rgba(255,255,255,0.72);
+  backdrop-filter: blur(30px) saturate(180%);
+  -webkit-backdrop-filter: blur(30px) saturate(180%);
+  border-top: 0.5px solid rgba(0,0,0,0.08);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  padding: 0 24px;
+}
+
+.progress-dots {
+  display: flex; gap: 10px; align-items: center;
+}
+
+.progress-dot {
+  width: 5px; height: 5px;
+  border-radius: 50%;
+  background: rgba(0,0,0,0.2);
+  transition: all 0.5s var(--spring-smooth);
+}
+
+.progress-dot.active {
+  width: 7px; height: 7px;
+  background: var(--accent);
+  box-shadow: 0 0 8px rgba(0,113,227,0.3);
+}
+
+.progress-dot.completed {
+  background: rgba(0,0,0,0.35);
+}
+
+.progress-label {
+  font-family: var(--font-display);
+  font-size: 11px;
+  font-weight: 300;
+  letter-spacing: 2px;
+  color: var(--text-tertiary);
+  text-transform: uppercase;
+}
+
+/* ============================================
+   TOP NAV (极简)
+   ============================================ */
+.top-nav {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 20;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 32px;
+}
+
+.nav-title {
+  font-family: var(--font-display);
+  font-size: 13px;
+  font-weight: 300;
+  letter-spacing: 3px;
+  color: var(--text-tertiary);
+  text-transform: uppercase;
+}
+
+.nav-button {
+  width: 32px; height: 32px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.6);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  border: 0.5px solid rgba(0,0,0,0.08);
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer;
+  transition: all 0.3s var(--spring-fast);
+  color: var(--text-secondary);
+  font-size: 18px;
+  font-weight: 200;
+  line-height: 1;
+}
+
+.nav-button:hover {
+  background: rgba(255,255,255,0.8);
+  transform: scale(1.05);
+  box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+}
+
+.nav-button:active {
+  transform: scale(0.96);
+  transition: transform 0.1s var(--spring-fast);
+}
+
+/* ============================================
+   MAIN CONTENT AREA
+   ============================================ */
+.main-content {
+  position: relative; z-index: 5;
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 80px 24px 100px;
+  min-height: 100vh;
+}
+
+/* ============================================
+   ROUND TITLE
+   ============================================ */
+.round-title {
+  text-align: center;
+  margin-bottom: 48px;
+}
+
+.round-title-label {
+  font-family: var(--font-display);
+  font-size: 11px;
+  font-weight: 400;
+  letter-spacing: 4px;
+  color: var(--text-tertiary);
+  text-transform: uppercase;
+  margin-bottom: 8px;
+}
+
+.round-title-theme {
+  font-family: var(--font-body);
+  font-size: 24px;
+  font-weight: 200;
+  letter-spacing: 6px;
+  color: var(--text-primary);
+}
+
+/* ============================================
+   GLASS CARD — Liquid Glass
+   ============================================ */
+.glass-card {
+  position: relative;
+  background: var(--glass-bg);
+  backdrop-filter: blur(25px) saturate(160%);
+  -webkit-backdrop-filter: blur(25px) saturate(160%);
+  border: 0.5px solid var(--glass-border);
+  border-radius: var(--squircle);
+  padding: 44px 40px;
+  margin-bottom: 40px;
+  box-shadow:
+    0 1px 3px var(--glass-shadow),
+    0 8px 24px rgba(0,0,0,0.03);
+  transition: all 0.5s var(--spring-smooth);
+  cursor: pointer;
+  overflow: hidden;
+}
+
+/* Squircle mask for true continuous curvature */
+.glass-card::before {
+  content: '';
+  position: absolute; inset: 0;
+  border-radius: inherit;
+  mask-image: radial-gradient(circle, black 98%, transparent 100%);
+  -webkit-mask-image: radial-gradient(circle, black 98%, transparent 100%);
+  pointer-events: none;
+}
+
+/* Card inner glow border */
+.glass-card::after {
+  content: '';
+  position: absolute; inset: 1px;
+  border-radius: calc(var(--squircle) - 1px);
+  border: 0.5px solid rgba(255,255,255,0.6);
+  pointer-events: none;
+}
+
+/* Character-specific side color line */
+.glass-card .side-line {
+  position: absolute;
+  left: 0; top: 15%; height: 70%;
+  width: 2px;
+  border-radius: 0 2px 2px 0;
+  opacity: 0.5;
+  transition: opacity 0.4s var(--spring-fast), height 0.5s var(--spring-smooth);
+}
+
+.glass-card:hover .side-line {
+  opacity: 0.85;
+  height: 80%;
+  top: 10%;
+}
+
+.card-zhuangzi .side-line { background: var(--zhuangzi-line); }
+.card-nietzsche .side-line { background: var(--nietzsche-line); }
+.card-beauvoir .side-line { background: var(--beauvoir-line); }
+
+/* Character-specific refract tint */
+.card-zhuangzi {
+  box-shadow:
+    0 1px 3px var(--glass-shadow),
+    0 8px 24px rgba(0,0,0,0.03),
+    inset 0 0 80px var(--zhuangzi-refract);
+}
+
+.card-nietzsche {
+  box-shadow:
+    0 1px 3px var(--glass-shadow),
+    0 8px 24px rgba(0,0,0,0.03),
+    inset 0 0 80px var(--nietzsche-refract);
+}
+
+.card-beauvoir {
+  box-shadow:
+    0 1px 3px var(--glass-shadow),
+    0 8px 24px rgba(0,0,0,0.03),
+    inset 0 0 80px var(--beauvoir-refract);
+}
+
+/* Card hover state */
+.glass-card:hover {
+  background: var(--glass-bg-hover);
+  transform: scale(1.003) translateY(-1px);
+  box-shadow:
+    0 2px 8px var(--glass-shadow-hover),
+    0 16px 40px rgba(0,0,0,0.05);
+}
+
+.glass-card:active {
+  transform: scale(0.998);
+  transition: transform 0.15s var(--spring-fast);
+}
+
+/* ============================================
+   ROLE HEADER inside Glass Card
+   ============================================ */
+.card-role {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  margin-bottom: 24px;
+  padding-bottom: 16px;
+  border-bottom: 0.5px solid rgba(0,0,0,0.06);
+}
+
+.card-role-name {
+  font-family: var(--font-body);
+  font-size: 20px;
+  font-weight: 200;
+  letter-spacing: 4px;
+  color: var(--text-primary);
+}
+
+.card-role-subtitle {
+  font-family: var(--font-display);
+  font-size: 10px;
+  font-weight: 300;
+  letter-spacing: 2px;
+  color: var(--text-tertiary);
+  text-transform: uppercase;
+}
+
+/* ============================================
+   GLASS CARD CONTENT
+   ============================================ */
+.card-content {
+  position: relative;
+  z-index: 1;
+}
+
+.card-content p {
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 1.8;
+  letter-spacing: 0.5px;
+  color: #1a1a1a;
+  margin-bottom: 16px;
+  max-width: 85%;
+}
+
+.card-content p:last-child {
+  margin-bottom: 0;
+}
+
+.card-content .highlight {
+  color: #000;
+  font-weight: 500;
+}
+
+/* Glass refraction zone — empty breathing space */
+.card-refract-zone {
+  height: 60px;
+  position: relative;
+}
+
+.card-refract-zone::before {
+  content: '';
+  position: absolute; inset: 0 10%;
+  background: linear-gradient(180deg,
+    rgba(255,255,255,0) 0%,
+    rgba(255,255,255,0.15) 40%,
+    rgba(255,255,255,0) 100%
+  );
+  border-radius: 50%;
+  filter: blur(15px);
+}
+
+/* ============================================
+   COLLISION GLASS (碰撞玻璃)
+   ============================================ */
+.collision-glass {
+  text-align: center;
+  padding: 32px 0;
+  margin: 24px 0;
+  position: relative;
+}
+
+.collision-glass .divider {
+  width: 1px; height: 32px;
+  margin: 0 auto;
+  background: linear-gradient(to bottom,
+    transparent 0%,
+    rgba(0,0,0,0.1) 30%,
+    rgba(0,0,0,0.15) 50%,
+    rgba(0,0,0,0.1) 70%,
+    transparent 100%
+  );
+}
+
+.collision-glass .ripple {
+  position: absolute;
+  left: 50%; top: 50%;
+  transform: translate(-50%, -50%);
+  width: 60px; height: 60px;
+  border-radius: 50%;
+  border: 0.5px solid rgba(0,0,0,0.08);
+  animation: rippleExpand 8s ease-out infinite;
+  opacity: 0;
+}
+
+.collision-glass .ripple:nth-child(2) { animation-delay: 2s; }
+.collision-glass .ripple:nth-child(3) { animation-delay: 4s; }
+.collision-glass .ripple:nth-child(4) { animation-delay: 6s; }
+
+@keyframes rippleExpand {
+  0% { width: 20px; height: 20px; opacity: 1; }
+  100% { width: 200px; height: 200px; opacity: 0; }
+}
+
+/* ============================================
+   FLOATING ACTION BUTTON (L3 depth)
+   ============================================ */
+.fab {
+  position: fixed; bottom: 80px; right: 32px; z-index: 30;
+  width: 48px; height: 48px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.75);
+  backdrop-filter: blur(30px) saturate(180%);
+  -webkit-backdrop-filter: blur(30px) saturate(180%);
+  border: 0.5px solid rgba(0,0,0,0.08);
+  box-shadow:
+    0 2px 8px rgba(0,0,0,0.06),
+    0 8px 32px rgba(0,0,0,0.04);
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer;
+  transition: all 0.4s var(--spring-smooth);
+  color: var(--accent);
+  font-size: 20px;
+  font-weight: 200;
+  line-height: 1;
+}
+
+.fab:hover {
+  transform: scale(1.08);
+  box-shadow:
+    0 4px 16px rgba(0,0,0,0.08),
+    0 12px 40px rgba(0,0,0,0.06);
+  background: rgba(255,255,255,0.85);
+}
+
+.fab:active {
+  transform: scale(0.94);
+  transition: transform 0.12s var(--spring-fast);
+}
+
+/* ============================================
+   SECTION BREAK (between rounds)
+   ============================================ */
+.section-break {
+  height: 1px;
+  margin: 16px 0 48px;
+  background: linear-gradient(to right,
+    transparent 0%,
+    rgba(0,0,0,0.05) 30%,
+    rgba(0,0,0,0.08) 50%,
+    rgba(0,0,0,0.05) 70%,
+    transparent 100%
+  );
+}
+
+/* ============================================
+   ROUND TRANSITION ANIMATION
+   ============================================ */
+.round-section {
+  animation: glassRefocus 0.8s var(--spring-smooth);
+}
+
+@keyframes glassRefocus {
+  0% { filter: blur(2px); opacity: 0.6; }
+  100% { filter: blur(0); opacity: 1; }
+}
+
+/* ============================================
+   RESPONSIVE
+   ============================================ */
+@media (max-width: 768px) {
+  .main-content {
+    padding: 64px 16px 120px;
+  }
+
+  .glass-card {
+    padding: 32px 28px;
+    border-radius: var(--squircle-sm);
+    margin-bottom: 28px;
+  }
+
+  .glass-card::after {
+    border-radius: calc(var(--squircle-sm) - 1px);
+  }
+
+  .card-content p {
+    font-size: 14px;
+    line-height: 2;
+    max-width: 100%;
+  }
+
+  .card-role-name {
+    font-size: 18px;
+  }
+
+  .round-title-theme {
+    font-size: 20px;
+    letter-spacing: 4px;
+  }
+
+  .top-nav {
+    padding: 0 16px;
+  }
+
+  .fab {
+    bottom: 72px; right: 16px;
+    width: 42px; height: 42px;
+  }
+}
+
+@media (max-width: 480px) {
+  .glass-card {
+    padding: 26px 22px;
+    border-radius: var(--squircle-xs);
+  }
+
+  .glass-card::after {
+    border-radius: calc(var(--squircle-xs) - 1px);
+  }
+
+  .card-content p {
+    font-size: 13px;
+    line-height: 1.9;
+  }
+
+  .card-role {
+    margin-bottom: 16px;
+    padding-bottom: 12px;
+  }
+
+  .card-role-name {
+    font-size: 16px;
+    letter-spacing: 2px;
+  }
+
+  .round-title-theme {
+    font-size: 18px;
+    letter-spacing: 3px;
+  }
+
+  .card-refract-zone {
+    height: 36px;
+  }
+
+  .collision-glass {
+    padding: 20px 0;
+    margin: 16px 0;
+  }
+}
+</style>
+</head>
+<body>
+
+<!-- Layer 0: Pure white background -->
+<div class="bg-layer"></div>
+
+<!-- Layer 1: Top Navigation -->
+<nav class="top-nav">
+  <span class="nav-title">Debate Arena</span>
+  <button class="nav-button" aria-label="info">+</button>
+</nav>
+
+<!-- Main Content -->
+<main class="main-content">
+
+  <!-- ROUND 1: 自由 -->
+  <section class="round-section">
+    <div class="round-title">
+      <div class="round-title-label">Round One</div>
+      <div class="round-title-theme">自由</div>
+    </div>
+
+    <!-- 庄周 -->
+    <div class="glass-card card-zhuangzi">
+      <div class="side-line"></div>
+      <header class="card-role">
+        <span class="card-role-name">庄周</span>
+        <span class="card-role-subtitle">逍遥游</span>
+      </header>
+      <div class="card-content">
+        <p>北冥有鱼，其名为鲲。鲲之大，不知其几千里也。化而为鸟，其名为鹏。<span class="highlight">鹏之背，不知其几千里也；怒而飞，其翼若垂天之云。</span></p>
+        <p>若夫乘天地之正，而御六气之辩，以游无穷者，彼且恶乎待哉？故曰：至人无己，神人无功，圣人无名。</p>
+      </div>
+      <div class="card-refract-zone"></div>
+    </div>
+
+    <!-- 尼采 -->
+    <div class="glass-card card-nietzsche">
+      <div class="side-line"></div>
+      <header class="card-role">
+        <span class="card-role-name">尼采</span>
+        <span class="card-role-subtitle">权力意志</span>
+      </header>
+      <div class="card-content">
+        <p><span class="highlight">人是一根系在动物与超人之间的绳索——一根悬于深渊之上的绳索。</span></p>
+        <p>人之伟大，在于其为桥梁而非目的；人之可爱，在于其为过渡与没落。我爱那除非作为没落者便不知如何生活的人，因为他们乃是过渡者。</p>
+      </div>
+      <div class="card-refract-zone"></div>
+    </div>
+
+    <!-- 碰撞 -->
+    <div class="collision-glass">
+      <div class="divider"></div>
+      <div class="ripple"></div>
+      <div class="ripple"></div>
+      <div class="ripple"></div>
+      <div class="ripple"></div>
+    </div>
+  </section>
+
+  <div class="section-break"></div>
+
+  <!-- ROUND 2: 存在 -->
+  <section class="round-section">
+    <div class="round-title">
+      <div class="round-title-label">Round Two</div>
+      <div class="round-title-theme">存在</div>
+    </div>
+
+    <!-- 庄周 -->
+    <div class="glass-card card-zhuangzi">
+      <div class="side-line"></div>
+      <header class="card-role">
+        <span class="card-role-name">庄周</span>
+        <span class="card-role-subtitle">齐物论</span>
+      </header>
+      <div class="card-content">
+        <p>昔者庄周梦为蝴蝶，栩栩然蝴蝶也。自喻适志与，不知周也。<span class="highlight">俄然觉，则蘧蘧然周也。不知周之梦为蝴蝶与？蝴蝶之梦为周与？</span></p>
+        <p>周与蝴蝶则必有分矣。此之谓物化。</p>
+      </div>
+      <div class="card-refract-zone"></div>
+    </div>
+
+    <!-- 波伏娃 -->
+    <div class="glass-card card-beauvoir">
+      <div class="side-line"></div>
+      <header class="card-role">
+        <span class="card-role-name">波伏娃</span>
+        <span class="card-role-subtitle">第二性</span>
+      </header>
+      <div class="card-content">
+        <p><span class="highlight">女人不是天生的，而是后天成为的。</span>一个自由之人，处于一个被给定的世界中，必须通过行动来为自身的存在赋予意义。</p>
+        <p>存在的先于本质的——但成为什么，由自己选择。每一个主体都是通过谋划来具体地确立自身为自由的。</p>
+      </div>
+      <div class="card-refract-zone"></div>
+    </div>
+
+    <!-- 碰撞 -->
+    <div class="collision-glass">
+      <div class="divider"></div>
+      <div class="ripple"></div>
+      <div class="ripple"></div>
+    </div>
+  </section>
+
+  <div class="section-break"></div>
+
+  <!-- ROUND 3: 超越 -->
+  <section class="round-section">
+    <div class="round-title">
+      <div class="round-title-label">Round Three</div>
+      <div class="round-title-theme">超越</div>
+    </div>
+
+    <!-- 尼采 -->
+    <div class="glass-card card-nietzsche">
+      <div class="side-line"></div>
+      <header class="card-role">
+        <span class="card-role-name">尼采</span>
+        <span class="card-role-subtitle">查拉图斯特拉</span>
+      </header>
+      <div class="card-content">
+        <p><span class="highlight">上帝已死。而我们杀死了他。</span>这最伟大的事迹，难道不是太过伟大了吗？我们必须自己成为神，才能配得上这一行为。</p>
+        <p>人是一种应当被超越的东西。你们做了什么以超越人呢？</p>
+      </div>
+      <div class="card-refract-zone"></div>
+    </div>
+
+    <!-- 波伏娃 -->
+    <div class="glass-card card-beauvoir">
+      <div class="side-line"></div>
+      <header class="card-role">
+        <span class="card-role-name">波伏娃</span>
+        <span class="card-role-subtitle">模糊性道德</span>
+      </header>
+      <div class="card-content">
+        <p>一个人不是生而为女人，而是成为女人。<span class="highlight">同样地，一个人也不是生而自由——自由是被争取的。</span></p>
+        <p>每一个主体都是通过谋划——作为超越性的运动——来具体地确立自身为自由的。</p>
+      </div>
+      <div class="card-refract-zone"></div>
+    </div>
+
+    <!-- 庄周 -->
+    <div class="glass-card card-zhuangzi">
+      <div class="side-line"></div>
+      <header class="card-role">
+        <span class="card-role-name">庄周</span>
+        <span class="card-role-subtitle">齐物</span>
+      </header>
+      <div class="card-content">
+        <p><span class="highlight">天地与我并生，而万物与我为一。</span>既已为一矣，且得有言乎？既已谓之一矣，且得无言乎？</p>
+        <p>一与言为二，二与一为三。自此以往，巧历不能得，而况其凡乎！</p>
+      </div>
+      <div class="card-refract-zone"></div>
+    </div>
+
+    <!-- 碰撞 -->
+    <div class="collision-glass">
+      <div class="divider"></div>
+      <div class="ripple"></div>
+      <div class="ripple"></div>
+    </div>
+  </section>
+
+</main>
+
+<!-- Layer 1: Bottom Glass Bar -->
+<div class="bottom-bar">
+  <div class="progress-dots">
+    <div class="progress-dot completed"></div>
+    <div class="progress-dot active"></div>
+    <div class="progress-dot"></div>
+  </div>
+  <span class="progress-label">Debate in Progress</span>
+</div>
+
+<!-- Layer 3: Floating Action Button -->
+<button class="fab" aria-label="continue">+</button>
+
+<script>
+/* ============================================
+   Minimal JS: Glass card interaction & progress
+   ============================================ */
+(function() {
+  /* Spring-like card hover refinement */
+  const cards = document.querySelectorAll('.glass-card');
+  cards.forEach(card => {
+    card.addEventListener('mouseenter', function() {
+      const sideLine = this.querySelector('.side-line');
+      if (sideLine) {
+        sideLine.style.transition = 'opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1), height 0.5s cubic-bezier(0.34, 1.56, 0.64, 1)';
+      }
+    });
+  });
+
+  /* Scroll-based progress dot update */
+  const dots = document.querySelectorAll('.progress-dot');
+  const sections = document.querySelectorAll('.round-section');
+  const progressLabel = document.querySelector('.progress-label');
+
+  const roundLabels = ['Round One: Freedom', 'Round Two: Being', 'Round Three: Transcend'];
+
+  function updateProgress() {
+    let activeIdx = 0;
+    const scrollY = window.scrollY + window.innerHeight / 2;
+
+    sections.forEach((section, i) => {
+      const top = section.offsetTop;
+      if (scrollY >= top) activeIdx = i;
+    });
+
+    dots.forEach((dot, i) => {
+      dot.classList.remove('active', 'completed');
+      if (i < activeIdx) dot.classList.add('completed');
+      if (i === activeIdx) dot.classList.add('active');
+    });
+
+    if (progressLabel) {
+      progressLabel.textContent = roundLabels[activeIdx] || 'Debate';
+    }
+  }
+
+  window.addEventListener('scroll', updateProgress, { passive: true });
+  updateProgress();
+
+  /* FAB interaction */
+  const fab = document.querySelector('.fab');
+  if (fab) {
+    fab.addEventListener('click', () => {
+      const currentSection = document.querySelector('.round-section:last-child');
+      if (currentSection) {
+        currentSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    });
+  }
+})();
+</script>
+
+</body>
+</html>

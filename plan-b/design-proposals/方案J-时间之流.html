@@ -1,0 +1,814 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>方案J：时间之流 · 自由辩论堂</title>
+<style>
+:root {
+  --zhuangzi: #4a9e6b;
+  --zhuangzi-glow: rgba(74,158,107,.4);
+  --zhuangzi-bg: #eaf5ee;
+  --nietzsche: #c44a3a;
+  --nietzsche-glow: rgba(196,74,58,.4);
+  --nietzsche-bg: #fdf0ee;
+  --beauvoir: #5b7fc4;
+  --beauvoir-glow: rgba(91,127,196,.4);
+  --beauvoir-bg: #eef2fa;
+  --bg: #0f0e17;
+  --surface: #1a1925;
+  --text: #e0dcd0;
+  --text-dim: #8a8878;
+  --accent: #d4a055;
+  --river: #2d4a5e;
+  --section: 340px;
+}
+
+* { box-sizing:border-box;margin:0;padding:0; }
+
+body {
+  font-family: 'Noto Serif SC','Georgia','Songti SC',serif;
+  background: var(--bg);
+  color: var(--text);
+  overflow-x: auto;
+  overflow-y: hidden;
+  height: 100vh;
+  scroll-behavior: smooth;
+}
+
+/* === TOPIC SWITCHER OVERLAY === */
+.topic-bar {
+  position: fixed;
+  top: 12px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 20;
+  display: flex;
+  gap: 8px;
+}
+.topic-dot {
+  width: 10px; height: 10px;
+  border-radius: 50%;
+  background: rgba(255,255,255,.15);
+  cursor: pointer;
+  transition: all .35s;
+  border: 1px solid transparent;
+}
+.topic-dot:hover { background: rgba(255,255,255,.3) }
+.topic-dot.active { 
+  background: var(--accent);
+  box-shadow: 0 0 12px rgba(212,160,85,.5);
+}
+.topic-dot::after {
+  content: attr(data-label);
+  position: absolute;
+  top: 16px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 10px;
+  white-space: nowrap;
+  color: var(--text-dim);
+  opacity: 0;
+  transition: opacity .3s;
+  letter-spacing: .04em;
+}
+.topic-dot.active::after { opacity: .8 }
+
+/* === MAIN RIVER === */
+.river {
+  display: flex;
+  height: 100vh;
+  width: max-content;
+  min-width: 100vw;
+}
+
+/* === SECTION === */
+.section {
+  width: var(--section);
+  min-width: var(--section);
+  height: 100vh;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 50px 28px;
+  cursor: pointer;
+  transition: filter .4s, opacity .4s, background .4s;
+  border-right: 1px solid rgba(255,255,255,.04);
+}
+.section.spacer {
+  min-width: 70px;
+  width: 70px;
+  background: transparent;
+  cursor: default;
+  border-right-color: transparent;
+}
+
+/* Flow line */
+.flow-line {
+  position: absolute;
+  top: 50%;
+  left: 0;
+  right: 0;
+  height: 2px;
+  z-index: 0;
+  transition: background .5s;
+}
+.section.intro .flow-line { background: linear-gradient(90deg,var(--accent),var(--river)); }
+.section.zhuangzi .flow-line { background: var(--zhuangzi); opacity: .7; }
+.section.nietzsche .flow-line { background: var(--nietzsche); opacity: .7; }
+.section.beauvoir .flow-line { background: var(--beauvoir); opacity: .7; }
+.section.zhuangzi:hover .flow-line,
+.section.nietzsche:hover .flow-line,
+.section.beauvoir:hover .flow-line { opacity: 1; }
+.section.synthesis .flow-line { background: linear-gradient(90deg,var(--accent),rgba(212,160,85,.2)); }
+
+/* Section backgrounds */
+.section.zhuangzi { background: linear-gradient(180deg, var(--bg) 0%, rgba(74,158,107,.05) 100%); }
+.section.nietzsche { background: linear-gradient(180deg, var(--bg) 0%, rgba(196,74,58,.05) 100%); }
+.section.beauvoir { background: linear-gradient(180deg, var(--bg) 0%, rgba(91,127,196,.05) 100%); }
+.section.synthesis { background: linear-gradient(180deg, var(--bg) 0%, rgba(212,160,85,.06) 100%); }
+
+.section:hover { filter: brightness(1.05); }
+.section.intro { filter: brightness(1); }
+
+/* === TOPIC BADGE === */
+.badge {
+  position: absolute;
+  top: 24px;
+  font-size: 11px;
+  letter-spacing: .16em;
+  text-transform: uppercase;
+  color: var(--text-dim);
+  opacity: .5;
+  z-index: 1;
+}
+
+/* === PHILOSOPHER SHAPE === */
+.shape {
+  width: 56px;
+  height: 56px;
+  margin-bottom: 18px;
+  position: relative;
+  z-index: 2;
+  transition: transform .4s, filter .4s, box-shadow .4s;
+}
+.section:hover .shape { transform: scale(1.14); }
+
+.section.zhuangzi .shape {
+  background: var(--zhuangzi);
+  clip-path: polygon(50% 5%, 90% 30%, 85% 75%, 50% 95%, 15% 75%, 10% 30%);
+  box-shadow: 0 0 32px var(--zhuangzi-glow);
+}
+.section.nietzsche .shape {
+  background: var(--nietzsche);
+  clip-path: polygon(50% 5%, 80% 20%, 95% 50%, 80% 80%, 50% 95%, 20% 80%, 5% 50%, 20% 20%);
+  box-shadow: 0 0 32px var(--nietzsche-glow);
+}
+.section.beauvoir .shape {
+  background: var(--beauvoir);
+  clip-path: polygon(50% 5%, 75% 25%, 75% 75%, 50% 95%, 25% 75%, 25% 25%);
+  box-shadow: 0 0 32px var(--beauvoir-glow);
+}
+.section.synthesis .shape {
+  width: 44px; height: 44px; background: var(--accent);
+  border-radius: 50%;
+  box-shadow: 0 0 28px rgba(212,160,85,.5);
+}
+
+/* === NAME === */
+.name {
+  font-size: 16px;
+  font-weight: 700;
+  letter-spacing: .06em;
+  margin-bottom: 20px;
+  z-index: 1;
+  position: relative;
+}
+.section.zhuangzi .name { color: var(--zhuangzi); }
+.section.nietzsche .name { color: var(--nietzsche); }
+.section.beauvoir .name { color: var(--beauvoir); }
+.section.synthesis .name { color: var(--accent); font-size: 14px; }
+
+/* === STANCE === */
+.stance {
+  font-size: 24px;
+  font-weight: 900;
+  text-align: center;
+  line-height: 1.5;
+  margin-bottom: 16px;
+  z-index: 1;
+  position: relative;
+  text-shadow: 0 0 20px rgba(0,0,0,.3);
+}
+
+/* === QUOTE BLOCK === */
+.quote {
+  font-size: 13px;
+  line-height: 1.9;
+  color: var(--text-dim);
+  text-align: center;
+  max-width: 260px;
+  position: relative;
+  z-index: 1;
+  font-style: italic;
+}
+
+/* === NAV ARROW === */
+.nav-arrow {
+  position: absolute;
+  bottom: 36px;
+  font-size: 24px;
+  color: var(--text-dim);
+  opacity: .25;
+  z-index: 3;
+  animation: pulse 2.4s infinite;
+  pointer-events: none;
+}
+@keyframes pulse {
+  0%,100% { opacity:.2;transform:translateX(0); }
+  50% { opacity:.6;transform:translateX(8px); }
+}
+
+/* === YEAR DOT === */
+.year-dot {
+  position: absolute;
+  top: 50%;
+  left: 0;
+  width: 10px; height: 10px;
+  border-radius: 50%;
+  transform: translate(-50%,-50%);
+  z-index: 3;
+  transition: transform .3s, box-shadow .3s;
+}
+.section.zhuangzi .year-dot { background: var(--zhuangzi); box-shadow: 0 0 14px var(--zhuangzi-glow); }
+.section.nietzsche .year-dot { background: var(--nietzsche); box-shadow: 0 0 14px var(--nietzsche-glow); }
+.section.beauvoir .year-dot { background: var(--beauvoir); box-shadow: 0 0 14px var(--beauvoir-glow); }
+.section:hover .year-dot { transform: translate(-50%,-50%) scale(1.6); }
+
+/* === LABEL === */
+.label {
+  font-size: 10px;
+  letter-spacing: .14em;
+  color: var(--text-dim);
+  opacity: .4;
+  margin-bottom: 8px;
+  z-index: 1;
+}
+
+/* === RESPONSE BUBBLES === */
+.response-area {
+  position: absolute;
+  bottom: 70px;
+  left: 24px;
+  right: 24px;
+  z-index: 2;
+}
+.response-bubble {
+  font-size: 11px;
+  line-height: 1.6;
+  padding: 10px 14px;
+  border-radius: 12px;
+  margin-bottom: 8px;
+  max-width: 88%;
+  opacity: .5;
+  transition: opacity .4s;
+}
+.section:hover .response-bubble { opacity: .88; }
+
+.section.zhuangzi .response-bubble { background: var(--zhuangzi-bg); color: #1e3a28; }
+.section.nietzsche .response-bubble { background: var(--nietzsche-bg); color: #3d1812; }
+.section.beauvoir .response-bubble { background: var(--beauvoir-bg); color: #1c2744; }
+
+/* Bubble attribution */
+.bubble-from {
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: .08em;
+  opacity: .5;
+  margin-bottom: 3px;
+}
+
+/* === INTRO === */
+.intro-text {
+  font-size: 36px;
+  font-weight: 900;
+  z-index: 1;
+  text-align: center;
+  line-height: 1.4;
+  letter-spacing: .04em;
+}
+.intro-sub {
+  font-size: 13px;
+  color: var(--text-dim);
+  margin-top: 20px;
+  z-index: 1;
+  letter-spacing: .06em;
+}
+
+/* === TOP BAR (rainbow river indicator) === */
+.top-bar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  z-index: 15;
+  background: linear-gradient(90deg, var(--zhuangzi) 0%, var(--nietzsche) 50%, var(--beauvoir) 100%);
+}
+
+/* === SYNTHESIS === */
+.syn-text {
+  font-size: 14px;
+  line-height: 2.2;
+  text-align: center;
+  color: var(--text-dim);
+  max-width: 250px;
+  z-index: 1;
+  position: relative;
+}
+
+/* === SECTION KEYWORD RING === */
+.keyword-ring {
+  position: absolute;
+  font-size: 10px;
+  color: var(--text-dim);
+  opacity: .18;
+  letter-spacing: .2em;
+  writing-mode: vertical-rl;
+  z-index: 0;
+  pointer-events: none;
+}
+.keyword-ring.left { left: 12px; top: 30%; }
+.keyword-ring.right { right: 12px; top: 30%; }
+
+/* === Debate scoring (small visual) === */
+.score-marks {
+  position: absolute;
+  bottom: 30px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 6px;
+  z-index: 2;
+  opacity: .25;
+}
+.score-mark {
+  width: 4px; height: 4px;
+  border-radius: 50%;
+}
+.section.zhuangzi .score-mark { background: var(--zhuangzi); }
+.section.nietzsche .score-mark { background: var(--nietzsche); }
+.section.beauvoir .score-mark { background: var(--beauvoir); }
+
+/* Hover interaction detail */
+.section.zhuangzi .score-mark:hover,
+.section.nietzsche .score-mark:hover,
+.section.beauvoir .score-mark:hover { transform: scale(2); }
+
+/* Spacer animation */
+.spacer-symbol {
+  font-size: 22px;
+  opacity: .08;
+  z-index: 1;
+  animation: spacerPulse 6s infinite;
+}
+@keyframes spacerPulse {
+  0%,100% { opacity:.04 }
+  50% { opacity:.14 }
+}
+
+/* Section counter (bottom-right) */
+.section-counter {
+  position: absolute;
+  bottom: 16px;
+  right: 16px;
+  font-size: 28px;
+  font-weight: 900;
+  opacity: .04;
+  z-index: 1;
+  pointer-events: none;
+}
+</style>
+</head>
+<body>
+<div class="top-bar"></div>
+
+<!-- Topic switcher dots -->
+<div class="topic-bar" id="topicBar">
+  <div class="topic-dot active" data-topic="0" data-label="自由之辩" title="自由之辩"></div>
+  <div class="topic-dot" data-topic="1" data-label="死亡与自由" title="死亡与自由"></div>
+  <div class="topic-dot" data-topic="2" data-label="他人与自由" title="他人与自由"></div>
+  <div class="topic-dot" data-topic="3" data-label="自由的可能" title="自由的可能"></div>
+</div>
+
+<div class="river" id="river">
+
+  <!-- 0 → INTRO -->
+  <div class="section intro" style="min-width:380px">
+    <div class="intro-text">关于<br>「自由」<br>的三个回答</div>
+    <div class="intro-sub">随时间的河流，聆听三声回响</div>
+    <div class="nav-arrow">→</div>
+    <div class="section-counter">λ</div>
+  </div>
+
+  <!-- TOPIC 0: 自由之辩 -->
+  <!-- 1 → ZHUANGZI -->
+  <div class="section zhuangzi" data-topic-group="0">
+    <div class="badge">约公元前369年</div>
+    <div class="keyword-ring left">道家·蒙地</div>
+    <div class="keyword-ring right">逍遥游</div>
+    <div class="label">道家 · 宋国蒙地</div>
+    <div class="shape"></div>
+    <div class="name">庄周</div>
+    <div class="stance">逍遥<br>无待</div>
+    <div class="quote">"若夫乘天地之正，而御六气之辩，<br>以游无穷者，彼且恶乎待哉？"</div>
+    <div class="year-dot"></div>
+    <div class="response-area">
+      <div class="response-bubble" style="margin-left:auto;text-align:right">
+        <div class="bubble-from">庄周</div>
+        自由不在挣脱枷锁，而在遗忘枷锁本身。鲲鹏之变，非力也，顺也。吾丧我，故无往而不逍遥。
+      </div>
+    </div>
+    <div class="score-marks"><div class="score-mark"></div><div class="score-mark"></div><div class="score-mark"></div></div>
+    <div class="nav-arrow">→</div>
+    <div class="section-counter">I</div>
+  </div>
+
+  <div class="section spacer"><div class="spacer-symbol">✦</div></div>
+
+  <!-- 2 → NIETZSCHE -->
+  <div class="section nietzsche" data-topic-group="0">
+    <div class="badge">1883–1885</div>
+    <div class="keyword-ring left">德意志</div>
+    <div class="keyword-ring right">超人</div>
+    <div class="label">德意志 · 西尔斯-玛利亚</div>
+    <div class="shape"></div>
+    <div class="name">尼采</div>
+    <div class="stance">成为<br>你自己</div>
+    <div class="quote">"人是应被超越的某种东西。<br>你为你自己做了什么超越之事？"</div>
+    <div class="year-dot"></div>
+    <div class="response-area">
+      <div class="response-bubble">
+        <div class="bubble-from">尼采</div>
+        你说无待？没有挣扎的自由不过是逃避！真正的自由是从虚无中为自己立法——做自己的神。
+      </div>
+      <div class="response-bubble" style="margin-left:auto;text-align:right;background:var(--zhuangzi-bg);color:#1e3a28;">
+        <div class="bubble-from">庄周</div>
+        汝之"自我"岂非最大之枷锁？我忘我，故我自由。
+      </div>
+    </div>
+    <div class="score-marks"><div class="score-mark"></div><div class="score-mark"></div><div class="score-mark"></div><div class="score-mark"></div></div>
+    <div class="nav-arrow">→</div>
+    <div class="section-counter">II</div>
+  </div>
+
+  <div class="section spacer"><div class="spacer-symbol">✦</div></div>
+
+  <!-- 3 → BEAUVOIR -->
+  <div class="section beauvoir" data-topic-group="0">
+    <div class="badge">1947</div>
+    <div class="keyword-ring left">巴黎</div>
+    <div class="keyword-ring right">第二性</div>
+    <div class="label">巴黎 · 花神咖啡馆</div>
+    <div class="shape"></div>
+    <div class="name">波伏娃</div>
+    <div class="stance">处境中的<br>自由</div>
+    <div class="quote">"人不是天生自由的，<br>而是不断成为自由的。"</div>
+    <div class="year-dot"></div>
+    <div class="response-area">
+      <div class="response-bubble">
+        <div class="bubble-from">波伏娃</div>
+        你二位的自由都太孤独了。庄周忘了他人，尼采轻视弱者——但自由从来是关系中的自由。
+      </div>
+      <div class="response-bubble" style="margin-left:auto;text-align:right;background:var(--nietzsche-bg);color:#3d1812;">
+        <div class="bubble-from">尼采</div>
+        同情弱者是奴隶道德的残留！自由属于敢于孤独者。
+      </div>
+      <div class="response-bubble" style="background:var(--zhuangzi-bg);color:#1e3a28;">
+        <div class="bubble-from">庄周</div>
+        鱼相忘于江湖，人相忘于道术。非忘他人，乃不执于彼此之形也。
+      </div>
+    </div>
+    <div class="score-marks"><div class="score-mark"></div><div class="score-mark"></div><div class="score-mark"></div><div class="score-mark"></div><div class="score-mark"></div></div>
+    <div class="nav-arrow">→</div>
+    <div class="section-counter">III</div>
+  </div>
+
+  <!-- TOPIC 1: 死亡与自由 (initially hidden via scroll position) -->
+  <div class="section zhuangzi" data-topic-group="1" style="display:none">
+    <div class="badge">妻死鼓盆而歌</div>
+    <div class="keyword-ring left">生死</div>
+    <div class="keyword-ring right">气化</div>
+    <div class="label">生死一体</div>
+    <div class="shape"></div>
+    <div class="name">庄周</div>
+    <div class="stance">死生<br>一体</div>
+    <div class="quote">"生者，气之聚也。聚则为生，<br>散则为死。死生一体耳。"</div>
+    <div class="year-dot"></div>
+    <div class="response-area">
+      <div class="response-bubble" style="margin-left:auto;text-align:right">
+        <div class="bubble-from">庄周</div>
+        吾妻死而鼓盆而歌，非无情也，乃通乎命也。既知死生一体，何忧之有？自由在此——不惧死亡，即是最大解放。
+      </div>
+    </div>
+    <div class="score-marks"><div class="score-mark"></div><div class="score-mark"></div><div class="score-mark"></div></div>
+    <div class="nav-arrow">→</div>
+    <div class="section-counter">IV</div>
+  </div>
+
+  <div class="section spacer" data-topic-group="1" style="display:none"><div class="spacer-symbol">✦</div></div>
+
+  <div class="section nietzsche" data-topic-group="1" style="display:none">
+    <div class="badge">永恒轮回</div>
+    <div class="keyword-ring left">命运</div>
+    <div class="keyword-ring right">Amor fati</div>
+    <div class="label">命运之爱</div>
+    <div class="shape"></div>
+    <div class="name">尼采</div>
+    <div class="stance">再来<br>一次</div>
+    <div class="quote">"你能对你生命中的每一个瞬间<br>说'再来一次！'吗？若能，你便自由了。"</div>
+    <div class="year-dot"></div>
+    <div class="response-area">
+      <div class="response-bubble">
+        <div class="bubble-from">尼采</div>
+        庄周！你的"鼓盆而歌"正是我说的Amor fati——命运之爱！不是顺从死亡，而是以最饱满的热情拥抱它。
+      </div>
+      <div class="response-bubble" style="margin-left:auto;text-align:right;background:var(--zhuangzi-bg);color:#1e3a28;">
+        <div class="bubble-from">庄周</div>
+        拥抱？太用力了。我只是放下。鼓盆是顺手，歌是无意——汝之"热情"又成了一种执着。
+      </div>
+    </div>
+    <div class="score-marks"><div class="score-mark"></div><div class="score-mark"></div><div class="score-mark"></div><div class="score-mark"></div></div>
+    <div class="nav-arrow">→</div>
+    <div class="section-counter">V</div>
+  </div>
+
+  <div class="section spacer" data-topic-group="1" style="display:none"><div class="spacer-symbol">✦</div></div>
+
+  <div class="section beauvoir" data-topic-group="1" style="display:none">
+    <div class="badge">有限性与自由</div>
+    <div class="keyword-ring left">死亡</div>
+    <div class="keyword-ring right">紧迫</div>
+    <div class="label">存在的紧迫性</div>
+    <div class="shape"></div>
+    <div class="name">波伏娃</div>
+    <div class="stance">有限性<br>赋予自由<br>以重量</div>
+    <div class="quote">"正因我必定死亡，<br>我的每一个选择才至关重要。"</div>
+    <div class="year-dot"></div>
+    <div class="response-area">
+      <div class="response-bubble">
+        <div class="bubble-from">波伏娃</div>
+        二位的豁达令我钦佩。但死亡于我不只是哲学命题——它是我有限性的最终标记。自由因死亡而紧迫——我没有无限的时间去"逍遥"或"超越"。
+      </div>
+      <div class="response-bubble" style="margin-left:auto;text-align:right;background:var(--nietzsche-bg);color:#3d1812;">
+        <div class="bubble-from">尼采</div>
+        说得好！永恒轮回不是无限——而是每一个瞬间获得永恒重量。这与你的"紧迫性"何其相似！
+      </div>
+    </div>
+    <div class="score-marks"><div class="score-mark"></div><div class="score-mark"></div><div class="score-mark"></div><div class="score-mark"></div><div class="score-mark"></div></div>
+    <div class="nav-arrow">→</div>
+    <div class="section-counter">VI</div>
+  </div>
+
+  <!-- TOPIC 2: 他人与自由 -->
+  <div class="section beauvoir" data-topic-group="2" style="display:none">
+    <div class="badge">他者的自由</div>
+    <div class="keyword-ring left">共在</div>
+    <div class="keyword-ring right">解放</div>
+    <div class="label">模糊性的道德</div>
+    <div class="shape"></div>
+    <div class="name">波伏娃</div>
+    <div class="stance">他人的自由<br>是我的<br>自由的条件</div>
+    <div class="quote">"若我宣称自己自由<br>却无视他者的处境，<br>那不过是特权者的幻觉。"</div>
+    <div class="year-dot"></div>
+    <div class="response-area">
+      <div class="response-bubble">
+        <div class="bubble-from">波伏娃</div>
+        庄子说"相忘于江湖"——但如果有人根本不在江湖中呢？如果她被关在厨房里、被定义为"第二性"呢？
+      </div>
+    </div>
+    <div class="score-marks"><div class="score-mark"></div><div class="score-mark"></div><div class="score-mark"></div><div class="score-mark"></div><div class="score-mark"></div></div>
+    <div class="nav-arrow">→</div>
+    <div class="section-counter">VII</div>
+  </div>
+
+  <div class="section spacer" data-topic-group="2" style="display:none"><div class="spacer-symbol">✦</div></div>
+
+  <div class="section nietzsche" data-topic-group="2" style="display:none">
+    <div class="badge">超人的孤独</div>
+    <div class="keyword-ring left">孤独</div>
+    <div class="keyword-ring right">分离</div>
+    <div class="label">查拉图斯特拉</div>
+    <div class="shape"></div>
+    <div class="name">尼采</div>
+    <div class="stance">超越<br>即是分离</div>
+    <div class="quote">"查拉图斯特拉在山上独居十年——<br>正是在孤独中，<br>新价值才得以淬炼。"</div>
+    <div class="year-dot"></div>
+    <div class="response-area">
+      <div class="response-bubble">
+        <div class="bubble-from">尼采</div>
+        波伏娃女士，我对"他者"的怀疑根植于此：大众的道德从来是平庸的道德。自由之路，首先是孤独的路。
+      </div>
+      <div class="response-bubble" style="margin-left:auto;text-align:right;background:var(--beauvoir-bg);color:#1c2744;">
+        <div class="bubble-from">波伏娃</div>
+        但尼采先生，查拉图斯特拉最终还是下山了。他需要听众——这就是关系的不可逃避性。
+      </div>
+    </div>
+    <div class="score-marks"><div class="score-mark"></div><div class="score-mark"></div><div class="score-mark"></div><div class="score-mark"></div></div>
+    <div class="nav-arrow">→</div>
+    <div class="section-counter">VIII</div>
+  </div>
+
+  <div class="section spacer" data-topic-group="2" style="display:none"><div class="spacer-symbol">✦</div></div>
+
+  <div class="section zhuangzi" data-topic-group="2" style="display:none">
+    <div class="badge">相忘于江湖</div>
+    <div class="keyword-ring left">江湖</div>
+    <div class="keyword-ring right">道术</div>
+    <div class="label">相忘之道</div>
+    <div class="shape"></div>
+    <div class="name">庄周</div>
+    <div class="stance">不即<br>不离</div>
+    <div class="quote">"鱼相忘于江湖，<br>人相忘于道术。"</div>
+    <div class="year-dot"></div>
+    <div class="response-area">
+      <div class="response-bubble" style="margin-left:auto;text-align:right">
+        <div class="bubble-from">庄周</div>
+        尼采的孤独是刻意的疏离，波伏娃的共在是刻意的牵连。我道：各适其适，互不相伤。你在你的江湖游，我在我的江湖游——我承认你在，但我不控制你。
+      </div>
+    </div>
+    <div class="score-marks"><div class="score-mark"></div><div class="score-mark"></div><div class="score-mark"></div></div>
+    <div class="nav-arrow">→</div>
+    <div class="section-counter">IX</div>
+  </div>
+
+  <!-- TOPIC 3: 自由的可能 -->
+  <div class="section zhuangzi" data-topic-group="3" style="display:none">
+    <div class="badge">可行之道</div>
+    <div class="keyword-ring left">坐忘</div>
+    <div class="keyword-ring right">心斋</div>
+    <div class="label">实践的自由</div>
+    <div class="shape"></div>
+    <div class="name">庄周</div>
+    <div class="stance">忘三事<br>即得自由</div>
+    <div class="quote">"忘是非，忘彼此，忘生死。<br>此三忘之后，何来不自由？"</div>
+    <div class="year-dot"></div>
+    <div class="response-area">
+      <div class="response-bubble" style="margin-left:auto;text-align:right">
+        <div class="bubble-from">庄周</div>
+        自由不在于做加法——增加选择、增加权力——而在于做减法。为学日益，为道日损。损之又损，以至于无为。无为而无不为——此真自由也。
+      </div>
+    </div>
+    <div class="score-marks"><div class="score-mark"></div><div class="score-mark"></div><div class="score-mark"></div></div>
+    <div class="nav-arrow">→</div>
+    <div class="section-counter">X</div>
+  </div>
+
+  <div class="section spacer" data-topic-group="3" style="display:none"><div class="spacer-symbol">✦</div></div>
+
+  <div class="section nietzsche" data-topic-group="3" style="display:none">
+    <div class="badge">精神三变</div>
+    <div class="keyword-ring left">骆驼</div>
+    <div class="keyword-ring right">孩子</div>
+    <div class="label">精神的变形</div>
+    <div class="shape"></div>
+    <div class="name">尼采</div>
+    <div class="stance">骆驼·狮子<br>·孩子</div>
+    <div class="quote">"精神变成骆驼，骆驼变成狮子，<br>狮子最终变成孩子——<br>孩子是新的开始，是神圣的肯定。"</div>
+    <div class="year-dot"></div>
+    <div class="response-area">
+      <div class="response-bubble">
+        <div class="bubble-from">尼采</div>
+        庄周的"减法"与我的精神三变有相似之处——最终都是"孩子"的天真。但路径不同：你靠遗忘，我靠战斗。狮子必须说"我要"，才配得上说"我是"。
+      </div>
+      <div class="response-bubble" style="margin-left:auto;text-align:right;background:var(--beauvoir-bg);color:#1c2744;">
+        <div class="bubble-from">波伏娃</div>
+        二位的方案都太个人化了。我在想：那些被困在结构中的普通人——他们如何实践你的"三忘"或"三变"？
+      </div>
+    </div>
+    <div class="score-marks"><div class="score-mark"></div><div class="score-mark"></div><div class="score-mark"></div><div class="score-mark"></div></div>
+    <div class="nav-arrow">→</div>
+    <div class="section-counter">XI</div>
+  </div>
+
+  <div class="section spacer" data-topic-group="3" style="display:none"><div class="spacer-symbol">✦</div></div>
+
+  <div class="section beauvoir" data-topic-group="3" style="display:none">
+    <div class="badge">行动中的自由</div>
+    <div class="keyword-ring left">介入</div>
+    <div class="keyword-ring right">集体</div>
+    <div class="label">自由的项目</div>
+    <div class="shape"></div>
+    <div class="name">波伏娃</div>
+    <div class="stance">自由是<br>持续的项目</div>
+    <div class="quote">"自由不是一次性的解放，<br>而是日复一日的征服——<br>它牵动着他人的命运。"</div>
+    <div class="year-dot"></div>
+    <div class="response-area">
+      <div class="response-bubble">
+        <div class="bubble-from">波伏娃</div>
+        自由的实践要求两件事：一是不断审视自己的处境，二是要为他人的自由而行动。庄周"忘"得太快，尼采"战"得太独——而我主张：在关系中行动，在行动中成为。
+      </div>
+    </div>
+    <div class="score-marks"><div class="score-mark"></div><div class="score-mark"></div><div class="score-mark"></div><div class="score-mark"></div><div class="score-mark"></div></div>
+    <div class="nav-arrow">→</div>
+    <div class="section-counter">XII</div>
+  </div>
+
+  <!-- SYNTHESIS -->
+  <div class="section synthesis" style="min-width:350px">
+    <div class="shape"></div>
+    <div class="name">三条河，一片海</div>
+    <div class="syn-text">
+      庄周的鲲鹏说：<br><strong style="color:var(--zhuangzi)">自由是遗忘</strong><br><br>
+      尼采的超人说：<br><strong style="color:var(--nietzsche)">自由是成为</strong><br><br>
+      波伏娃的他者说：<br><strong style="color:var(--beauvoir)">自由是共在</strong><br><br>
+      跨越两千四百年的对话——<br>自由没有唯一的答案，<br>但每一个答案都让我们更接近它。<br><br>
+      <span style="font-size:12px;opacity:.5">点击上方圆点切换议题</span>
+    </div>
+    <div class="section-counter">Ω</div>
+  </div>
+
+</div>
+
+<script>
+// === TOPIC SWITCHING ===
+const topicDots = document.querySelectorAll('.topic-dot');
+const river = document.getElementById('river');
+
+function showTopic(topicIndex) {
+  // Hide all topic-grouped sections
+  const allSections = river.querySelectorAll('.section[data-topic-group], .spacer[data-topic-group]');
+  allSections.forEach(s => s.style.display = 'none');
+
+  // Show sections for selected topic
+  const targetSections = river.querySelectorAll(`[data-topic-group="${topicIndex}"]`);
+  targetSections.forEach(s => s.style.display = '');
+
+  // Restore flex display for sections
+  targetSections.forEach(s => {
+    if (s.classList.contains('section')) s.style.display = 'flex';
+    else if (s.classList.contains('spacer')) s.style.display = 'flex';
+  });
+
+  // Scroll to first section of topic group
+  if (targetSections.length > 0) {
+    const first = targetSections[0];
+    document.documentElement.scrollLeft = first.offsetLeft - 40;
+  }
+
+  // Update topic dots
+  topicDots.forEach(d => d.classList.remove('active'));
+  topicDots.forEach(d => {
+    if (d.dataset.topic === String(topicIndex)) d.classList.add('active');
+  });
+}
+
+topicDots.forEach(dot => {
+  dot.addEventListener('click', () => {
+    showTopic(parseInt(dot.dataset.topic));
+  });
+});
+
+// Topic 0 is visible by default
+showTopic(0);
+
+// Scroll behavior
+let scrolled = false;
+document.addEventListener('wheel', (e) => {
+  if (Math.abs(e.deltaX) > Math.abs(e.deltaY)) return;
+  e.preventDefault();
+  document.documentElement.scrollLeft += e.deltaY;
+  scrolled = true;
+}, {passive:false});
+
+let touchStart = 0;
+document.addEventListener('touchstart', e => { touchStart = e.touches[0].clientX; });
+document.addEventListener('touchmove', e => {
+  const dx = touchStart - e.touches[0].clientX;
+  document.documentElement.scrollLeft += dx;
+  touchStart = e.touches[0].clientX;
+  scrolled = true;
+});
+
+// Auto-scroll hint
+setTimeout(() => {
+  if (!scrolled) {
+    let pos = 0;
+    const hint = setInterval(() => {
+      pos += 2;
+      document.documentElement.scrollLeft = pos;
+      if (pos > 450 || scrolled) clearInterval(hint);
+    }, 16);
+  }
+}, 3000);
+
+// Keyboard navigation
+document.addEventListener('keydown', e => {
+  if (e.key === 'ArrowRight') document.documentElement.scrollLeft += 200;
+  if (e.key === 'ArrowLeft') document.documentElement.scrollLeft -= 200;
+});
+</script>
+</body>
+</html>

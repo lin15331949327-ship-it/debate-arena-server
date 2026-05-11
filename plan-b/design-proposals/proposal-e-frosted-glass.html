@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Debate Arena — 霜冻玻璃 Frosted Glass &amp; Ice</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@200;300;400&family=Noto+Sans+SC:wght@200;300;400;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --ice-deep: #0d1b2a;
+  --ice-mid: #152a42;
+  --ice-surface: #1b3452;
+  --ice-frost: #2a4a6e;
+  --blue-ice: #7eb8da;
+  --blue-frost: #a3d5f0;
+  --blue-mist: #c5e3f6;
+  --text-ice: #d8ecf8;
+  --text-dim: #8ab4cc;
+  --glass-border: rgba(163,213,240,0.2);
+  --glass-glow: rgba(126,184,218,0.15);
+  --frost-blur: 20px;
+  --noise-opacity: 0.05;
+  --font-body: 'Noto Sans SC', sans-serif;
+  --font-delicate: 'Noto Serif SC', serif;
+}
+* { margin:0; padding:0; box-sizing:border-box; }
+body {
+  font-family: var(--font-body);
+  background: var(--ice-deep);
+  color: var(--text-ice);
+  min-height:100vh;
+  overflow-x:hidden;
+  font-weight:300;
+}
+/* === FROST NOISE === */
+body::before {
+  content:'';
+  position:fixed; inset:0; z-index:2; pointer-events:none;
+  background: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='frost-noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='1.2' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23frost-noise)' opacity='0.08'/%3E%3C/svg%3E");
+  opacity: var(--noise-opacity);
+  mix-blend-mode: screen;
+}
+/* === ICE CRYSTAL PATTERN === */
+.ice-crust {
+  position:fixed; inset:0; z-index:3; pointer-events:none;
+  background:
+    url("data:image/svg+xml,%3Csvg width='40' height='40' xmlns='http://www.w3.org/2000/svg'%3E%3Cdefs%3E%3Cpattern id='crystal' width='40' height='40' patternUnits='userSpaceOnUse'%3E%3Cpath d='M20 0 L24 16 L40 20 L24 24 L20 40 L16 24 L0 20 L16 16 Z' fill='none' stroke='rgba(163,213,240,0.08)' stroke-width='0.5'/%3E%3C/pattern%3E%3C/defs%3E%3Crect width='100%25' height='100%25' fill='url(%23crystal)'/%3E%3C/svg%3E");
+  opacity:0.6;
+}
+/* === COLD RADIAL GLOW === */
+body::after {
+  content:'';
+  position:fixed; inset:0; z-index:4; pointer-events:none;
+  background:
+    radial-gradient(ellipse 800px 500px at 30% 20%, rgba(126,184,218,0.1) 0%, transparent 60%),
+    radial-gradient(ellipse 600px 400px at 70% 70%, rgba(163,213,240,0.06) 0%, transparent 55%),
+    radial-gradient(ellipse 400px 300px at 50% 50%, rgba(197,227,246,0.04) 0%, transparent 50%);
+}
+/* === MAIN === */
+.app { position:relative; z-index:6; max-width:1400px; margin:0 auto; padding:24px 32px; }
+/* === HEADER === */
+.header {
+  text-align:center; padding:42px 20px 26px;
+  border-bottom: 1px solid rgba(163,213,240,0.1);
+  margin-bottom:28px;
+  position:relative;
+}
+.header h1 {
+  font-family: var(--font-delicate);
+  font-size:2.4rem;
+  font-weight:200;
+  letter-spacing:0.22em;
+  color: var(--blue-mist);
+  text-shadow: 0 0 40px rgba(163,213,240,0.3);
+}
+.header .subtitle {
+  font-size:0.78rem;
+  letter-spacing:0.45em;
+  color: var(--text-dim);
+  font-weight:300;
+  margin-top:8px;
+}
+.header .frost-spark {
+  width:60px; height:1px;
+  margin:14px auto 0;
+  background: linear-gradient(90deg, transparent, var(--blue-frost), var(--blue-mist), var(--blue-frost), transparent);
+}
+/* === TOPIC BAR === */
+.topic-bar {
+  display:flex; gap:12px; align-items:center;
+  margin-bottom:28px;
+  background: rgba(27,52,82,0.6);
+  backdrop-filter: blur(var(--frost-blur));
+  -webkit-backdrop-filter: blur(var(--frost-blur));
+  padding:14px 20px;
+  border: 1px solid var(--glass-border);
+  border-radius: 6px;
+  box-shadow: 0 4px 24px rgba(0,0,0,0.2);
+}
+.topic-bar .frost-icon {
+  font-family: var(--font-delicate);
+  font-size:1.2rem;
+  color: var(--blue-frost);
+  opacity:0.7;
+}
+.topic-input {
+  flex:1; border:none; background:transparent;
+  font-family: var(--font-body);
+  font-weight:300;
+  font-size:1rem;
+  color: var(--text-ice);
+  padding:8px 4px;
+  outline:none;
+}
+.topic-input::placeholder { color:var(--text-dim); font-weight:200; }
+.topic-btn {
+  background: rgba(126,184,218,0.1);
+  color: var(--blue-frost);
+  border: 1px solid rgba(163,213,240,0.25);
+  padding:9px 24px;
+  border-radius:4px;
+  font-family: var(--font-body);
+  font-weight:300;
+  font-size:0.9rem;
+  letter-spacing:0.12em;
+  cursor:pointer;
+  transition: all 0.35s;
+}
+.topic-btn:hover {
+  background: rgba(126,184,218,0.18);
+  border-color: rgba(163,213,240,0.45);
+  box-shadow: 0 0 24px var(--glass-glow);
+}
+/* === LAYOUT === */
+.main-layout { display:flex; gap:24px; align-items:flex-start; }
+.debate-grid { flex:1; display:grid; grid-template-columns: repeat(3, 1fr); gap:20px; }
+.sidebar { width:260px; flex-shrink:0; }
+/* === CARDS === */
+.debate-card {
+  background: rgba(27,52,82,0.55);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  border: 1px solid var(--glass-border);
+  border-radius: 6px;
+  padding: 22px 18px 18px;
+  position:relative;
+  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 8px 32px rgba(0,0,0,0.25), inset 0 1px 0 rgba(255,255,255,0.03);
+  overflow:hidden;
+}
+.debate-card::before {
+  content:'';
+  position:absolute; inset:0; z-index:0; pointer-events:none;
+  background: url("data:image/svg+xml,%3Csvg viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='cf'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='1.5' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23cf)' opacity='0.05'/%3E%3C/svg%3E");
+  mix-blend-mode: screen;
+  border-radius:6px;
+  transition: opacity 0.4s;
+}
+.debate-card::after {
+  content:'';
+  position:absolute; top:-1px; left:30px; right:30px; height:1px; z-index:1;
+  background: linear-gradient(90deg, transparent, rgba(163,213,240,0.25), transparent);
+}
+.debate-card:hover {
+  transform: translateY(-4px);
+  border-color: rgba(163,213,240,0.35);
+  box-shadow:
+    0 12px 40px rgba(0,0,0,0.35),
+    0 0 40px rgba(126,184,218,0.08),
+    inset 0 2px 0 rgba(255,255,255,0.04);
+}
+.debate-card:hover::before { opacity:0.08; }
+.debate-card .card-header {
+  position:relative; z-index:1;
+  display:flex; align-items:center; gap:10px;
+  margin-bottom:14px;
+  padding-bottom:10px;
+  border-bottom: 1px solid rgba(163,213,240,0.08);
+}
+.card-avatar {
+  width:42px; height:42px; border-radius:50%;
+  display:flex; align-items:center; justify-content:center;
+  font-family: var(--font-delicate);
+  font-size:1rem;
+  border:1px solid;
+  flex-shrink:0;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+.card-avatar.z { color:var(--blue-frost); border-color:rgba(163,213,240,0.4); background:rgba(126,184,218,0.1); }
+.card-avatar.n { color:#f0c8c8; border-color:rgba(240,200,200,0.4); background:rgba(240,200,200,0.1); }
+.card-avatar.b { color:#c8d8f0; border-color:rgba(200,216,240,0.4); background:rgba(200,216,240,0.1); }
+.card-name { font-family:var(--font-delicate); font-size:1.05rem; color:var(--text-ice); font-weight:300; }
+.card-role { font-size:0.7rem; color:var(--text-dim); font-weight:300; }
+.debate-card .card-body { position:relative; z-index:1; font-size:0.85rem; line-height:1.85; color:var(--text-ice); font-weight:300; }
+.debate-card .card-body p { margin-bottom:8px; }
+.debate-card .card-body .quote {
+  border-left: 2px solid rgba(163,213,240,0.3);
+  padding: 6px 12px;
+  margin: 8px 0;
+  color: var(--blue-mist);
+  font-weight:300;
+  font-size:0.84rem;
+}
+.debate-card .card-stance {
+  margin-top:12px; padding-top:8px;
+  border-top: 1px solid rgba(163,213,240,0.06);
+  font-size:0.74rem; color:var(--blue-frost);
+  font-weight:300;
+}
+/* === SIDEBAR === */
+.sidebar {
+  background: rgba(27,52,82,0.55);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  border: 1px solid var(--glass-border);
+  border-radius:6px;
+  padding:20px;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+}
+.sidebar h3 {
+  font-family: var(--font-delicate);
+  font-size:1rem;
+  font-weight:300;
+  color: var(--blue-mist);
+  margin-bottom:16px;
+  text-align:center;
+  letter-spacing:0.12em;
+}
+.heatmap-bar { margin-bottom:12px; }
+.heatmap-label {
+  display:flex; justify-content:space-between;
+  font-size:0.7rem; color:var(--text-dim); font-weight:300;
+  margin-bottom:4px;
+}
+.heatmap-track {
+  height:4px; background:rgba(255,255,255,0.05);
+  border-radius:2px; overflow:hidden;
+}
+.heatmap-fill { height:100%; border-radius:2px; transition:width 0.7s ease; }
+.heatmap-fill.ice1 { background: linear-gradient(90deg, var(--blue-ice), var(--blue-mist)); }
+.heatmap-fill.ice2 { background: linear-gradient(90deg, #f0c8c8, #f8d8d8); }
+.heatmap-fill.ice3 { background: linear-gradient(90deg, #c8d8f0, #d8e8f8); }
+.sidebar .insight-box {
+  margin-top:18px; padding:14px;
+  border-left: 2px solid rgba(163,213,240,0.2);
+  background: rgba(126,184,218,0.05);
+  font-size:0.75rem; color:var(--text-dim); font-weight:300;
+  line-height:1.7;
+}
+@media (max-width:1024px) {
+  .main-layout { flex-direction:column }
+  .sidebar { width:100% }
+  .debate-grid { grid-template-columns:1fr }
+}
+</style>
+</head>
+<body>
+<div class="ice-crust"></div>
+<div class="app">
+  <header class="header">
+    <h1>冰 霜 对 话</h1>
+    <div class="subtitle">FROSTED GLASS &amp; ICE</div>
+    <div class="frost-spark"></div>
+  </header>
+
+  <div class="topic-bar">
+    <span class="frost-icon">&#10040;</span>
+    <input class="topic-input" placeholder="在冰面上刻下辩题..." value="自由意志是否存在？">
+    <button class="topic-btn">破 冰</button>
+  </div>
+
+  <div class="main-layout">
+    <div class="debate-grid">
+      <div class="debate-card">
+        <div class="card-header">
+          <div class="card-avatar z">庄</div>
+          <div>
+            <div class="card-name">庄周</div>
+            <div class="card-role">逍遥游</div>
+          </div>
+        </div>
+        <div class="card-body">
+          <p>大知闲闲，小知间间。大言炎炎，小言詹詹。其寐也魂交，其觉也形开。</p>
+          <div class="quote">"天地有大美而不言，四时有明法而不议，万物有成理而不说。"</div>
+          <p>当冰霜覆盖大地，万物归寂——这不是死亡，而是回归。自由与命运的争论，不过是春天到来前的一场薄雾。</p>
+        </div>
+        <div class="card-stance">立场：大音希声，自由在于静观天地之美</div>
+      </div>
+
+      <div class="debate-card">
+        <div class="card-header">
+          <div class="card-avatar n">尼</div>
+          <div>
+            <div class="card-name">尼采</div>
+            <div class="card-role">查拉图斯特拉</div>
+          </div>
+        </div>
+        <div class="card-body">
+          <p>静观天地之美？庄周，你把这叫做智慧，我称之为——畏惧。畏惧成为你自己，畏惧那深渊中的孤独。</p>
+          <div class="quote">"你必须准备好沐浴在你自身的烈焰之中：你怎能重生，若不曾先化为灰烬？"</div>
+          <p>冰霜不是回归，冰霜是考验！只有那些在冰霜中依然燃烧的灵魂，才配谈论自由。</p>
+        </div>
+        <div class="card-stance">立场：在冰与火之间，选择成为火焰</div>
+      </div>
+
+      <div class="debate-card">
+        <div class="card-header">
+          <div class="card-avatar b">波</div>
+          <div>
+            <div class="card-name">波伏娃</div>
+            <div class="card-role">第二性</div>
+          </div>
+        </div>
+        <div class="card-body">
+          <p>庄周想融化于冰霜，尼采想在冰霜中燃烧——两种姿态都拒绝了一个简单的事实：我们首先是肉身，然后才是灵魂。</p>
+          <div class="quote">"身体不是一件物，而是一种处境：是我们把握世界的工具。"</div>
+          <p>自由不是超越冰霜，而是在冰霜中找到立足之处。每一个活着的人都在用身体证明：处境不可逃避，但可以改变。</p>
+        </div>
+        <div class="card-stance">立场：在冰霜的大地上行走，一步一步</div>
+      </div>
+    </div>
+
+    <aside class="sidebar">
+      <h3>冰 层 深 度</h3>
+      <div class="heatmap-bar">
+        <div class="heatmap-label"><span>庄周 · 静观</span><span>68%</span></div>
+        <div class="heatmap-track"><div class="heatmap-fill ice1" style="width:68%"></div></div>
+      </div>
+      <div class="heatmap-bar">
+        <div class="heatmap-label"><span>尼采 · 燃烧</span><span>90%</span></div>
+        <div class="heatmap-track"><div class="heatmap-fill ice2" style="width:90%"></div></div>
+      </div>
+      <div class="heatmap-bar">
+        <div class="heatmap-label"><span>波伏娃 · 行走</span><span>60%</span></div>
+        <div class="heatmap-track"><div class="heatmap-fill ice3" style="width:60%"></div></div>
+      </div>
+      <div class="insight-box">
+        <strong>冰语</strong><br>
+        庄周欲融，尼采欲焚，波伏娃欲行。三条冰上之舞，在霜冻的玻璃上留下各自的水痕——终将蒸发，却曾存在。
+      </div>
+    </aside>
+  </div>
+</div>
+</body>
+</html>

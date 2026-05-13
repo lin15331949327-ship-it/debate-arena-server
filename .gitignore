@@ -3,3 +3,10 @@ __pycache__/
 *.pyc
 sessions/
 .env
+plan-b/server/node_modules/
+plan-b/server/knowledge/
+plan-b/server/__pycache__/
+plan-b/server/engine/__pycache__/
+plan-b/server/agents/__pycache__/
+plan-b/server/*
+!plan-b/server/index.js

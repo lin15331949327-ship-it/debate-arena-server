@@ -968,11 +968,10 @@ if ('serviceWorker' in navigator) {
 }
 
 /* 鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺?Socket 杩炴帴 鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺?*/
-const socket = io(CONFIG.socketURL, {transports: ['polling']});
+const socket = io(CONFIG.socketURL, {transports: ['websocket'], upgrade: false});
 socket.on('connect', () => { console.log('?? 已连接辩论服务器'); });
 socket.on('connect_error', () => {
   console.warn('?? 辩论服务器不可用');
-  alert('?? 无法连接辩论服务器，请稍后重试或检查网络。');
   document.getElementById('btnStart').disabled = false;
 });
 socket.on('disconnect', (reason) => { console.warn('?? 与服务器断开:', reason); });

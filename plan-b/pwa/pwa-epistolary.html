@@ -681,11 +681,10 @@ if ('serviceWorker' in navigator) {
 }
 
 // â”€â”€â”€ Socket â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-const socket = io(CONFIG.socketURL, {transports: ['polling']});
+const socket = io(CONFIG.socketURL, {transports: ['websocket'], upgrade: false});
 socket.on('connect', () => { console.log('?? ÒÑÁ¬½Ó±çÂÛ·þÎñÆ÷'); });
 socket.on('connect_error', () => {
   console.warn('?? ±çÂÛ·þÎñÆ÷²»¿ÉÓÃ');
-  alert('?? ÎÞ·¨Á¬½Ó±çÂÛ·þÎñÆ÷£¬ÇëÉÔºóÖØÊÔ»ò¼ì²éÍøÂç¡£');
   document.getElementById('btnStart').disabled = false;
 });
 socket.on('disconnect', (reason) => { console.warn('?? Óë·þÎñÆ÷¶Ï¿ª:', reason); });

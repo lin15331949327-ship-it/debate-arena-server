@@ -1,0 +1,1173 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>思想书简 �?PWA</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@200;300;400;500&family=Noto+Sans+SC:wght@200;300;400;500&family=Noto+Serif+SC:wght@300;400;600&family=Ma+Shan+Zheng&display=swap" rel="stylesheet">
+<link rel="manifest" href="/manifest-epistolary.json">
+<meta name="theme-color" content="#0f0d0a">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<link rel="apple-touch-icon" href="/icon-192.png">
+<style>
+/* ══════════════════════════════════════�?
+   思想书简 Epistolary �?打磨�?v2
+   侘寂纸纹 · 暖墨色系 · 碰撞光彩
+   迷你水晶 · 热力�?· 质量报告 · 微交�?
+   设计语言: Digital Epistle 数字书简
+   ══════════════════════════════════════�?*/
+
+:root {
+  /* ── 暖墨色系 (Ink-on-Paper) ── */
+  --paper-warm: #0f0d0a;
+  --paper-surface: #161310;
+  --paper-elevated: #1c1814;
+  --paper-border: rgba(200,180,150,0.06);
+
+  /* ── 墨色文字 ── */
+  --ink-primary: #e8e4dc;
+  --ink-secondary: #b8b0a4;
+  --ink-muted: #6e6860;
+  --ink-timestamp: #585248;
+
+  /* ── 庄周 · 竹青�?── */
+  --zhuangzi-ink: #5a8a4a;
+  --zhuangzi-ink-light: #7ab86a;
+  --zhuangzi-glow: rgba(90,138,74,0.35);
+  --zhuangzi-bg: linear-gradient(160deg, rgba(40,70,30,0.28), rgba(25,45,18,0.35));
+  --zhuangzi-border: rgba(90,138,74,0.18);
+  --zhuangzi-text: #c8e0c0;
+
+  /* ── 尼采 · 朱砂�?── */
+  --nietzsche-ink: #c84030;
+  --nietzsche-ink-light: #e85848;
+  --nietzsche-glow: rgba(200,64,48,0.4);
+  --nietzsche-bg: linear-gradient(160deg, rgba(70,22,18,0.32), rgba(50,14,10,0.38));
+  --nietzsche-border: rgba(200,64,48,0.22);
+  --nietzsche-text: #f0c8c0;
+
+  /* ── 波伏�?· 靛蓝�?── */
+  --beauvoir-ink: #4a80c8;
+  --beauvoir-ink-light: #6a9ee0;
+  --beauvoir-glow: rgba(74,128,200,0.3);
+  --beauvoir-bg: linear-gradient(160deg, rgba(20,35,60,0.28), rgba(12,24,44,0.35));
+  --beauvoir-border: rgba(74,128,200,0.18);
+  --beauvoir-text: #c8d8f0;
+
+  /* ── 系统/金墨 ── */
+  --gold-ink: #c8a850;
+  --gold-glow: rgba(200,168,80,0.3);
+
+  /* ── 排版 ── */
+  --font-serif: 'Noto Serif SC', 'Ma Shan Zheng', serif;
+  --font-chat: system-ui, 'SF Pro Text', 'Segoe UI', 'Noto Sans SC', sans-serif;
+  --font-display: 'Ma Shan Zheng', 'Noto Serif SC', cursive;
+}
+
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+html{font-size:16px}
+
+body{
+  background:#080604;
+  display:flex;align-items:center;justify-content:center;
+  min-height:100vh;
+  font-family:var(--font-chat);
+  overflow-x:hidden;
+  -webkit-font-smoothing:antialiased;
+}
+
+/* ══�?桌面背景 �?书案 (侘寂纸纹) ══�?*/
+.desk{
+  position:fixed;inset:0;z-index:0;
+  background:
+    radial-gradient(ellipse at 50% 30%, #1a1510 0%, #0f0d0a 60%, #080604 100%);
+}
+/* 纸纹叠加�?*/
+.desk::after{
+  content:'';position:absolute;inset:0;
+  opacity:0.025;
+  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='paper'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='5' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23paper)'/%3E%3C/svg%3E");
+  background-size:200px;
+  pointer-events:none;
+}
+
+/* ══�?App 容器 ══�?*/
+.app-container{
+  position:relative;z-index:10;
+  width:100vw;max-width:480px;
+  height:100vh;height:100dvh;
+  margin:0 auto;
+  background:var(--paper-warm);
+  display:flex;flex-direction:column;
+  overflow:hidden;
+  box-shadow:inset 0 0 0 1px rgba(200,180,150,0.03);
+}
+/* 容器纸纹 */
+.app-container::after{
+  content:'';position:absolute;inset:0;pointer-events:none;z-index:999;
+  opacity:0.018;
+  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23g)'/%3E%3C/svg%3E");
+  background-size:180px;
+}
+
+@media(min-width:769px){
+  .app-container{
+    margin:20px auto;
+    border-radius:24px;
+    border:1px solid rgba(200,180,150,0.06);
+    height:min(820px,90vh);
+    box-shadow:
+      0 0 0 1px rgba(200,180,150,0.04),
+      0 16px 48px rgba(0,0,0,.5);
+  }
+}
+
+/* ══�?顶部�?══�?*/
+.top-bar{
+  display:flex;align-items:center;
+  padding:6px 14px;
+  border-bottom:1px solid var(--paper-border);
+  gap:10px;
+  flex-shrink:0;
+  height:50px;min-height:50px;max-height:50px;
+  background:var(--paper-surface);
+}
+
+.status-indicator{
+  font-size:0.7rem;font-weight:500;
+  letter-spacing:0.06em;white-space:nowrap;
+  padding:4px 12px;border-radius:10px;
+  flex-shrink:0;transition:all .4s ease;
+  font-family:var(--font-serif);
+}
+.status-indicator.debate{
+  background:rgba(200,180,150,0.06);
+  color:var(--ink-secondary);
+  border:1px solid rgba(200,180,150,0.1);
+}
+.status-indicator.private{
+  background:rgba(74,128,200,0.1);
+  color:var(--beauvoir-ink-light);
+  border:1px solid rgba(74,128,200,0.18);
+}
+
+/* ── 迷你水晶�?(文档要求：顶部导航栏迷你水晶) ── */
+.mini-crystals{
+  display:flex;gap:3px;align-items:center;
+  margin-left:auto;margin-right:8px;
+}
+.mini-crystal{
+  width:14px;height:14px;
+  clip-path:polygon(50% 0%,100% 50%,50% 100%,0% 50%);
+  background:rgba(255,255,255,0.04);
+  transition:all .5s ease;
+  position:relative;
+}
+.mini-crystal[data-agent="zhuangzi"].done{
+  background:rgba(90,138,74,0.6);
+  box-shadow:0 0 6px var(--zhuangzi-glow);
+}
+.mini-crystal[data-agent="nietzsche"].done{
+  background:rgba(200,64,48,0.6);
+  box-shadow:0 0 6px var(--nietzsche-glow);
+}
+.mini-crystal[data-agent="beauvoir"].done{
+  background:rgba(74,128,200,0.6);
+  box-shadow:0 0 6px var(--beauvoir-glow);
+}
+.mini-crystal.current{
+  animation:crystalMiniPulse 1.6s ease-in-out infinite;
+}
+@keyframes crystalMiniPulse{
+  0%,100%{transform:scale(1);opacity:.5}
+  50%{transform:scale(1.3);opacity:1}
+}
+
+/* ── 头像 ── */
+.top-avatars{
+  display:flex;align-items:center;gap:4px;
+}
+.top-avatar{
+  width:30px;height:30px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  font-size:0.72rem;cursor:pointer;
+  transition:all .3s cubic-bezier(.4,0,.2,1);
+  position:relative;flex-shrink:0;
+  overflow:hidden;
+}
+/* 头像点击涟漪 */
+.top-avatar::before{
+  content:'';position:absolute;inset:-4px;border-radius:50%;
+  background:transparent;
+  transition:all .4s ease;
+}
+.top-avatar:active::before{
+  background:rgba(255,255,255,0.08);
+  animation:avatarRipple .5s ease-out;
+}
+@keyframes avatarRipple{
+  0%{transform:scale(.8);opacity:1}
+  100%{transform:scale(1.6);opacity:0}
+}
+.top-avatar:hover{transform:scale(1.12)}
+.top-avatar.zhuangzi{
+  background:linear-gradient(135deg,rgba(74,110,58,.45),rgba(26,46,20,.55));
+  border:1px solid rgba(107,142,90,.2);
+  box-shadow:0 0 6px var(--zhuangzi-glow);
+}
+.top-avatar.nietzsche{
+  background:linear-gradient(135deg,rgba(200,70,40,.45),rgba(70,24,10,.55));
+  border:1px solid rgba(200,70,40,.25);
+  box-shadow:0 0 6px var(--nietzsche-glow);
+}
+.top-avatar.beauvoir{
+  background:linear-gradient(135deg,rgba(74,128,200,.4),rgba(22,48,80,.5));
+  border:1px solid rgba(74,128,200,.2);
+  box-shadow:0 0 6px var(--beauvoir-glow);
+}
+.top-avatar.selected{
+  box-shadow:0 0 12px rgba(255,255,255,.25),0 0 0 2px rgba(255,255,255,.18);
+  transform:scale(1.06);
+}
+.top-avatar::after{
+  content:'';position:absolute;bottom:0;right:0;
+  width:7px;height:7px;border-radius:50%;
+  background:#5a8a4a;
+  border:1.5px solid var(--paper-warm);
+}
+
+/* ══�?话题输入�?══�?*/
+.topic-input-bar{
+  display:flex;gap:8px;padding:8px 14px;
+  border-bottom:1px solid var(--paper-border);
+  flex-shrink:0;
+  background:var(--paper-warm);
+}
+.topic-input-bar input{
+  flex:1;padding:8px 14px;border-radius:18px;
+  border:1px solid var(--paper-border);
+  background:rgba(255,255,255,0.03);
+  color:var(--ink-primary);
+  font-size:0.78rem;font-family:inherit;
+  outline:none;
+  transition:border-color .3s;
+}
+.topic-input-bar input:focus{
+  border-color:rgba(200,180,150,0.2);
+}
+.topic-input-bar input::placeholder{color:var(--ink-muted)}
+.topic-input-bar button{
+  padding:8px 18px;border-radius:18px;border:none;
+  background:linear-gradient(135deg,var(--beauvoir-ink),#3058a0);
+  color:#fff;font-size:0.78rem;cursor:pointer;
+  white-space:nowrap;transition:all .25s cubic-bezier(.4,0,.2,1);
+  font-family:var(--font-serif);letter-spacing:1px;
+}
+.topic-input-bar button:hover{
+  box-shadow:0 0 14px rgba(74,128,200,.35);
+  transform:translateY(-1px);
+}
+.topic-input-bar button:disabled{opacity:.35;cursor:not-allowed;transform:none}
+
+/* ══�?聊天内容�?══�?*/
+.chat-content{
+  flex:1;overflow-y:auto;
+  padding:0.6rem 0.4rem 0.4rem;
+  display:flex;flex-direction:column;
+  gap:0.4rem;
+  scroll-behavior:smooth;
+  -webkit-overflow-scrolling:touch;
+}
+.chat-content::-webkit-scrollbar{width:3px}
+.chat-content::-webkit-scrollbar-thumb{
+  background:rgba(200,180,150,0.08);border-radius:3px;
+}
+
+/* ── 日期分隔�?(书简风格) ── */
+.date-sep{
+  text-align:center;margin:0.5rem 0 0.2rem;
+  display:flex;align-items:center;gap:10px;
+  padding:0 16px;
+}
+.date-sep::before,.date-sep::after{
+  content:'';flex:1;height:1px;
+  background:linear-gradient(to right,transparent,var(--paper-border),transparent);
+}
+.date-sep span{
+  display:inline-block;padding:0.2rem 0.8rem;
+  background:rgba(200,180,150,0.04);
+  border:1px solid var(--paper-border);
+  border-radius:12px;
+  font-size:0.6rem;color:var(--ink-timestamp);
+  letter-spacing:0.06em;
+  font-family:var(--font-serif);
+  white-space:nowrap;
+}
+
+/* ── 消息�?── */
+.msg-group{
+  display:flex;flex-direction:column;gap:2px;
+  max-width:84%;
+  animation:msgSlideIn .4s cubic-bezier(.22,.61,.36,1);
+}
+@media(min-width:769px){.msg-group{max-width:62%}}
+.msg-group.received{align-self:flex-start}
+
+@keyframes msgSlideIn{
+  from{opacity:0;transform:translateY(10px) scale(.97)}
+  to{opacity:1;transform:translateY(0) scale(1)}
+}
+
+/* ── 消息气泡 ── */
+.msg-bubble{
+  padding:0.55rem 0.75rem;line-height:1.7;
+  position:relative;word-break:break-word;
+  font-size:14px;
+  transition:border-color .3s ease, box-shadow .3s ease;
+}
+
+/* 庄子气泡 */
+.msg-bubble.zhuangzi-bubble{
+  background:var(--zhuangzi-bg);
+  border:1px solid var(--zhuangzi-border);
+  color:var(--zhuangzi-text);
+  border-radius:4px 16px 16px 12px;
+  box-shadow:0 1px 8px rgba(90,138,74,0.06);
+}
+.msg-bubble.zhuangzi-bubble.collision-glow{
+  border-color:rgba(90,138,74,0.7)!important;
+  box-shadow:0 0 18px var(--zhuangzi-glow),0 0 36px rgba(90,138,74,0.12)!important;
+}
+
+/* 尼采气泡 */
+.msg-bubble.nietzsche-bubble{
+  background:var(--nietzsche-bg);
+  border:1px solid var(--nietzsche-border);
+  color:var(--nietzsche-text);
+  border-radius:3px 12px 3px 12px;
+  box-shadow:0 1px 8px rgba(200,64,48,0.06);
+  clip-path:polygon(0% 0%,97% 0%,100% 3%,100% 97%,97% 100%,0% 100%,2% 97%,2% 3%);
+}
+.msg-bubble.nietzsche-bubble.collision-glow{
+  border-color:rgba(200,64,48,0.8)!important;
+  box-shadow:0 0 20px var(--nietzsche-glow),0 0 40px rgba(200,64,48,0.15)!important;
+}
+
+/* 波伏娃气�?*/
+.msg-bubble.beauvoir-bubble{
+  background:var(--beauvoir-bg);
+  border:1px solid var(--beauvoir-border);
+  color:var(--beauvoir-text);
+  border-radius:12px;
+  box-shadow:0 1px 8px rgba(74,128,200,0.06);
+}
+.msg-bubble.beauvoir-bubble.collision-glow{
+  border-color:rgba(74,128,200,0.7)!important;
+  box-shadow:0 0 18px var(--beauvoir-glow),0 0 36px rgba(74,128,200,0.12)!important;
+}
+
+/* 系统消息气泡 */
+.msg-bubble.system-bubble{
+  background:rgba(200,180,150,0.04);
+  border:1px solid rgba(200,180,150,0.1);
+  color:var(--ink-secondary);
+  border-radius:10px;text-align:center;
+  font-size:12px;padding:0.35rem 0.6rem;
+  font-style:italic;
+}
+
+/* 热力图迷你消�?*/
+.msg-bubble.heatmap-bubble{
+  background:rgba(200,180,150,0.05);
+  border:1px solid rgba(200,180,150,0.12);
+  border-radius:12px;
+  display:flex;align-items:center;gap:8px;
+  font-size:11px;color:var(--ink-muted);
+  padding:0.4rem 0.7rem;
+}
+
+/* 质量报告气泡 */
+.msg-bubble.report-bubble{
+  background:linear-gradient(160deg,rgba(60,45,20,0.35),rgba(40,28,10,0.4));
+  border:1px solid rgba(200,168,80,0.35);
+  border-radius:14px;
+  text-align:center;
+  padding:0.8rem 1rem;
+  box-shadow:0 0 20px rgba(200,168,80,0.08);
+  animation:msgSlideIn .5s cubic-bezier(.22,.61,.36,1);
+}
+.report-bubble .report-title{
+  font-family:var(--font-display);
+  font-size:18px;color:var(--gold-ink);
+  letter-spacing:3px;margin-bottom:8px;
+}
+.report-bubble .report-score{
+  font-size:36px;font-weight:200;
+  color:var(--gold-ink);
+  font-family:var(--font-serif);
+}
+.report-bubble .report-stats{
+  display:flex;gap:16px;justify-content:center;
+  margin-top:8px;flex-wrap:wrap;
+}
+.report-bubble .report-stat{
+  text-align:center;
+}
+.report-bubble .report-stat .val{
+  font-size:16px;color:var(--ink-primary);font-weight:500;
+}
+.report-bubble .report-stat .lbl{
+  font-size:10px;color:var(--ink-muted);
+  text-transform:uppercase;letter-spacing:1px;
+}
+
+/* ── 消息元数�?── */
+.msg-meta{
+  display:flex;align-items:center;gap:4px;
+  font-size:0.58rem;color:var(--ink-timestamp);
+  padding:0 5px;margin-top:1px;
+  font-family:var(--font-serif);
+}
+
+/* ══�?Typing 指示�?══�?*/
+.typing-indicator-wrap{
+  display:flex;padding:0 0.7rem 0.2rem;min-height:26px;
+}
+.typing-indicator{
+  display:flex;align-items:center;gap:4px;
+  padding:0.4rem 0.65rem;max-width:fit-content;
+  animation:msgSlideIn .3s ease-out;
+  background:rgba(200,180,150,0.04);
+  border:1px solid var(--paper-border);
+  border-radius:12px;
+  color:var(--ink-secondary);font-size:12px;
+  font-style:italic;
+}
+.typing-dot{
+  width:5px;height:5px;border-radius:50%;
+  background:var(--ink-muted);
+  animation:dotBounce 1.5s ease-in-out infinite;
+}
+.typing-dot:nth-child(2){animation-delay:.2s}
+.typing-dot:nth-child(3){animation-delay:.4s}
+@keyframes dotBounce{
+  0%,60%,100%{transform:translateY(0);opacity:.35}
+  30%{transform:translateY(-4px);opacity:.9}
+}
+.typing-indicator .typing-name{
+  margin-left:4px;color:var(--ink-secondary);
+  font-size:11px;
+}
+
+/* ══�?输入区域 �?玻璃态追问框 ══�?*/
+.chat-input-area{
+  padding:0.5rem 0.6rem max(0.7rem,env(safe-area-inset-bottom));
+  border-top:1px solid var(--paper-border);
+  display:flex;align-items:center;gap:6px;
+  flex-shrink:0;
+  background:var(--paper-surface);
+}
+.chat-input{
+  flex:1;padding:0.55rem 0.8rem;
+  background:rgba(255,255,255,0.03);
+  border:1px solid var(--paper-border);
+  border-radius:22px;
+  color:var(--ink-primary);
+  font-size:0.8rem;outline:none;
+  transition:all .3s;
+  font-family:inherit;
+  backdrop-filter:blur(8px);
+}
+.chat-input:focus{
+  border-color:rgba(200,180,150,0.22);
+  background:rgba(255,255,255,0.05);
+}
+.chat-input::placeholder{color:var(--ink-muted)}
+
+/* 发送按�?�?微交互弹�?*/
+.chat-send{
+  width:34px;height:34px;border-radius:50%;border:none;
+  background:linear-gradient(135deg,var(--beauvoir-ink),#3058a0);
+  color:#fff;font-size:1rem;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  transition:all .15s cubic-bezier(.4,0,.2,1);
+  flex-shrink:0;
+}
+.chat-send:hover{
+  transform:scale(1.08);
+  box-shadow:0 0 12px rgba(74,128,200,.3);
+}
+.chat-send:active{
+  transform:scale(.9);
+}
+.chat-send:disabled{opacity:.35;cursor:not-allowed;transform:none}
+
+/* ══�?FAB (移动�? ══�?*/
+.mobile-fab{
+  position:fixed;bottom:80px;right:14px;z-index:100;
+  width:42px;height:42px;border-radius:50%;
+  background:linear-gradient(135deg,var(--beauvoir-ink),#3058a0);
+  color:#fff;border:none;font-size:20px;
+  display:none;align-items:center;justify-content:center;
+  cursor:pointer;
+  box-shadow:0 4px 16px rgba(0,0,0,.45);
+  transition:all .3s cubic-bezier(.4,0,.2,1);
+  font-family:var(--font-chat);
+}
+.mobile-fab.open{
+  transform:rotate(45deg);
+  background:linear-gradient(135deg,#c84030,#a03020);
+}
+
+.fab-menu{
+  position:fixed;bottom:130px;right:14px;z-index:99;
+  display:none;flex-direction:column;gap:6px;align-items:flex-end;
+}
+.fab-menu.show{display:flex}
+.fab-menu button{
+  padding:8px 16px;border-radius:18px;
+  border:1px solid var(--paper-border);
+  background:rgba(20,16,12,.94);
+  color:var(--ink-secondary);font-size:0.72rem;
+  cursor:pointer;white-space:nowrap;
+  backdrop-filter:blur(14px);
+  transition:all .25s;
+  font-family:var(--font-chat);
+}
+.fab-menu button:hover{
+  color:var(--ink-primary);
+  border-color:rgba(200,180,150,0.25);
+  background:rgba(30,24,18,.96);
+}
+
+/* ══�?桌面操作�?══�?*/
+.desktop-actions{
+  position:relative;z-index:10;
+  display:flex;gap:0.5rem;margin-top:0.6rem;justify-content:center;
+}
+.desktop-actions button{
+  padding:0.5rem 1.2rem;border-radius:18px;
+  border:1px solid var(--paper-border);
+  background:rgba(200,180,150,0.04);
+  color:var(--ink-secondary);font-size:0.78rem;
+  cursor:pointer;transition:all .3s;
+  font-family:var(--font-chat);
+}
+.desktop-actions button:hover{
+  border-color:rgba(200,180,150,0.25);
+  color:var(--ink-primary);
+  background:rgba(200,180,150,0.08);
+}
+
+/* ══�?错误横幅 ══�?*/
+.error-banner{
+  display:none;
+  padding:8px 16px;margin:4px 12px;
+  border-radius:10px;
+  background:rgba(200,64,48,0.12);
+  border:1px solid rgba(200,64,48,0.2);
+  color:#f07060;
+  font-size:11px;text-align:center;
+}
+
+@media(max-width:768px){
+  .app-container{width:100vw;max-width:100vw;border-radius:0;border:none}
+  .msg-bubble{font-size:13px;padding:0.5rem 0.65rem}
+  .desktop-actions{display:none}
+  .mobile-fab{display:flex}
+  .mini-crystal{width:12px;height:12px}
+}
+</style>
+</head>
+<body>
+
+<div class="desk"></div>
+
+<div class="app-container" id="appContainer">
+
+  <!-- 顶部�?-->
+  <div class="top-bar">
+    <span class="status-indicator debate" id="statusIndicator">书简</span>
+    <!-- 迷你水晶 (新增) -->
+    <div class="mini-crystals" id="miniCrystals">
+      <div class="mini-crystal" data-agent="zhuangzi" data-r="1"></div>
+      <div class="mini-crystal" data-agent="nietzsche" data-r="2"></div>
+      <div class="mini-crystal" data-agent="beauvoir" data-r="3"></div>
+      <div class="mini-crystal" data-agent="zhuangzi" data-r="4"></div>
+      <div class="mini-crystal" data-agent="nietzsche" data-r="5"></div>
+      <div class="mini-crystal" data-agent="beauvoir" data-r="6"></div>
+    </div>
+    <!-- 头像 -->
+    <div class="top-avatars" id="headerAvatars">
+      <div class="top-avatar zhuangzi selected" data-char="zhuangzi" onclick="togglePrivateChat('zhuangzi')">�?/div>
+      <div class="top-avatar nietzsche selected" data-char="nietzsche" onclick="togglePrivateChat('nietzsche')">�?/div>
+      <div class="top-avatar beauvoir selected" data-char="beauvoir" onclick="togglePrivateChat('beauvoir')">�?/div>
+    </div>
+  </div>
+
+  <!-- 话题输入 -->
+  <div class="topic-input-bar">
+    <input type="text" id="topicInput" placeholder="输入辩论话题�? value="AI 应该被赋予权利吗�?>
+    <button id="btnStart" onclick="startDebate()">�?开�?/button>
+  </div>
+
+  <!-- 错误横幅 -->
+  <div class="error-banner" id="errorBanner"></div>
+
+  <!-- 聊天内容 -->
+  <div class="chat-content" id="chatContent"></div>
+
+  <!-- Typing -->
+  <div class="typing-indicator-wrap" id="typingWrap" style="display:none">
+    <div class="typing-indicator" id="typingIndicator">
+      <span class="typing-dot"></span><span class="typing-dot"></span><span class="typing-dot"></span>
+      <span class="typing-name" id="typingName"></span>
+    </div>
+  </div>
+
+  <!-- 输入区域 -->
+  <div class="chat-input-area">
+    <input type="text" class="chat-input" id="chatInput" placeholder="向哲学家追问�?
+      onkeydown="if(event.key==='Enter')sendMessage()">
+    <button class="chat-send" id="btnSend" onclick="sendMessage()">�?/button>
+  </div>
+
+</div>
+
+<!-- 桌面操作 -->
+<div class="desktop-actions">
+  <button onclick="startDebate()">🗣 三人辩论</button>
+  <button onclick="resetChat()">🔄 清空</button>
+</div>
+
+<!-- 移动端FAB -->
+<div class="mobile-fab" id="mobileFab" onclick="toggleFabMenu()">+</div>
+<div class="fab-menu" id="fabMenu">
+  <button onclick="startDebate();toggleFabMenu()">🗣 三人辩论</button>
+  <button onclick="resetChat();toggleFabMenu()">🗑 清空</button>
+</div>
+
+<script src="socket.io.min.js"></script>
+<script>
+/* ══════════════════════════════════════════�?
+   思想书简 �?JS 完整逻辑
+   config · 迷你水晶 · 碰撞光彩 · 热力�?
+   质量报告气泡 · 微交�?· 私聊追问
+   ══════════════════════════════════════════�?*/
+
+// ─── Config 模板化出�?────────────────────────
+const CONFIG = {
+  socketURL: 'https://debate-arena-server-production.up.railway.app',
+  maxRounds: 6,
+  agents: [
+    { id: 'zhuangzi', name: '庄子', emoji: '�?, color: '#5a8a4a' },
+    { id: 'nietzsche', name: '尼采', emoji: '�?, color: '#c84030' },
+    { id: 'beauvoir', name: '波伏�?, emoji: '�?, color: '#4a80c8' },
+  ],
+  roundAgent: (r) => CONFIG.agents[(r - 1) % 3],
+  // 特性开�?
+  showPaperTexture: true,
+  miniCrystals: true,
+  collisionGlow: true,
+  heatmapMiniSVG: true,
+};
+
+// ─── Service Worker ──────────────────────────
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('/sw.js');
+}
+
+// ─── Socket ──────────────────────────────────
+const socket = io(CONFIG.socketURL);
+
+// ─── 快捷选择�?──────────────────────────────
+const $ = (id) => document.getElementById(id);
+
+// ─── 状�?────────────────────────────────────
+const bubbleMap = {
+  zhuangzi: 'zhuangzi-bubble',
+  nietzsche: 'nietzsche-bubble',
+  beauvoir: 'beauvoir-bubble',
+};
+const chars = {
+  zhuangzi: { name: '庄子', emoji: '�? },
+  nietzsche: { name: '尼采', emoji: '�? },
+  beauvoir: { name: '波伏�?, emoji: '�? },
+};
+let mode = 'debate';
+let privateChar = null;
+let msgId = 0;
+let isTyping = false;
+let currentDebateId = null;
+let debateActive = false;
+let totalRoundsSeen = 0;
+let lastBubbleEl = null; // 跟踪最近一条哲学家气泡用于碰撞光彩
+
+// ══════════════════════════════════════════════�?
+// 迷你水晶更新
+// ══════════════════════════════════════════════�?
+function smartScroll(el) { const nearBottom = (window.innerHeight + window.scrollY) >= (document.body.scrollHeight - 200); if (!nearBottom) return; smartScroll(el); }
+
+function updateMiniCrystals(completedRounds) {
+  const crystals = document.querySelectorAll('.mini-crystal');
+  crystals.forEach((c, i) => {
+    const r = i + 1;
+    c.classList.remove('done', 'current');
+    if (r <= completedRounds) {
+      c.classList.add('done');
+    }
+    if (r === completedRounds + 1 && debateActive) {
+      c.classList.add('current');
+    }
+  });
+}
+
+// ══════════════════════════════════════════════�?
+// 碰撞光彩 (文档要求：聊天气泡边框变�?
+// ══════════════════════════════════════════════�?
+function triggerCollisionGlow(intensity) {
+  if (!CONFIG.collisionGlow) return;
+  // 找到最近一条哲学家气泡
+  const allBubbles = document.querySelectorAll(
+    '.msg-bubble.zhuangzi-bubble,.msg-bubble.nietzsche-bubble,.msg-bubble.beauvoir-bubble'
+  );
+  if (allBubbles.length === 0) return;
+  const target = allBubbles[allBubbles.length - 1];
+  const clamped = Math.min(1, Math.max(0.2, intensity || 0.5));
+  target.classList.add('collision-glow');
+  const duration = 400 + clamped * 400;
+  setTimeout(() => {
+    target.classList.remove('collision-glow');
+  }, duration);
+}
+
+// ══════════════════════════════════════════════�?
+// 热力图迷你SVG (文档要求：系统消息内嵌三�?
+// ══════════════════════════════════════════════�?
+function buildHeatmapMiniSVG(matrix) {
+  if (!CONFIG.heatmapMiniSVG || !matrix) return '';
+  const z2n = matrix['zhuangzi-nietzsche'] || matrix['nietzsche-zhuangzi'] || 0;
+  const n2b = matrix['nietzsche-beauvoir'] || matrix['beauvoir-nietzsche'] || 0;
+  const b2z = matrix['beauvoir-zhuangzi'] || matrix['zhuangzi-beauvoir'] || 0;
+  const maxV = Math.max(0.1, z2n, n2b, b2z);
+  const zn = Math.min(1, z2n / maxV);
+  const nb = Math.min(1, n2b / maxV);
+  const bz = Math.min(1, b2z / maxV);
+  const w = (v) => (1.5 + v * 5).toFixed(1);
+  const o = (v) => (0.15 + v * 0.65).toFixed(2);
+
+  return `
+  <svg viewBox="0 0 100 87" width="40" height="35" style="vertical-align:middle;flex-shrink:0">
+    <polygon points="50,5 5,75 95,75" fill="none" stroke="rgba(200,180,150,0.12)" stroke-width="0.8"/>
+    <line x1="50" y1="5" x2="5" y2="75" stroke="rgba(90,138,74,${o(zn)})" stroke-width="${w(zn)}" stroke-linecap="round"/>
+    <line x1="5" y1="75" x2="95" y2="75" stroke="rgba(200,64,48,${o(nb)})" stroke-width="${w(nb)}" stroke-linecap="round"/>
+    <line x1="95" y1="75" x2="50" y2="5" stroke="rgba(74,128,200,${o(bz)})" stroke-width="${w(bz)}" stroke-linecap="round"/>
+  </svg>`;
+}
+
+// ══════════════════════════════════════════════�?
+// 添加消息气泡
+// ══════════════════════════════════════════════�?
+function addBubble(sender, text, extraClass = '') {
+  const el = $('chatContent');
+  const cls = sender === 'system' ? 'system-bubble' : (bubbleMap[sender] || '');
+  const d = document.createElement('div');
+  d.className = 'msg-group received';
+
+  const bubbleCls = cls + (extraClass ? ' ' + extraClass : '');
+  d.innerHTML =
+    `<div class="msg-bubble ${bubbleCls}">${text}</div><div class="msg-meta">刚刚</div>`;
+  el.appendChild(d);
+  el.scrollTop = el.scrollHeight;
+
+  if (cls && cls !== 'system-bubble') {
+    lastBubbleEl = d.querySelector('.msg-bubble');
+  }
+  return d;
+}
+
+// ══════════════════════════════════════════════�?
+// 质量报告气泡 (文档要求 + 研究增强)
+// ══════════════════════════════════════════════�?
+function showReportBubble(data) {
+  const score = data.score || data.quality || '--';
+  const rounds = data.debate_count || data.rounds || totalRoundsSeen || '--';
+  const avgCol =
+    data.collision_avg || data.avgIntensity || '--';
+  const avgStr =
+    typeof avgCol === 'number' ? avgCol.toFixed(2) : avgCol;
+
+  const el = $('chatContent');
+  const d = document.createElement('div');
+  d.className = 'msg-group received';
+  d.innerHTML = `
+    <div class="msg-bubble report-bubble">
+      <div class="report-title">�?辩论终幕 �?/div>
+      <div class="report-score">${score}</div>
+      <div class="report-stats">
+        <div class="report-stat"><div class="val">${rounds}</div><div class="lbl">辩论轮次</div></div>
+        <div class="report-stat"><div class="val">${avgStr}</div><div class="lbl">平均碰撞</div></div>
+        <div class="report-stat"><div class="val">${totalRoundsSeen}</div><div class="lbl">完成发言</div></div>
+      </div>
+    </div>
+    <div class="msg-meta">辩论结束</div>
+  `;
+  el.appendChild(d);
+  el.scrollTop = el.scrollHeight;
+}
+
+// ══════════════════════════════════════════════�?
+// Typing
+// ══════════════════════════════════════════════�?
+function showTyping(name) {
+  $('typingWrap').style.display = 'flex';
+  if (name) $('typingName').textContent = name;
+  else $('typingName').textContent = '';
+}
+function hideTyping() {
+  $('typingWrap').style.display = 'none';
+  $('typingName').textContent = '';
+}
+
+// ══════════════════════════════════════════════�?
+// 错误横幅
+// ══════════════════════════════════════════════�?
+function showError(message) {
+  const banner = $('errorBanner');
+  banner.textContent = '�?' + (message || '辩论出错');
+  banner.style.display = 'block';
+  setTimeout(() => { banner.style.display = 'none'; }, 8000);
+}
+
+// ══════════════════════════════════════════════�?
+// Socket 事件
+// ══════════════════════════════════════════════�?
+
+// debate_started
+socket.on('debate_started', (msg) => {
+  console.log('[辩论开始]', msg.debateId, msg.topic);
+  currentDebateId = msg.debateId;
+  debateActive = true;
+  $('btnStart').disabled = true;
+  $('statusIndicator').textContent = '辩论�?;
+  $('statusIndicator').className = 'status-indicator debate';
+  updateMiniCrystals(0);
+});
+
+// agent_speaking
+socket.on('agent_speaking', (msg) => {
+  const name = msg.name || msg.agentId || '哲学�?;
+  isTyping = true;
+  showTyping(name);
+});
+
+// debate_message
+socket.on('debate_message', (msg) => {
+  hideTyping();
+  isTyping = false;
+
+  const payload = msg.payload || msg;
+  if (payload.type === 'collision') {
+    const intensity = payload.intensity || 0.5;
+    addBubble('system', `�?思想碰撞 · 烈度 ${Math.round(intensity * 100)}%`);
+    triggerCollisionGlow(intensity);
+  } else {
+    const agentId = payload.agentId || payload.agent || payload.speaker || 'system';
+    addBubble(agentId, payload.content || payload.text);
+    const round = payload.round;
+    if (round !== undefined && round > 0) {
+      if (round > totalRoundsSeen) totalRoundsSeen = round;
+      updateMiniCrystals(round);
+    }
+  }
+});
+
+// heatmap_update �?热力图迷你SVG
+socket.on('heatmap_update', (data) => {
+  const matrix = (data.payload && data.payload.matrix) || data.matrix;
+  if (data.collisions) {
+    data.collisions.forEach((c) => {
+      addBubble('system', `�?碰撞�?· ${Math.round((c.intensity || 0.5) * 100)}%`);
+      triggerCollisionGlow(c.intensity);
+    });
+  }
+  if (matrix && CONFIG.heatmapMiniSVG) {
+    const svg = buildHeatmapMiniSVG(matrix);
+    const el = $('chatContent');
+    const d = document.createElement('div');
+    d.className = 'msg-group received';
+    const avg = (
+      ((matrix['zhuangzi-nietzsche'] || matrix['nietzsche-zhuangzi'] || 0) +
+        (matrix['nietzsche-beauvoir'] || matrix['beauvoir-nietzsche'] || 0) +
+        (matrix['beauvoir-zhuangzi'] || matrix['zhuangzi-beauvoir'] || 0)) /
+      3
+    ).toFixed(2);
+    d.innerHTML = `
+      <div class="msg-bubble heatmap-bubble">
+        ${svg}
+        <span>碰撞矩阵 · 均�?${avg}</span>
+      </div>
+      <div class="msg-meta">实时</div>
+    `;
+    el.appendChild(d);
+    el.scrollTop = el.scrollHeight;
+  }
+});
+
+// collision_event
+socket.on('collision_event', (msg) => {
+  const fromName = msg.fromName || msg.from_agent || '?';
+  const toName = msg.toName || msg.to_agent || '?';
+  addBubble(
+    'system',
+    `�?${fromName} �?${toName} ${msg.collisionType || '碰撞'} (${msg.intensity || 1})`
+  );
+  triggerCollisionGlow(msg.intensity || 0.6);
+});
+
+// quality_update
+socket.on('quality_update', (msg) => {
+  if (msg.score !== undefined) {
+    $('statusIndicator').textContent = `质量 ${msg.score}`;
+    setTimeout(() => {
+      if (debateActive) $('statusIndicator').textContent = '辩论�?;
+    }, 2500);
+  }
+});
+
+// debate_ended �?质量报告气泡
+socket.on('debate_ended', (data) => {
+  hideTyping();
+  isTyping = false;
+  debateActive = false;
+  const payload = data.payload || data;
+  showReportBubble(payload);
+  $('btnStart').disabled = false;
+  $('statusIndicator').textContent = '辩论结束';
+  $('statusIndicator').className = 'status-indicator debate';
+  updateMiniCrystals(totalRoundsSeen);
+});
+
+// debate_error
+socket.on('debate_error', (msg) => {
+  hideTyping();
+  isTyping = false;
+  debateActive = false;
+  showError(msg.message || '辩论异常中断');
+  $('btnStart').disabled = false;
+});
+
+// agent_reply
+socket.on('agent_reply', (data) => {
+  if (data.reply) {
+    const agentId = data.agentId || 'agent';
+    addBubble(agentId, `📩 ${data.agentName || chars[agentId]?.name || '哲学�?}: ${data.reply}`);
+  }
+  isTyping = false;
+  hideTyping();
+});
+
+// spectator_question
+socket.on('spectator_question', (msg) => {
+  addBubble('system', `💬 旁观�? ${msg.question}`);
+});
+
+// ══════════════════════════════════════════════�?
+// 开始辩�?
+// ══════════════════════════════════════════════�?
+function startDebate() {
+  const topic = $('topicInput').value.trim();
+  if (!topic) return;
+
+  $('chatContent').innerHTML = '';
+  totalRoundsSeen = 0;
+  debateActive = true;
+  currentDebateId = null;
+  lastBubbleEl = null;
+
+  $('btnStart').disabled = true;
+  $('statusIndicator').textContent = '连接中�?;
+  $('statusIndicator').className = 'status-indicator debate';
+  updateMiniCrystals(0);
+  $('errorBanner').style.display = 'none';
+
+  isTyping = true;
+  showTyping('系统');
+
+  fetch(`${CONFIG.socketURL}/api/debate/start`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      topic,
+      maxRounds: CONFIG.maxRounds,
+      agents: ['zhuangzi', 'nietzsche', 'beauvoir'],
+    }),
+  })
+    .then((r) => r.json())
+    .then((data) => {
+      hideTyping();
+      if (data.debateId) {
+        currentDebateId = data.debateId;
+        socket.emit('join_debate', data.debateId);
+      }
+      if (data.messages) {
+        data.messages.forEach((m) => {
+          if (m.type === 'collision') {
+            addBubble('system', `�?碰撞 · ${Math.round((m.intensity || 0.5) * 100)}%`);
+            triggerCollisionGlow(m.intensity);
+          } else {
+            addBubble(
+              m.agentId || m.name || m.speaker || m.agent,
+              m.content || m.text
+            );
+          }
+        });
+      }
+      if (data.debateId) addBubble('system', '📜 辩论已启动，等待哲学家回信�?);
+    })
+    .catch(() => {
+      hideTyping();
+      currentDebateId = 'demo_' + Date.now();
+      $('statusIndicator').textContent = '演示模式';
+      addBubble('system', '📜 演示模式 �?连接后端获取实时辩论');
+      const demo = [
+        { s: 'zhuangzi', t: `关于"${topic}"——天地与我并生，万物与我为一。` },
+        { t: 'collision', i: 0.5 },
+        { s: 'nietzsche', t: `${topic}？用锤子敲碎旧石板！超人创造价值，不乞求承认。` },
+        { t: 'collision', i: 0.7 },
+        { s: 'beauvoir', t: `${topic}——自由从来不是一个人的事业。` },
+      ];
+      let i = 0;
+      (function n() {
+        if (i >= demo.length) {
+          addBubble('system', '📜 演示结束');
+          hideTyping();
+          $('btnStart').disabled = false;
+          return;
+        }
+        const m = demo[i++];
+        if (m.t === 'collision') {
+          addBubble('system', `�?碰撞 · ${Math.round(m.i * 100)}%`);
+          triggerCollisionGlow(m.i);
+        } else {
+          addBubble(m.s, m.t);
+          if (i <= 2) updateMiniCrystals(1);
+          else updateMiniCrystals(2);
+        }
+        setTimeout(n, 1200 + Math.random() * 800);
+      })();
+    })
+    .finally(() => {
+      $('btnStart').disabled = false;
+      isTyping = false;
+    });
+}
+
+// ══════════════════════════════════════════════�?
+// 发送消�?(追问)
+// ══════════════════════════════════════════════�?
+function sendMessage() {
+  const text = $('chatInput').value.trim();
+  if (!text || isTyping) return;
+  $('chatInput').value = '';
+
+  // 显示自己消息
+  const el = $('chatContent');
+  const d = document.createElement('div');
+  d.className = 'msg-group received';
+  d.style.alignSelf = 'flex-end';
+  d.innerHTML = `
+    <div class="msg-bubble" style="
+      background:linear-gradient(160deg,rgba(74,128,200,0.18),rgba(30,55,100,0.25));
+      color:#c8d8f0;border-radius:14px 14px 4px 14px;
+      border:1px solid rgba(74,128,200,0.18);
+    ">${text}</div>
+    <div class="msg-meta">刚刚</div>
+  `;
+  el.appendChild(d);
+  el.scrollTop = el.scrollHeight;
+
+  // 发送到后端
+  if (mode === 'private' && privateChar) {
+    socket.emit('user_message', {
+      debateId: currentDebateId || 'demo',
+      agentId: privateChar,
+      message: text,
+    });
+  } else if (currentDebateId) {
+    fetch(`${CONFIG.socketURL}/api/spectator/question`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ debateId: currentDebateId, question: text }),
+    }).catch(() => {
+      socket.emit('user_message', {
+        debateId: currentDebateId,
+        agentId: 'zhuangzi',
+        message: text,
+      });
+    });
+  }
+}
+
+// ══════════════════════════════════════════════�?
+// 私聊切换
+// ══════════════════════════════════════════════�?
+function togglePrivateChat(char) {
+  if (isTyping) return;
+  if (mode === 'private' && privateChar === char) {
+    mode = 'debate';
+    privateChar = null;
+  } else {
+    mode = 'private';
+    privateChar = char;
+  }
+  updateUI();
+}
+
+function updateUI() {
+  const indicator = $('statusIndicator');
+  document.querySelectorAll('.top-avatar').forEach((a) => {
+    if (mode === 'debate') {
+      a.classList.add('selected');
+    } else {
+      a.classList.toggle('selected', a.dataset.char === privateChar);
+    }
+  });
+  if (mode === 'debate') {
+    indicator.textContent = debateActive ? '辩论�? : '书简';
+    indicator.className = 'status-indicator debate';
+  } else {
+    const c = chars[privateChar];
+    indicator.textContent = '私聊 · ' + c.name;
+    indicator.className = 'status-indicator private';
+  }
+}
+
+function resetChat() {
+  $('chatContent').innerHTML = '';
+  mode = 'debate';
+  privateChar = null;
+  updateUI();
+  totalRoundsSeen = 0;
+  updateMiniCrystals(0);
+}
+
+function toggleFabMenu() {
+  const fab = $('mobileFab');
+  const menu = $('fabMenu');
+  fab.classList.toggle('open');
+  menu.classList.toggle('show');
+}
+
+// ══════════════════════════════════════════════�?
+// 初始�?
+// ══════════════════════════════════════════════�?
+updateUI();
+updateMiniCrystals(0);
+</script>
+
+</body>
+</html>

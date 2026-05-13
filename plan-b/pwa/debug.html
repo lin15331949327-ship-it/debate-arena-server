@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Debug Test</title>
+<script src="socket.io.min.js"></script>
+<style>
+body{font-family:sans-serif;max-width:600px;margin:40px auto;padding:20px}
+button{padding:12px 24px;font-size:16px;cursor:pointer}
+#log{background:#111;color:#0f0;padding:16px;margin-top:16px;font-family:monospace;font-size:13px;border-radius:4px;max-height:400px;overflow-y:auto;white-space:pre-wrap}
+</style>
+</head>
+<body>
+<h2>Debug: API Test</h2>
+<input id="topic" value="自由是什�? style="padding:10px;font-size:16px;width:300px">
+<button onclick="test()">发起辩论</button>
+<div id="log">Ready...</div>
+
+<script>
+const BACKEND = 'https://debate-arena-server-production.up.railway.app';
+const log = document.getElementById('log');
+function L(msg) { log.textContent += '\n' + new Date().toLocaleTimeString() + ' ' + msg; }
+
+L('Page loaded');
+L('BACKEND: ' + BACKEND);
+
+const socket = io(BACKEND, {transports: ['websocket','polling']});
+socket.on('connect', () => L('Socket.IO connected: ' + socket.id));
+socket.on('connect_error', e => L('Socket ERROR: ' + e.message));
+socket.on('debate_message', m => L('MSG ' + (m.name||m.agentId||'?') + ': ' + (m.content||'').substring(0,80)));
+socket.on('heatmap_update', d => L('HEATMAP: ' + JSON.stringify(d)));
+socket.on('debate_ended', d => L('ENDED: quality=' + d.quality + ' score=' + d.score));
+socket.on('agent_speaking', m => L('THINKING: ' + (m.name||m.agentId||'?')));
+socket.on('collision_event', m => L('COLLISION: ' + (m.fromName||'?') + ' �?' + (m.toName||'?') + ' ' + (m.collisionType||'') + ' i=' + (m.intensity||0)));
+socket.on('debate_error', m => L('ERROR: ' + (m.message||'unknown')));
+socket.on('debate_started', m => L('STARTED: ' + m.topic + ' id=' + m.debateId));
+
+async function test() {
+  L('--- START ---');
+  const topic = document.getElementById('topic').value;
+  
+  try {
+    L('Fetching: POST /api/debate/start topic=' + topic);
+    const resp = await fetch(BACKEND + '/api/debate/start', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({topic, maxRounds: 6})
+    });
+    L('Response: ' + resp.status);
+    const data = await resp.json();
+    L('Data: ' + JSON.stringify(data));
+    
+    const debateId = data.debateId;
+    if (debateId) {
+      L('Joining debate: ' + debateId);
+      socket.emit('join_debate', debateId);
+    } else {
+      L('NO debateId in response!');
+    }
+  } catch(e) {
+    L('ERROR: ' + e.message);
+  }
+}
+</script>
+</body>
+</html>

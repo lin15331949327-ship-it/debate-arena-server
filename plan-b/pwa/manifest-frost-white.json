@@ -1,0 +1,12 @@
+{
+  "name": "霜白·臻简 — 三子辩",
+  "short_name": "霜白·臻简",
+  "start_url": "/pwa-frost-white.html",
+  "display": "standalone",
+  "background_color": "#fafafa",
+  "theme_color": "#1a1714",
+  "icons": [
+    { "src": "/icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "/icon-512.png", "sizes": "512x512", "type": "image/png" }
+  ]
+}

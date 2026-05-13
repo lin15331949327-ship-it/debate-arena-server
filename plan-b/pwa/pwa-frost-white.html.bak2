@@ -1,0 +1,1029 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>霜白·臻简 — PWA</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@200;300;400;500&family=Noto+Sans+SC:wght@200;300;400;500&family=Noto+Serif+SC:wght@300;400&display=swap" rel="stylesheet">
+<link rel="manifest" href="/manifest-frost-white.json">
+<meta name="theme-color" content="#fafafa">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<link rel="apple-touch-icon" href="/icon-192.png">
+<style>
+/* ═══════════════════════════════════════
+   霜白·臻简 Frost White — 打磨版 v2
+   双主题 · 碰撞光晕 · 追问框 · sticky统计栏
+   设计语言: Frost Duality 霜白/霜夜
+   ═══════════════════════════════════════ */
+
+/* ── 日间 · 霜白 ── */
+[data-theme="light"] {
+  --bg-primary: #f5f5f7;
+  --bg-secondary: #ffffff;
+  --bg-surface: #fafafa;
+  --bg-void: #fafafa;
+  --text-primary: #1d1d1f;
+  --text-secondary: #555558;
+  --text-tertiary: #6e6e72;
+  --accent: #0071e3;
+  --accent-dim: rgba(0,113,227,0.08);
+  --divider: rgba(0,0,0,0.08);
+  --card-bg: rgba(255,255,255,0.72);
+  --card-bg-alt: rgba(255,255,255,0.62);
+  --card-border: rgba(255,255,255,0.5);
+  --card-shadow-1: rgba(0,0,0,0.04);
+  --card-shadow-2: rgba(0,0,0,0.04);
+  --card-shadow-3: rgba(0,0,0,0.06);
+  --hover-lift: -2px;
+  --hover-shadow-1: rgba(0,0,0,0.06);
+  --hover-shadow-2: rgba(0,0,0,0.06);
+  --hover-shadow-3: rgba(0,0,0,0.1);
+  --role-a: #0071e3; --role-b: #e3303b; --role-c: #34c759;
+  --role-a-soft: rgba(0,113,227,0.08); --role-b-soft: rgba(227,48,59,0.08); --role-c-soft: rgba(52,199,89,0.08);
+  --input-bg: rgba(255,255,255,0.6);
+  --input-border: rgba(0,0,0,0.08);
+  --overlay-bg: rgba(0,0,0,0.25);
+  --stats-bg: rgba(255,255,255,0.8);
+  --question-bg: rgba(255,255,255,0.8);
+  --collision-aura-color: rgba(0,0,0,0.04);
+  --beam-opacity: 0.12;
+  --dust-opacity: 0.25;
+  --ice-opacity: 1;
+  --noise-opacity: 0.015;
+}
+
+/* ── 夜间 · 霜夜 ── */
+[data-theme="dark"] {
+  --bg-primary: #0d1117;
+  --bg-secondary: #161b22;
+  --bg-surface: #11161e;
+  --bg-void: #0d1117;
+  --text-primary: #e6edf3;
+  --text-secondary: #8b949e;
+  --text-tertiary: #6e7681;
+  --accent: #5090ff;
+  --accent-dim: rgba(80,144,255,0.1);
+  --divider: rgba(255,255,255,0.08);
+  --card-bg: rgba(22,27,34,0.78);
+  --card-bg-alt: rgba(22,27,34,0.65);
+  --card-border: rgba(255,255,255,0.06);
+  --card-shadow-1: rgba(0,0,0,0.2);
+  --card-shadow-2: rgba(0,0,0,0.3);
+  --card-shadow-3: rgba(0,0,0,0.4);
+  --hover-lift: -2px;
+  --hover-shadow-1: rgba(0,0,0,0.25);
+  --hover-shadow-2: rgba(0,0,0,0.35);
+  --hover-shadow-3: rgba(0,0,0,0.45);
+  --role-a: #5090ff; --role-b: #f05050; --role-c: #40d060;
+  --role-a-soft: rgba(80,144,255,0.1); --role-b-soft: rgba(240,80,80,0.1); --role-c-soft: rgba(64,208,96,0.1);
+  --input-bg: rgba(22,27,34,0.7);
+  --input-border: rgba(255,255,255,0.1);
+  --overlay-bg: rgba(0,0,0,0.5);
+  --stats-bg: rgba(22,27,34,0.85);
+  --question-bg: rgba(22,27,34,0.9);
+  --collision-aura-color: rgba(255,255,255,0.06);
+  --beam-opacity: 0.04;
+  --dust-opacity: 0.12;
+  --ice-opacity: 0.6;
+  --noise-opacity: 0.025;
+}
+
+/* ── 全局过渡 ── */
+*{margin:0;padding:0;box-sizing:border-box}
+html{
+  font-size:16px;-webkit-font-smoothing:antialiased;
+  transition: background 0.6s ease, color 0.6s ease;
+}
+body{
+  font-family:'Noto Sans SC','Inter',-apple-system,sans-serif;
+  background:var(--bg-primary);
+  color:var(--text-primary);
+  min-height:100vh;position:relative;overflow-x:hidden;
+  font-weight:350;letter-spacing:.01em;line-height:1.8;
+  transition: background 0.6s ease, color 0.6s ease;
+}
+
+/* ── 全局纹理 ── */
+body::before{
+  content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
+  opacity:var(--noise-opacity);
+  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  transition: opacity 0.6s ease;
+}
+
+/* ── 主容器 ── */
+.main-container{
+  position:relative;z-index:1;
+  max-width:960px;margin:0 auto;
+  padding:60px 40px 100px;
+}
+@media(max-width:768px){ .main-container{padding:48px 20px 80px} }
+@media(max-width:480px){ .main-container{padding:40px 14px 100px} }
+
+/* ═══ Header ═══ */
+.header{
+  text-align:center;margin-bottom:36px;
+  animation:fadeInDown .8s cubic-bezier(.22,.61,.36,1) both;
+  position:relative;
+}
+.header-title{
+  font-family:'Inter',-apple-system,sans-serif;
+  font-size:2.2rem;font-weight:300;letter-spacing:-.02em;
+  color:var(--text-primary);margin-bottom:6px;
+  transition: color 0.6s ease;
+}
+.header-subtitle{
+  font-size:.95rem;font-weight:350;
+  color:var(--text-secondary);
+  transition: color 0.6s ease;
+}
+.header-divider{
+  width:40px;height:1px;background:var(--divider);
+  margin:20px auto;
+  transition: background 0.6s ease;
+}
+
+/* ── 主题切换按钮 ── */
+.theme-toggle{
+  position:absolute;top:0;right:0;
+  width:40px;height:40px;border-radius:50%;
+  border:1px solid var(--divider);
+  background:var(--card-bg);
+  backdrop-filter:blur(20px);
+  cursor:pointer;font-size:18px;
+  display:flex;align-items:center;justify-content:center;
+  transition:all .4s ease;
+  color:var(--text-secondary);
+}
+.theme-toggle:hover{
+  border-color:var(--accent);
+  color:var(--accent);
+  transform:rotate(15deg);
+}
+@media(max-width:480px){ .theme-toggle{top:-8px;right:-4px;width:36px;height:36px;font-size:16px} }
+
+/* ═══ 话题区 + 统计栏 (sticky) ═══ */
+.topic-stats-wrap{
+  position:sticky;top:0;z-index:15;
+  background:var(--stats-bg);
+  backdrop-filter:blur(30px);
+  -webkit-backdrop-filter:blur(30px);
+  padding:16px 0 12px;
+  margin-bottom:28px;
+  border-bottom:1px solid var(--divider);
+  transition:all 0.6s ease;
+  animation:fadeInDown .8s cubic-bezier(.22,.61,.36,1) .1s both;
+}
+.topic-area{
+  display:flex;gap:10px;justify-content:center;
+  flex-wrap:wrap;margin-bottom:12px;
+}
+.topic-input{
+  padding:10px 18px;border-radius:100px;
+  border:1px solid var(--input-border);
+  background:var(--input-bg);
+  font-family:inherit;font-size:.85rem;
+  color:var(--text-primary);outline:none;
+  backdrop-filter:blur(20px);
+  min-width:240px;flex:1;max-width:400px;
+  transition:all 0.4s ease;
+}
+.topic-input:focus{
+  border-color:var(--accent);
+  box-shadow:0 0 0 3px var(--accent-dim);
+}
+
+.btn-start{
+  padding:10px 28px;border-radius:100px;border:none;
+  background:var(--accent);color:#fff;
+  font-family:inherit;font-size:.85rem;font-weight:400;
+  cursor:pointer;transition:all .3s ease;white-space:nowrap;
+}
+.btn-start:hover{ filter:brightness(1.1);transform:scale(1.03); }
+.btn-start:disabled{ opacity:.4;cursor:not-allowed;transform:none; }
+
+/* ── 统计栏 (紧贴话题下方，文档要求上移) ── */
+.stats-bar{
+  display:flex;align-items:center;justify-content:center;
+  gap:28px;padding:8px 0 0;
+  transition:all 0.6s ease;
+}
+.stats-bar .stat-item{text-align:center}
+.stats-bar .stat-value{
+  font-family:'Inter',-apple-system,sans-serif;
+  font-size:1.1rem;font-weight:300;color:var(--text-primary);
+  transition:color 0.6s ease;
+}
+.stats-bar .stat-label{
+  font-size:.62rem;font-weight:400;color:var(--text-tertiary);
+  text-transform:uppercase;letter-spacing:.08em;margin-top:1px;
+}
+.stats-bar .stat-dot{
+  width:3px;height:3px;border-radius:50%;background:var(--divider);
+}
+
+/* ═══ 辩论舞台 ═══ */
+.debate-stage{
+  display:flex;flex-direction:column;gap:18px;
+  margin-bottom:20px;
+}
+
+/* ── 卡片 ── */
+.debate-card{
+  position:relative;
+  background:var(--card-bg);
+  backdrop-filter:blur(40px) saturate(180%);
+  -webkit-backdrop-filter:blur(40px) saturate(180%);
+  border:1px solid var(--card-border);
+  border-radius:20px;
+  padding:26px 30px;
+  box-shadow:0 1px 2px var(--card-shadow-1),0 4px 16px var(--card-shadow-2),0 16px 48px var(--card-shadow-3);
+  overflow:hidden;
+  animation:cardAppear .6s cubic-bezier(.22,.61,.36,1) both;
+  transition:all .4s cubic-bezier(.25,.46,.45,.94);
+  cursor:pointer;
+}
+.debate-card:hover{
+  transform:translateY(var(--hover-lift));
+  box-shadow:0 1px 2px var(--hover-shadow-1),0 6px 24px var(--hover-shadow-2),0 24px 64px var(--hover-shadow-3);
+}
+.debate-card::before{
+  content:'';position:absolute;left:0;top:20px;bottom:20px;
+  width:2px;border-radius:1px;
+  transition:all .4s cubic-bezier(.25,.46,.45,.94);
+}
+.debate-card:hover::before{ top:14px;bottom:14px;width:3px; }
+.debate-card.role-a::before{ background:var(--role-a) }
+.debate-card.role-b::before{ background:var(--role-b) }
+.debate-card.role-c::before{ background:var(--role-c) }
+
+/* ── 碰撞光晕 (文档要求) ── */
+.debate-card.collision-aura{
+  box-shadow:
+    0 0 0 6px var(--collision-aura-color),
+    0 0 0 12px var(--collision-aura-color),
+    0 4px 24px var(--collision-aura-color),
+    0 16px 48px var(--card-shadow-3) !important;
+  transition:box-shadow .6s ease-out;
+}
+
+.card-header{
+  display:flex;align-items:center;gap:10px;
+  margin-bottom:12px;padding-left:12px;
+}
+.card-icon{
+  width:28px;height:28px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  font-size:.7rem;font-weight:500;
+  font-family:'Inter',-apple-system,sans-serif;
+  color:#fff;flex-shrink:0;
+}
+.role-a .card-icon{background:var(--role-a)}
+.role-b .card-icon{background:var(--role-b)}
+.role-c .card-icon{background:var(--role-c)}
+.card-name{
+  font-family:'Inter',-apple-system,sans-serif;
+  font-size:.9rem;font-weight:500;color:var(--text-primary);
+  transition:color 0.6s ease;
+}
+.card-round{
+  margin-left:auto;font-size:.68rem;font-weight:500;
+  color:var(--text-tertiary);letter-spacing:.06em;
+}
+.card-body{
+  padding-left:12px;font-size:.92rem;line-height:1.8;
+  color:var(--text-secondary);font-weight:350;
+  transition:color 0.6s ease;
+}
+
+/* ── 碰撞分隔 (保留克制风格 + 增强光晕) ── */
+.collision-sep{
+  text-align:center;padding:14px 0;margin:2px 0;
+  position:relative;
+}
+.collision-sep .sep-line{
+  width:1px;height:18px;margin:0 auto;
+  background:linear-gradient(to bottom,transparent,var(--divider),var(--divider),transparent);
+  transition:background 0.6s ease;
+}
+.collision-sep .sep-label{
+  font-size:9px;color:var(--text-tertiary);
+  text-transform:uppercase;letter-spacing:.1em;margin-top:3px;
+  transition:color 0.6s ease;
+}
+/* 碰撞增强环 */
+.collision-sep::after{
+  content:'';position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);
+  width:40px;height:40px;border-radius:50%;
+  background:radial-gradient(circle,var(--collision-aura-color) 0%,transparent 70%);
+  opacity:0;transition:opacity .3s ease;
+}
+.collision-sep.aura-active::after{
+  opacity:1;
+  animation:auraPulse 1.2s ease-out;
+}
+@keyframes auraPulse{
+  0%{width:20px;height:20px;opacity:0;transform:translate(-50%,-50%)}
+  40%{width:60px;height:60px;opacity:1}
+  100%{width:120px;height:120px;opacity:0;transform:translate(-50%,-50%)}
+}
+
+@keyframes cardAppear{ from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:translateY(0)} }
+@keyframes fadeInDown{ from{opacity:0;transform:translateY(-12px)} to{opacity:1;transform:translateY(0)} }
+
+/* ═══ Idle Ambient System (保留 + 暗色适配) ═══ */
+
+/* ── Washi Paper ── */
+.washi-overlay{
+  position:fixed;inset:0;z-index:0;pointer-events:none;
+  opacity:0;transition:opacity 2s ease;mix-blend-mode:multiply;
+}
+body.idle .washi-overlay{ opacity:1; }
+[data-theme="dark"] .washi-overlay{ mix-blend-mode:screen; }
+.washi-overlay::before{
+  content:'';position:absolute;inset:0;
+  background:
+    repeating-linear-gradient(2deg,transparent,transparent 3px,rgba(180,170,155,.03) 3px,rgba(180,170,155,.03) 4px),
+    repeating-linear-gradient(88deg,transparent,transparent 5px,rgba(160,150,140,.02) 5px,rgba(160,150,140,.02) 6px);
+  opacity:.7;
+}
+
+/* ── Ice Crystal ── */
+.ice-crystal-overlay{
+  position:fixed;inset:0;z-index:0;pointer-events:none;
+  opacity:0;transition:opacity 1.5s ease;
+}
+body.idle .ice-crystal-overlay{ opacity:var(--ice-opacity); }
+.ice-crystal-overlay::before{
+  content:'';position:absolute;inset:0;
+  background:
+    repeating-conic-gradient(rgba(180,190,210,.04) 0% .6%,transparent .6% 2.5%) 0 0/80px 100px,
+    repeating-conic-gradient(rgba(190,200,220,.03) 0% .4%,transparent .4% 5%) 20px 30px/120px 150px;
+  animation:frostSpin 70s linear infinite;
+}
+[data-theme="dark"] .ice-crystal-overlay::before{
+  background:
+    repeating-conic-gradient(rgba(140,180,220,.06) 0% .5%,transparent .5% 2.5%) 0 0/80px 100px,
+    repeating-conic-gradient(rgba(120,160,210,.04) 0% .3%,transparent .3% 5%) 20px 30px/120px 150px;
+}
+@keyframes frostSpin{ 0%{transform:rotate(0deg)} 100%{transform:rotate(360deg)} }
+
+/* ── Dawn / Aurora Cycle ── */
+body.idle::after{
+  animation:dawnCycle 36s ease-in-out infinite;
+}
+[data-theme="dark"] body.idle::after{
+  animation:auroraCycle 36s ease-in-out infinite;
+}
+@keyframes dawnCycle{
+  0%,100%{background:radial-gradient(ellipse 70% 50% at 50% 25%,#faf8f3 0%,#f3efe8 40%,#ece8e0 100%)}
+  30%{background:radial-gradient(ellipse 70% 50% at 50% 25%,#f8f6f2 0%,#f0efe8 40%,#eae6e0 100%)}
+  50%{background:radial-gradient(ellipse 70% 50% at 50% 35%,#f5f8fa 0%,#edf0f5 40%,#e5e8ee 100%)}
+  80%{background:radial-gradient(ellipse 70% 50% at 50% 20%,#f8f6f0 0%,#f0ece5 40%,#e8e4dc 100%)}
+}
+@keyframes auroraCycle{
+  0%,100%{background:radial-gradient(ellipse 70% 50% at 50% 30%,#111c2e 0%,#0d1520 40%,#0a0f18 100%)}
+  30%{background:radial-gradient(ellipse 70% 50% at 50% 28%,#161e30 0%,#0f1622 40%,#0b1018 100%)}
+  50%{background:radial-gradient(ellipse 70% 50% at 50% 35%,#0f1a2a 0%,#0c141e 40%,#0a0f16 100%)}
+  80%{background:radial-gradient(ellipse 70% 50% at 50% 22%,#141c2c 0%,#0e1520 40%,#0b1018 100%)}
+}
+
+/* ── Light Beams → Starlight (暗色) ── */
+.light-shaft{
+  position:fixed;pointer-events:none;z-index:1;
+  opacity:0;transition:opacity 2s ease;
+}
+body.idle .light-shaft{ opacity:var(--beam-opacity); }
+.light-shaft::after{
+  content:'';position:absolute;
+  background:linear-gradient(180deg,rgba(255,240,220,.5) 0%,rgba(255,245,235,.3) 40%,transparent 100%);
+}
+[data-theme="dark"] .light-shaft::after{
+  background:linear-gradient(180deg,rgba(160,200,240,.25) 0%,rgba(140,180,220,.12) 40%,transparent 100%);
+}
+.light-beam-1{top:-20%;left:15%;width:120px;height:140%;transform:rotate(-12deg);animation:beamDrift1 28s ease-in-out infinite}
+.light-beam-1::after{inset:0;clip-path:polygon(40% 0%,60% 0%,80% 100%,20% 100%)}
+.light-beam-2{top:-20%;right:20%;width:90px;height:130%;transform:rotate(8deg);animation:beamDrift2 32s ease-in-out infinite;animation-delay:-10s}
+.light-beam-2::after{inset:0;clip-path:polygon(35% 0%,65% 0%,85% 100%,15% 100%)}
+.light-beam-3{top:-20%;left:50%;width:70px;height:120%;transform:rotate(-3deg);animation:beamDrift1 38s ease-in-out infinite;animation-delay:-20s;opacity:.08}
+.light-beam-3::after{inset:0;clip-path:polygon(30% 0%,70% 0%,90% 100%,10% 100%)}
+@keyframes beamDrift1{0%,100%{transform:rotate(-12deg) translateX(0);opacity:var(--beam-opacity)}25%{opacity:calc(var(--beam-opacity)*1.25);transform:rotate(-10deg) translateX(8px)}50%{opacity:calc(var(--beam-opacity)*0.83);transform:rotate(-14deg) translateX(-5px)}75%{opacity:calc(var(--beam-opacity)*1.08);transform:rotate(-11deg) translateX(3px)}}
+@keyframes beamDrift2{0%,100%{transform:rotate(8deg) translateX(0);opacity:calc(var(--beam-opacity)*0.83)}33%{opacity:calc(var(--beam-opacity)*1.08);transform:rotate(10deg) translateX(-6px)}66%{opacity:calc(var(--beam-opacity)*0.75);transform:rotate(6deg) translateX(4px)}}
+
+/* ── Dust Particles ── */
+.dust-particle{
+  position:fixed;border-radius:50%;pointer-events:none;z-index:2;
+  opacity:0;transition:opacity 1.5s ease;
+  background:radial-gradient(circle,rgba(200,180,140,.4) 0%,rgba(200,180,140,0) 70%);
+}
+[data-theme="dark"] .dust-particle{
+  background:radial-gradient(circle,rgba(160,200,240,.35) 0%,rgba(160,200,240,0) 70%);
+}
+body.idle .dust-particle{ opacity:var(--dust-opacity); }
+.dp1{width:3px;height:3px;top:16%;left:10%;animation:drift1 24s cubic-bezier(.42,0,.58,1) infinite;box-shadow:0 0 4px rgba(200,180,140,.3)}
+[data-theme="dark"] .dp1{box-shadow:0 0 4px rgba(160,200,240,.25)}
+.dp2{width:2.5px;height:2.5px;top:30%;left:24%;animation:drift2 20s cubic-bezier(.38,0,.62,1) infinite;animation-delay:-4s}
+.dp3{width:3.5px;height:3.5px;top:48%;left:6%;animation:drift3 22s cubic-bezier(.4,0,.6,1) infinite;animation-delay:-8s}
+.dp4{width:2px;height:2px;top:20%;right:16%;animation:drift1 28s cubic-bezier(.35,0,.65,1) infinite;animation-delay:-12s}
+.dp5{width:3px;height:3px;top:42%;right:26%;animation:drift2 21s cubic-bezier(.42,0,.58,1) infinite;animation-delay:-6s}
+.dp6{width:2.5px;height:2.5px;top:65%;left:20%;animation:drift3 26s cubic-bezier(.38,0,.62,1) infinite;animation-delay:-16s}
+.dp7{width:3.5px;height:3.5px;top:72%;right:10%;animation:drift1 23s cubic-bezier(.4,0,.6,1) infinite;animation-delay:-10s}
+.dp8{width:2px;height:2px;top:10%;left:42%;animation:drift2 25s cubic-bezier(.35,0,.65,1) infinite;animation-delay:-18s}
+.dp9{width:3px;height:3px;top:55%;left:52%;animation:drift3 22s cubic-bezier(.42,0,.58,1) infinite;animation-delay:-3s}
+.dp10{width:2.5px;height:2.5px;top:33%;right:35%;animation:drift1 27s cubic-bezier(.38,0,.62,1) infinite;animation-delay:-14s}
+@keyframes drift1{0%,100%{transform:translate(0,0)}25%{transform:translate(26px,-35px)}50%{transform:translate(-14px,-60px)}75%{transform:translate(-32px,-25px)}}
+@keyframes drift2{0%,100%{transform:translate(0,0)}33%{transform:translate(-32px,-42px)}66%{transform:translate(20px,-72px)}}
+@keyframes drift3{0%,100%{transform:translate(0,0)}50%{transform:translate(38px,-55px)}}
+
+/* ── Card Micro-Breath ── */
+body.idle .debate-card{
+  animation:cardAppear .6s cubic-bezier(.22,.61,.36,1) both,cardMicroBreath 9s cubic-bezier(.42,0,.58,1) infinite;
+}
+@keyframes cardMicroBreath{0%,100%{transform:scale(1)}30%{transform:scale(1.005)}60%{transform:scale(1.002)}80%{transform:scale(1.006)}}
+
+/* ── Idle Placeholder ── */
+.idle-placeholder{
+  animation:cardMicroBreath 9s cubic-bezier(.42,0,.58,1) infinite!important;
+  text-align:center;cursor:default;
+  padding:36px!important;
+  display:flex;flex-direction:column;align-items:center;gap:8px;
+}
+.idle-placeholder .idle-text{
+  font-family:'Noto Serif SC','Inter',serif;
+  font-size:18px;font-weight:300;letter-spacing:2px;
+  color:var(--text-primary);
+}
+.idle-placeholder .idle-sub{
+  font-size:12px;color:var(--text-tertiary);
+  letter-spacing:1px;line-height:1.8;
+}
+.idle-placeholder .idle-dot-row{display:flex;gap:6px;margin-top:4px}
+.idle-placeholder .idle-dot{
+  width:4px;height:4px;border-radius:50%;
+  background:var(--divider);
+  animation:dotPulse 3s ease-in-out infinite;
+}
+.idle-placeholder .idle-dot:nth-child(2){animation-delay:.5s;background:var(--role-a)}
+.idle-placeholder .idle-dot:nth-child(3){animation-delay:1s;background:var(--role-b)}
+.idle-placeholder .idle-dot:nth-child(4){animation-delay:1.5s;background:var(--role-c)}
+@keyframes dotPulse{0%,100%{transform:scale(1);opacity:.3}50%{transform:scale(1.8);opacity:.8}}
+
+/* ═══ Typing 指示器 ═══ */
+.typing-row{
+  display:none;align-items:center;gap:8px;
+  padding:12px 18px;margin-bottom:8px;
+  background:var(--card-bg-alt);
+  border:1px solid var(--card-border);
+  border-radius:14px;
+  backdrop-filter:blur(20px);
+  animation:cardAppear .4s ease both;
+}
+.typing-row .typing-dots{display:flex;gap:4px}
+.typing-row .typing-dots span{
+  width:5px;height:5px;border-radius:50%;
+  background:var(--text-tertiary);
+  animation:dotBounce 1.4s ease-in-out infinite;
+  opacity:.35;
+}
+.typing-row .typing-dots span:nth-child(2){animation-delay:.2s}
+.typing-row .typing-dots span:nth-child(3){animation-delay:.4s}
+.typing-row .typing-label{
+  font-size:13px;color:var(--text-tertiary);font-style:italic;
+}
+@keyframes dotBounce{0%,60%,100%{opacity:.3;transform:translateY(0)}30%{opacity:1;transform:translateY(-4px)}}
+
+/* ═══ 错误横幅 ═══ */
+.error-banner{
+  display:none;padding:10px 18px;
+  margin:0 0 12px;border-radius:12px;
+  background:rgba(227,48,59,0.08);
+  border:1px solid rgba(227,48,59,0.18);
+  color:#e3303b;font-size:13px;text-align:center;
+}
+[data-theme="dark"] .error-banner{ color:#f06060; }
+
+/* ═══ 追问框 (底部固定极简) ═══ */
+.question-bar{
+  position:fixed;bottom:0;left:0;right:0;z-index:30;
+  padding:10px 16px;
+  padding-bottom:max(10px,env(safe-area-inset-bottom));
+  background:var(--question-bg);
+  backdrop-filter:blur(24px);
+  -webkit-backdrop-filter:blur(24px);
+  border-top:1px solid var(--divider);
+  display:none;align-items:center;gap:10px;
+  justify-content:center;
+  transition:all 0.5s ease;
+}
+.question-bar.visible{ display:flex; }
+.question-bar input{
+  flex:1;max-width:720px;
+  padding:10px 18px;border-radius:24px;
+  border:1px solid var(--input-border);
+  background:var(--input-bg);
+  color:var(--text-primary);font-size:14px;
+  font-family:inherit;outline:none;
+  backdrop-filter:blur(12px);
+  transition:all .3s;
+}
+.question-bar input:focus{
+  border-color:var(--accent);
+  box-shadow:0 0 0 3px var(--accent-dim);
+}
+.question-bar input::placeholder{color:var(--text-tertiary)}
+.question-bar button{
+  width:40px;height:40px;border-radius:50%;border:none;
+  background:var(--accent);color:#fff;
+  font-size:18px;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  transition:all .25s;flex-shrink:0;
+}
+.question-bar button:hover{ filter:brightness(1.15);transform:scale(1.05); }
+.question-bar button:active{ transform:scale(.9); }
+
+/* ═══ 报告弹窗 (保留原结构 + 暗色适配) ═══ */
+.report-overlay{
+  position:fixed;inset:0;z-index:50;
+  background:var(--overlay-bg);
+  backdrop-filter:blur(10px);
+  display:none;align-items:center;justify-content:center;
+}
+.report-overlay.show{ display:flex; }
+.report-card{
+  background:var(--card-bg);
+  backdrop-filter:blur(40px);
+  border:1px solid var(--card-border);
+  border-radius:20px;
+  padding:40px;max-width:440px;width:90%;
+  box-shadow:0 20px 60px rgba(0,0,0,.1);
+  text-align:center;
+  animation:cardAppear .5s cubic-bezier(.34,1.56,.64,1) both;
+}
+.report-card h2{
+  font-family:'Noto Serif SC','Inter',serif;
+  font-size:22px;font-weight:300;margin-bottom:8px;
+  color:var(--text-primary);
+}
+.report-card .score{
+  font-size:52px;font-weight:200;color:var(--accent);
+}
+.report-card .stats{
+  display:flex;gap:24px;justify-content:center;
+  margin:20px 0;flex-wrap:wrap;
+}
+.report-card .stat-item{text-align:center}
+.report-card .stat-value{
+  font-size:20px;font-weight:300;color:var(--text-primary);
+}
+.report-card .stat-label{
+  font-size:10px;color:var(--text-tertiary);
+  text-transform:uppercase;letter-spacing:1px;margin-top:2px;
+}
+.report-card button{
+  margin-top:20px;padding:10px 28px;border-radius:100px;
+  border:none;background:var(--accent);color:#fff;
+  cursor:pointer;font-size:14px;font-family:inherit;
+  transition:all .3s;
+}
+.report-card button:hover{ filter:brightness(1.1); }
+
+/* ═══ 响应式 ═══ */
+@media(max-width:768px){
+  .header-title{font-size:1.8rem}
+  .debate-card{padding:20px 22px}
+  .stats-bar{gap:20px;flex-wrap:wrap}
+  .report-card{padding:28px}
+}
+@media(max-width:480px){
+  .header-title{font-size:1.5rem}
+  .topic-input{font-size:.78rem;min-width:180px}
+  .debate-card{padding:18px 18px;border-radius:16px}
+  .card-body{font-size:.85rem}
+}
+</style>
+</head>
+
+<body class="idle">
+<div class="main-container">
+
+  <!-- Idle 氛围层 -->
+  <div class="washi-overlay"></div>
+  <div class="ice-crystal-overlay"></div>
+  <div class="light-shaft light-beam-1"></div>
+  <div class="light-shaft light-beam-2"></div>
+  <div class="light-shaft light-beam-3"></div>
+  <div class="dust-particle dp1"></div><div class="dust-particle dp2"></div><div class="dust-particle dp3"></div><div class="dust-particle dp4"></div><div class="dust-particle dp5"></div><div class="dust-particle dp6"></div><div class="dust-particle dp7"></div><div class="dust-particle dp8"></div><div class="dust-particle dp9"></div><div class="dust-particle dp10"></div>
+
+  <!-- Header -->
+  <header class="header">
+    <h1 class="header-title">深思录</h1>
+    <p class="header-subtitle">三子论道 · 一字一光</p>
+    <div class="header-divider"></div>
+    <!-- 主题切换 -->
+    <button class="theme-toggle" id="themeToggle" onclick="toggleTheme()" title="切换日/夜模式" aria-label="切换主题">
+      <span id="themeIcon">🌙</span>
+    </button>
+  </header>
+
+  <!-- 话题区 + 统计栏 (sticky) -->
+  <div class="topic-stats-wrap" id="topicStatsWrap">
+    <div class="topic-area">
+      <input type="text" class="topic-input" id="topicInput" placeholder="输入辩论话题…" value="AI 应该被赋予权利吗？">
+      <button class="btn-start" id="btnStart" onclick="startDebate()">发起辩论</button>
+    </div>
+    <div class="stats-bar" id="statsBar">
+      <div class="stat-item"><div class="stat-value" id="statRounds">0</div><div class="stat-label">辩论轮次</div></div>
+      <div class="stat-dot"></div>
+      <div class="stat-item"><div class="stat-value" id="statCollisions">0</div><div class="stat-label">碰撞次数</div></div>
+      <div class="stat-dot"></div>
+      <div class="stat-item"><div class="stat-value" id="statScore">--</div><div class="stat-label">实时质量</div></div>
+    </div>
+  </div>
+
+  <!-- 错误横幅 -->
+  <div class="error-banner" id="errorBanner"></div>
+
+  <!-- Typing 指示器 -->
+  <div class="typing-row" id="typingRow">
+    <span class="typing-dots"><span>.</span><span>.</span><span>.</span></span>
+    <span class="typing-label" id="typingLabel"></span>
+  </div>
+
+  <!-- 辩论舞台 -->
+  <div class="debate-stage" id="debateStage">
+    <div class="debate-card idle-placeholder">
+      <div class="idle-text">输入辩题 · 开启思想对话</div>
+      <div class="idle-sub">庄周 · 尼采 · 波伏娃，三重奏辩论</div>
+      <div class="idle-dot-row"><div class="idle-dot"></div><div class="idle-dot"></div><div class="idle-dot"></div><div class="idle-dot"></div></div>
+    </div>
+  </div>
+
+</div>
+
+<!-- 追问框 -->
+<div class="question-bar" id="questionBar">
+  <input type="text" id="questionInput" placeholder="向哲学家追问…" onkeydown="if(event.key==='Enter')askQuestion()">
+  <button onclick="askQuestion()">↑</button>
+</div>
+
+<!-- 报告弹窗 -->
+<div class="report-overlay" id="reportOverlay">
+  <div class="report-card">
+    <h2>辩论质量报告</h2>
+    <div class="score" id="reportScore">--</div>
+    <div class="stats" id="reportStats"></div>
+    <button onclick="closeReport()">关闭</button>
+  </div>
+</div>
+
+<script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+<script>
+/* ═══════════════════════════════════════════
+   霜白·臻简 — JS 完整逻辑
+   双主题 · 碰撞光晕 · 追问 · config
+   ═══════════════════════════════════════════ */
+
+// ─── Config 模板化出口 ────────────────────────
+const CONFIG = {
+  socketURL: 'https://debate-arena-server-production.up.railway.app',
+  maxRounds: 6,
+  agents: [
+    { id: 'zhuangzi', name: '庄周', emoji: '🎋', roleClass: 'role-a' },
+    { id: 'nietzsche', name: '尼采', emoji: '⚡', roleClass: 'role-b' },
+    { id: 'beauvoir', name: '波伏娃', emoji: '💧', roleClass: 'role-c' },
+  ],
+  darkModeDefault: false,
+};
+
+// ─── Service Worker ──────────────────────────
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('/sw.js');
+}
+
+// ─── Socket ──────────────────────────────────
+const socket = io(CONFIG.socketURL);
+
+// ─── 快捷选择器 ──────────────────────────────
+const $ = (id) => document.getElementById(id);
+
+// ─── 角色映射 ────────────────────────────────
+const roleMap = { zhuangzi: 'role-a', nietzsche: 'role-b', beauvoir: 'role-c' };
+const names = { zhuangzi: '庄周', nietzsche: '尼采', beauvoir: '波伏娃' };
+const icons = { zhuangzi: '🎋', nietzsche: '⚡', beauvoir: '💧' };
+
+// ─── 状态 ────────────────────────────────────
+let roundCount = 0;
+let collisionCount = 0;
+let currentDebateId = null;
+let debateActive = false;
+let lastCardEl = null; // 追踪最近一张卡片用于碰撞光晕
+
+// ═══════════════════════════════════════════════
+// 主题切换 (暗色模式)
+// ═══════════════════════════════════════════════
+function toggleTheme() {
+  const html = document.documentElement;
+  const current = html.getAttribute('data-theme');
+  const next = current === 'dark' ? 'light' : 'dark';
+  html.setAttribute('data-theme', next);
+  localStorage.setItem('frost-theme', next);
+  updateThemeUI(next);
+
+  // 更新 theme-color meta
+  const meta = document.querySelector('meta[name="theme-color"]');
+  if (meta) meta.content = next === 'dark' ? '#0d1117' : '#fafafa';
+}
+
+function updateThemeUI(theme) {
+  const icon = $('themeIcon');
+  icon.textContent = theme === 'dark' ? '☀️' : '🌙';
+}
+
+// 初始化主题
+(function initTheme() {
+  const saved = localStorage.getItem('frost-theme');
+  const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+  const theme = saved || (CONFIG.darkModeDefault ? 'dark' : (prefersDark ? 'dark' : 'light'));
+  document.documentElement.setAttribute('data-theme', theme);
+  updateThemeUI(theme);
+  const meta = document.querySelector('meta[name="theme-color"]');
+  if (meta) meta.content = theme === 'dark' ? '#0d1117' : '#fafafa';
+})();
+
+// ═══════════════════════════════════════════════
+// 卡片渲染
+// ═══════════════════════════════════════════════
+function addCard(speaker, text, round) {
+  const stage = $('debateStage');
+  const card = document.createElement('div');
+  card.className = `debate-card ${roleMap[speaker] || 'role-a'}`;
+  card.innerHTML = `
+    <div class="card-header">
+      <div class="card-icon">${icons[speaker] || '?'}</div>
+      <span class="card-name">${names[speaker] || speaker}</span>
+      <span class="card-round">Round ${round}</span>
+    </div>
+    <div class="card-body">${text}</div>`;
+  stage.appendChild(card);
+  roundCount = Math.max(roundCount, round || 0);
+  $('statRounds').textContent = roundCount;
+  lastCardEl = card;
+  setTimeout(() => card.scrollIntoView({ behavior: 'smooth', block: 'end' }), 100);
+  return card;
+}
+
+// ═══════════════════════════════════════════════
+// 碰撞光晕 (文档要求 + 克制的霜白风格)
+// ═══════════════════════════════════════════════
+function addCollision(intensity) {
+  const stage = $('debateStage');
+  const pct = Math.round((intensity || 0.5) * 100);
+  const el = document.createElement('div');
+  el.className = 'collision-sep';
+  el.innerHTML = `<div class="sep-line"></div><div class="sep-label">⚡ 碰撞 · ${pct}%</div>`;
+  stage.appendChild(el);
+  collisionCount++;
+  $('statCollisions').textContent = collisionCount;
+
+  // 碰撞光晕：让碰撞分隔线短暂发光
+  el.classList.add('aura-active');
+  setTimeout(() => el.classList.remove('aura-active'), 1400);
+
+  // 碰撞光晕：最近卡片也有微弱光晕
+  if (lastCardEl && intensity > 0.3) {
+    lastCardEl.classList.add('collision-aura');
+    setTimeout(() => lastCardEl.classList.remove('collision-aura'), 800 + intensity * 600);
+  }
+
+  setTimeout(() => el.scrollIntoView({ behavior: 'smooth', block: 'end' }), 100);
+}
+
+// ═══════════════════════════════════════════════
+// Typing
+// ═══════════════════════════════════════════════
+function showThinking(name) {
+  const row = $('typingRow');
+  row.style.display = 'flex';
+  $('typingLabel').textContent = `${name || '哲学家'} 正在酝酿回应…`;
+  setTimeout(() => row.scrollIntoView({ behavior: 'smooth', block: 'end' }), 50);
+}
+function hideThinking() {
+  $('typingRow').style.display = 'none';
+}
+
+// ═══════════════════════════════════════════════
+// 错误横幅
+// ═══════════════════════════════════════════════
+function showError(message) {
+  const banner = $('errorBanner');
+  banner.textContent = '⚠ ' + (message || '辩论出错');
+  banner.style.display = 'block';
+  setTimeout(() => { banner.style.display = 'none'; }, 8000);
+}
+
+// ═══════════════════════════════════════════════
+// Socket 事件
+// ═══════════════════════════════════════════════
+
+// debate_started
+socket.on('debate_started', (msg) => {
+  console.log('[辩论开始]', msg.debateId, msg.topic);
+  currentDebateId = msg.debateId;
+  debateActive = true;
+  $('btnStart').disabled = true;
+  $('questionBar').classList.add('visible');
+});
+
+// agent_speaking
+socket.on('agent_speaking', (msg) => {
+  const name = msg.name || msg.agentId || '哲学家';
+  showThinking(name);
+});
+
+// debate_message
+socket.on('debate_message', (msg) => {
+  hideThinking();
+  const payload = msg.payload || msg;
+  if (payload.type === 'collision') {
+    addCollision(payload.intensity);
+  } else {
+    const speaker = payload.agentId || payload.agent || payload.speaker || 'zhuangzi';
+    addCard(speaker, payload.content || payload.text, payload.round || 0);
+    $('questionBar').classList.add('visible');
+  }
+});
+
+// heatmap_update
+socket.on('heatmap_update', (data) => {
+  if (data.collisions) {
+    data.collisions.forEach((c) => addCollision(c.intensity));
+  }
+});
+
+// collision_event
+socket.on('collision_event', (msg) => {
+  addCollision(msg.intensity || 0.6);
+});
+
+// quality_update
+socket.on('quality_update', (msg) => {
+  if (msg.score !== undefined) {
+    $('statScore').textContent = msg.score;
+  }
+});
+
+// debate_ended
+socket.on('debate_ended', (data) => {
+  hideThinking();
+  debateActive = false;
+  const payload = data.payload || data;
+  const score = payload.score || payload.quality || '--';
+  $('statScore').textContent = score;
+  $('reportScore').textContent = score;
+  $('reportStats').innerHTML = `
+    <div class="stat-item"><div class="stat-value">${roundCount}</div><div class="stat-label">总轮次</div></div>
+    <div class="stat-item"><div class="stat-value">${collisionCount}</div><div class="stat-label">总碰撞</div></div>
+    <div class="stat-item"><div class="stat-value">${score}</div><div class="stat-label">质量评分</div></div>
+  `;
+  $('reportOverlay').classList.add('show');
+  $('btnStart').disabled = false;
+  $('questionBar').classList.remove('visible');
+});
+
+// debate_error
+socket.on('debate_error', (msg) => {
+  hideThinking();
+  debateActive = false;
+  showError(msg.message || '辩论异常中断');
+  $('btnStart').disabled = false;
+});
+
+// agent_reply
+socket.on('agent_reply', (data) => {
+  if (data.reply) {
+    const agentId = data.agentId || 'agent';
+    addCard(agentId, `📩 ${data.agentName || names[agentId] || '哲学家'}: ${data.reply}`, roundCount);
+  }
+});
+
+// ═══════════════════════════════════════════════
+// 开始辩论
+// ═══════════════════════════════════════════════
+function startDebate() {
+  document.body.classList.remove('idle');
+  const topic = $('topicInput').value.trim();
+  if (!topic) return;
+
+  $('debateStage').innerHTML = '';
+  roundCount = 0;
+  collisionCount = 0;
+  lastCardEl = null;
+  debateActive = true;
+  currentDebateId = null;
+
+  $('statRounds').textContent = '0';
+  $('statCollisions').textContent = '0';
+  $('statScore').textContent = '--';
+  $('btnStart').disabled = true;
+  $('reportOverlay').classList.remove('show');
+  $('errorBanner').style.display = 'none';
+  hideThinking();
+  $('questionBar').classList.add('visible');
+
+  fetch(`${CONFIG.socketURL}/api/debate/start`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      topic,
+      maxRounds: CONFIG.maxRounds,
+      agents: ['zhuangzi', 'nietzsche', 'beauvoir'],
+    }),
+  })
+    .then((r) => r.json())
+    .then((data) => {
+      if (data.debateId) {
+        currentDebateId = data.debateId;
+        socket.emit('join_debate', data.debateId);
+      }
+      if (data.messages) {
+        data.messages.forEach((m) => {
+          if (m.type === 'collision') addCollision(m.intensity);
+          else addCard(
+            m.agentId || m.speaker || m.agent,
+            m.content || m.text,
+            m.round || 0
+          );
+        });
+      }
+    })
+    .catch(() => {
+      currentDebateId = 'demo_' + Date.now();
+      const demo = [
+        { s: 'zhuangzi', t: `关于"${topic}"——天地与我并生，万物与我为一。`, r: 1 },
+        { t: 'collision', i: 0.55 },
+        { s: 'nietzsche', t: `${topic}？用锤子敲碎旧石板！超人创造价值。`, r: 1 },
+        { t: 'collision', i: 0.7 },
+        { s: 'beauvoir', t: `${topic}——自由从来不是一个人的事业。我的自由以他者的自由为前提。`, r: 2 },
+      ];
+      let i = 0;
+      (function n() {
+        if (i >= demo.length) {
+          $('statScore').textContent = 'demo';
+          return;
+        }
+        const m = demo[i++];
+        if (m.t === 'collision') addCollision(m.i);
+        else addCard(m.s, m.t, m.r);
+        setTimeout(n, 1200 + Math.random() * 800);
+      })();
+    })
+    .finally(() => {
+      $('btnStart').disabled = false;
+    });
+}
+
+// ═══════════════════════════════════════════════
+// 追问
+// ═══════════════════════════════════════════════
+function askQuestion() {
+  const input = $('questionInput');
+  const question = input.value.trim();
+  if (!question || !currentDebateId) return;
+  input.value = '';
+
+  // 在舞台显示追问
+  const stage = $('debateStage');
+  const qEl = document.createElement('div');
+  qEl.className = 'debate-card';
+  qEl.style.cssText = 'text-align:right;padding:16px 24px;background:var(--card-bg-alt);';
+  qEl.innerHTML = `<div class="card-body" style="padding-left:0;font-style:italic;">💬 ${question}</div>`;
+  stage.appendChild(qEl);
+  qEl.scrollIntoView({ behavior: 'smooth', block: 'end' });
+
+  fetch(`${CONFIG.socketURL}/api/spectator/question`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ debateId: currentDebateId, question }),
+  }).catch(() => {
+    socket.emit('user_message', {
+      debateId: currentDebateId,
+      agentId: 'zhuangzi',
+      message: question,
+    });
+  });
+}
+
+// ═══════════════════════════════════════════════
+// 关闭报告
+// ═══════════════════════════════════════════════
+function closeReport() {
+  $('reportOverlay').classList.remove('show');
+}
+</script>
+
+</body>
+</html>
+

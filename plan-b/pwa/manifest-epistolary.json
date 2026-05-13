@@ -1,0 +1,12 @@
+{
+  "name": "思想书简 — 三子辩",
+  "short_name": "思想书简",
+  "start_url": "/pwa-epistolary.html",
+  "display": "standalone",
+  "background_color": "#f5f0e8",
+  "theme_color": "#2d6a4f",
+  "icons": [
+    { "src": "/icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "/icon-512.png", "sizes": "512x512", "type": "image/png" }
+  ]
+}

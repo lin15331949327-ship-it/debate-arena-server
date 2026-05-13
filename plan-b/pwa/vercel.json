@@ -1,0 +1,11 @@
+{
+  "buildCommand": "echo 'Static PWA site build complete'",
+  "outputDirectory": ".",
+  "cleanUrls": true,
+  "headers": [
+    {
+      "source": "/socket.io.min.js",
+      "headers": [{ "key": "Cache-Control", "value": "public, max-age=604800" }]
+    }
+  ]
+}

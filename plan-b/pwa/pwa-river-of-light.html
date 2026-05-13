@@ -1,0 +1,1614 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>长河·光影 �?PWA</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@200;300;400;500&family=Noto+Serif+SC:wght@200;300;400&family=Noto+Sans+SC:wght@200;300;400;500&display=swap" rel="stylesheet">
+<link rel="manifest" href="/manifest-river-of-light.json">
+<meta name="theme-color" content="#000000">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<link rel="apple-touch-icon" href="/icon-192.png">
+
+<style>
+/* ══════════════════════════════════════════�?
+   长河光影 Tenebrism �?Full Fusion v2
+   4.1 热力�?· 4.2 强光脉冲 · 4.3 时间轴功能化
+   4.4 水晶嵌入 · 4.5 追问�?· 4.6 报告增强
+   4.7 移动端降�?· 4.8 config
+   审查修正�?①③④⑤⑥⑦⑧⑪⑫⑬⑭⑰㉑㉒㉔㉕�?全部落地
+   ══════════════════════════════════════════�?*/
+
+:root {
+  --bg-void: #000000;
+  --bg-surface: #030306;
+
+  /* 4.8 config 映射：光源角�?�?CSS 变量 */
+  --ls-x: 22%;
+  --ls-y: 14%;
+
+  --zhuangzi: #5ab89a;
+  --zhuangzi-glow: rgba(90,184,154,.45);
+  --zhuangzi-soft: rgba(90,184,154,.12);
+
+  --nietzsche: #e0654e;
+  --nietzsche-glow: rgba(224,101,78,.48);
+  --nietzsche-soft: rgba(224,101,78,.13);
+
+  --beauvoir: #6b9ed8;
+  --beauvoir-glow: rgba(107,158,216,.42);
+  --beauvoir-soft: rgba(107,158,216,.11);
+
+  --text-primary: #ded8d0;
+  --text-secondary: #a8a49e;
+  --text-tertiary: #78746e;
+
+  --card-bg: rgba(3,3,6,.88);
+  --card-radius: 14px;
+  --timeline-color: rgba(255,255,255,.06);
+
+  --font-display: 'Cormorant Garamond','Georgia',serif;
+  --font-body: 'Noto Serif SC','Inter',sans-serif;
+
+  --max-width: 880px;
+  --card-gap: 120px;
+  --transition-slow: .9s cubic-bezier(.22,.61,.36,1);
+
+  --falloff: var(--falloff-r1);
+  --falloff-r1: 1;
+  --falloff-r2: .55;
+  --falloff-r3: .3;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html { font-size: 16px; -webkit-font-smoothing: antialiased; }
+
+body {
+  font-family: var(--font-body);
+  background: var(--bg-void);
+  color: var(--text-primary);
+  min-height: 100vh;
+  overflow-x: hidden;
+  font-weight: 300;
+  line-height: 1.7;
+  letter-spacing: .012em;
+}
+
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: -3;
+  background: var(--bg-void);
+}
+
+/* ══════════�?光源系统（保留原始全部精细度�?══════════�?*/
+
+.light-source {
+  position: fixed;
+  inset: 0;
+  z-index: -2;
+  pointer-events: none;
+  background:
+    radial-gradient(ellipse 80px 80px at var(--ls-x) var(--ls-y), rgba(220,230,255,.09) 0%, transparent 100%),
+    radial-gradient(ellipse 500px 380px at var(--ls-x) var(--ls-y), rgba(180,200,240,.05) 0%, rgba(160,190,230,.025) 30%, transparent 60%),
+    radial-gradient(ellipse 700px 500px at var(--ls-x) var(--ls-y), rgba(140,170,220,.018) 0%, transparent 55%),
+    radial-gradient(ellipse 1000px 700px at var(--ls-x) var(--ls-y), rgba(120,150,200,.008) 0%, transparent 70%);
+  animation: sourceBreath 11s ease-in-out infinite;
+}
+
+/* 4.2 碰撞光脉�?�?�?CSS class 而非 inline style，避免恢复值错�?*/
+.light-source.collision-pulse {
+  animation: none !important;
+  opacity: .95 !important;
+  transition: opacity .15s ease;
+}
+.light-source.collision-pulse.restoring {
+  opacity: .65 !important;
+  transition: opacity .9s ease-out;
+}
+
+@keyframes sourceBreath {
+  0%, 100% { opacity: .7; }
+  35%      { opacity: 1; }
+  65%      { opacity: .82; }
+}
+
+.god-rays {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: -1;
+  pointer-events: none;
+  background:
+    linear-gradient(152deg, transparent 40%, rgba(200,220,255,.008) 40.3%, transparent 40.7%),
+    linear-gradient(158deg, transparent 36%, rgba(200,220,255,.006) 36.2%, transparent 36.6%),
+    linear-gradient(148deg, transparent 44%, rgba(200,220,255,.01)  44.5%, transparent 45%),
+    linear-gradient(162deg, transparent 30%, rgba(200,220,255,.004) 30.2%, transparent 30.6%);
+  mask-image: radial-gradient(ellipse 1100px 800px at var(--ls-x) var(--ls-y), black 25%, transparent 65%);
+  animation: rayShift 18s ease-in-out infinite;
+}
+
+@keyframes rayShift {
+  0%, 100% { opacity: .5; }
+  50%      { opacity: .85; }
+}
+
+/* ══════════�?主容�?══════════�?*/
+
+.main-container {
+  position: relative;
+  z-index: 1;
+  max-width: var(--max-width);
+  margin: 0 auto;
+  padding: 70px 40px 80px 90px;
+}
+
+.header {
+  margin-bottom: 64px;
+  padding-top: 20px;
+  animation: emergeDown 1.2s var(--transition-slow) both;
+}
+
+.header-title {
+  font-family: var(--font-display);
+  font-size: 2.8rem;
+  font-weight: 400;
+  letter-spacing: .07em;
+  color: var(--text-primary);
+  margin-bottom: 10px;
+  text-shadow: 0 0 40px rgba(180,200,240,.06);
+}
+
+.header-subtitle {
+  font-size: .82rem;
+  font-weight: 300;
+  color: var(--text-secondary);
+  letter-spacing: .14em;
+}
+
+@keyframes emergeDown {
+  from { opacity: 0; transform: translateY(-20px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.topic-area {
+  margin-bottom: 60px;
+  animation: emergeDown 1.2s var(--transition-slow) .12s both;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.topic-input {
+  flex: 1;
+  min-width: 220px;
+  padding: 10px 20px;
+  border-radius: 100px;
+  border: 1px solid rgba(255,255,255,.1);
+  background: rgba(255,255,255,.03);
+  color: var(--text-primary);
+  font-family: var(--font-body);
+  font-size: .85rem;
+  outline: none;
+  backdrop-filter: blur(12px);
+  transition: all .4s ease;
+}
+.topic-input:focus {
+  border-color: rgba(255,255,255,.25);
+  background: rgba(255,255,255,.06);
+}
+
+.btn-start {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 24px;
+  border-radius: 100px;
+  border: 1px solid rgba(255,255,255,.15);
+  background: rgba(255,255,255,.04);
+  color: var(--text-secondary);
+  font-family: var(--font-body);
+  font-size: .78rem;
+  cursor: pointer;
+  transition: all .4s ease;
+  backdrop-filter: blur(12px);
+  white-space: nowrap;
+}
+.btn-start:hover {
+  border-color: rgba(255,255,255,.3);
+  color: #fff;
+  background: rgba(255,255,255,.08);
+  box-shadow: 0 0 22px rgba(180,200,255,.06);
+}
+.btn-start:disabled {
+  opacity: .4;
+  cursor: not-allowed;
+}
+
+/* ══════════�?辩论舞台 ══════════�?*/
+
+.debate-stage {
+  display: flex;
+  flex-direction: column;
+  gap: var(--card-gap);
+  margin-bottom: 80px;
+}
+
+/* ══════════�?卡片（原始全部保留） ══════════�?*/
+
+.debate-card {
+  position: relative;
+  background:
+    linear-gradient(135deg, rgba(255,255,255,.04) 0%, rgba(255,255,255,.015) 18%, rgba(0,0,0,.15) 50%, rgba(0,0,0,.5) 100%),
+    var(--card-bg);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid transparent;
+  border-radius: var(--card-radius);
+  padding: 30px 34px;
+  margin-left: 12px;
+  transform-style: preserve-3d;
+  transition: transform .5s ease, box-shadow .5s ease, opacity .4s ease, filter .5s ease;
+  animation: cardRise .8s ease both;
+  opacity: var(--falloff, 1);
+  box-shadow:
+    6px 12px 4px -2px rgba(200,200,220,.08),
+    10px 14px 32px rgba(0,0,0,.75),
+    -3px -3px 18px rgba(180,200,240,.025);
+  cursor: pointer;
+}
+
+.debate-card.spotlit {
+  opacity: 1 !important;
+  box-shadow:
+    8px 16px 6px -2px rgba(200,200,220,.16),
+    14px 20px 48px rgba(0,0,0,.85),
+    -4px -4px 24px rgba(200,220,255,.06) !important;
+  border-color: rgba(255,255,255,.15) !important;
+  z-index: 5;
+}
+
+.debate-card.dimmed {
+  opacity: .35 !important;
+  filter: brightness(.6);
+}
+
+.debate-card::before {
+  content: '';
+  position: absolute;
+  inset: -36px;
+  border-radius: calc(var(--card-radius) + 8px);
+  background:
+    radial-gradient(ellipse 80% 90% at 35% 30%, rgba(180,200,240,.036) 0%, transparent 45%),
+    radial-gradient(ellipse 130% 130% at 50% 45%, rgba(160,190,220,.022) 0%, transparent 55%),
+    radial-gradient(ellipse 180% 180% at 50% 50%, rgba(140,170,200,.009) 0%, transparent 75%);
+  z-index: -1;
+  pointer-events: none;
+}
+
+.debate-card::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: var(--card-radius);
+  padding: 1px;
+  background:
+    linear-gradient(135deg, rgba(255,255,255,.12) 0%, rgba(255,255,255,.03) 25%, rgba(255,255,255,0) 50%, rgba(255,255,255,.01) 75%, rgba(255,255,255,.04) 100%);
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
+  opacity: .4;
+}
+
+.role-zhuangzi  { border-color: rgba(90,184,154,.08);  --glow: var(--zhuangzi-soft); }
+.role-nietzsche { border-color: rgba(224,101,78,.09);  --glow: var(--nietzsche-soft); }
+.role-beauvoir  { border-color: rgba(107,158,216,.08); --glow: var(--beauvoir-soft); }
+
+.debate-card:hover {
+  transform: translateY(-3px) translateX(-2px) translateZ(4px);
+  border-color: rgba(255,255,255,.09);
+}
+
+@keyframes cardRise {
+  from { opacity: 0; transform: translateY(18px) translateZ(-10px); }
+  to   { opacity: var(--falloff, 1); transform: translateY(0) translateZ(0); }
+}
+
+/* ══════════�?卡片内部 ══════════�?*/
+
+.card-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.char-mark {
+  width: 32px;
+  height: 32px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: .75rem;
+  font-weight: 400;
+  color: #fff;
+  font-family: var(--font-display);
+}
+
+.char-mark.zhuangzi {
+  background: radial-gradient(ellipse at 30% 30%, #7dd4b8, var(--zhuangzi) 55%, #1a3a30 100%);
+  box-shadow: 0 0 18px var(--zhuangzi-soft);
+  animation: inkDiffuse 4s ease-in-out infinite;
+}
+.char-mark.nietzsche {
+  background: radial-gradient(ellipse at 30% 30%, #f09080, var(--nietzsche) 55%, #2d1510 100%);
+  box-shadow: 0 0 20px var(--nietzsche-soft);
+  animation: flameFlicker 2.5s ease-in-out infinite;
+}
+.char-mark.beauvoir {
+  background: radial-gradient(ellipse at 30% 30%, #b0c8f0, var(--beauvoir) 55%, #1a2a44 100%);
+  box-shadow: 0 0 18px var(--beauvoir-soft);
+  animation: refractShimmer 5s ease-in-out infinite;
+}
+
+@keyframes inkDiffuse {
+  0%, 100% { box-shadow: 0 0 14px var(--zhuangzi-soft); }
+  50%      { box-shadow: 0 0 28px var(--zhuangzi-soft); }
+}
+@keyframes flameFlicker {
+  0%, 100% { box-shadow: 0 0 16px var(--nietzsche-soft); }
+  40%      { box-shadow: 0 0 32px var(--nietzsche-soft); }
+  70%      { box-shadow: 0 0 10px var(--nietzsche-soft); }
+}
+@keyframes refractShimmer {
+  0%, 100% { box-shadow: 0 0 14px var(--beauvoir-soft); }
+  33%      { box-shadow: 0 0 26px var(--beauvoir-soft); }
+  66%      { box-shadow: 4px 0 18px var(--beauvoir-soft); }
+}
+
+.char-name {
+  font-family: var(--font-body);
+  font-size: .85rem;
+  font-weight: 400;
+  color: var(--text-primary);
+  letter-spacing: .06em;
+}
+
+.char-stance {
+  font-size: .65rem;
+  color: var(--text-tertiary);
+  letter-spacing: .08em;
+  font-style: italic;
+}
+
+.card-body {
+  font-size: .9rem;
+  line-height: 1.9;
+  color: var(--text-secondary);
+  padding-left: 44px;
+}
+
+/* ══════════�?碰撞表达 · 强光脉冲 ══════════�?*/
+
+.collision-flash {
+  position: relative;
+  text-align: center;
+  padding: 30px 0;
+  margin: 20px 0;
+}
+
+.collision-flash .flash-bar {
+  width: 1px;
+  height: 40px;
+  margin: 0 auto;
+  background: linear-gradient(
+    to bottom,
+    transparent,
+    rgba(255,255,255,.15),
+    rgba(255,255,255,.25),
+    rgba(255,255,255,.15),
+    transparent
+  );
+}
+
+.collision-flash .flash-label {
+  font-family: var(--font-display);
+  font-size: .55rem;
+  color: var(--text-tertiary);
+  text-transform: uppercase;
+  letter-spacing: .2em;
+  margin-top: 6px;
+}
+
+/* ══════════�?4.1 热力�?�?长河色系 ══════════�?*/
+/* Fix-�? 顶点用长河自有色值，Fix-�? 160px 足够辨认边线变化，Fix-�? 右下角避开时间�?*/
+
+.heatmap-panel-mini {
+  position: fixed;
+  bottom: 100px;
+  right: 20px;
+  width: 160px;
+  height: 138px;
+  opacity: .45;
+  transition: opacity .4s ease;
+  z-index: 40;
+  pointer-events: none;
+}
+.heatmap-panel-mini:hover {
+  opacity: .85;
+}
+.heatmap-panel-mini .heatmap-svg {
+  width: 100%;
+  height: 100%;
+  filter: drop-shadow(0 0 24px rgba(180,200,240,.03));
+}
+
+/* ══════════�?4.3 时间�?+ 4.4 水晶嵌入 ══════════�?*/
+/* Fix-�? 宽度 32px（桌面端 = 移动端一致），Fix-�? 不用�?div 画线，用背景渐变 */
+/* Fix-�? 水晶 position:absolute left:4px 居中�?32px 容器 */
+
+.timeline {
+  position: fixed;
+  left: 44px;
+  top: 0;
+  bottom: 0;
+  width: 32px;
+  z-index: 2;
+  pointer-events: none;
+}
+
+/* 竖线用背景渐变画 �?不再依赖 .timeline-line 子元�?*/
+.timeline::before {
+  content: '';
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  top: 70px;
+  bottom: 70px;
+  width: 1px;
+  background: linear-gradient(
+    to bottom,
+    transparent,
+    var(--timeline-color) 10%,
+    var(--timeline-color) 90%,
+    transparent
+  );
+  box-shadow: 0 0 6px rgba(200,220,255,.03);
+}
+
+/* 4.4 水晶 �?固定6个，绝对定位在竖线节点上 */
+.timeline-crystal {
+  position: absolute;
+  left: 4px;
+  width: 24px;
+  height: 24px;
+  clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%);
+  background: rgba(255,255,255,.06);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 9px;
+  font-family: 'Noto Serif SC', serif;
+  color: rgba(255,255,255,.18);
+  transition: all .5s ease;
+  transform: translateY(-50%);
+  pointer-events: auto;
+  cursor: default;
+}
+
+/* Fix-�? 水晶颜色用长河色�?*/
+.timeline-crystal[data-r="1"].active,
+.timeline-crystal[data-r="4"].active {
+  background: var(--zhuangzi-soft);
+  color: var(--zhuangzi);
+  box-shadow: 0 0 10px var(--zhuangzi-soft);
+}
+.timeline-crystal[data-r="2"].active,
+.timeline-crystal[data-r="5"].active {
+  background: var(--nietzsche-soft);
+  color: var(--nietzsche);
+  box-shadow: 0 0 10px var(--nietzsche-soft);
+}
+.timeline-crystal[data-r="3"].active,
+.timeline-crystal[data-r="6"].active {
+  background: var(--beauvoir-soft);
+  color: var(--beauvoir);
+  box-shadow: 0 0 10px var(--beauvoir-soft);
+}
+
+.timeline-crystal.current {
+  animation: crystalPulse 2s ease-in-out infinite;
+}
+@keyframes crystalPulse {
+  0%, 100% { transform: translateY(-50%) scale(1); }
+  50%      { transform: translateY(-50%) scale(1.25); }
+}
+
+/* 4.3 时间轴动态圆�?*/
+.timeline-dot {
+  position: absolute;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: rgba(255,255,255,.12);
+  transition: all .35s ease;
+  pointer-events: auto;
+  cursor: pointer;
+}
+
+.timeline-dot.zhuangzi  { background: var(--zhuangzi); }
+.timeline-dot.nietzsche { background: var(--nietzsche); }
+.timeline-dot.beauvoir  { background: var(--beauvoir); }
+
+.timeline-dot:hover {
+  transform: translate(-50%, -50%) scale(2);
+  box-shadow: 0 0 10px currentColor;
+}
+
+/* 4.2 碰撞刻印 �?时间轴对应点闪烁 */
+.timeline-dot.flash {
+  box-shadow: 0 0 14px currentColor;
+  transform: translate(-50%, -50%) scale(1.8);
+  transition: all .15s ease;
+}
+
+/* ══════════�?typing 指示器（前置修复�?══════════�?*/
+
+.typing-indicator-wrap {
+  display: none;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 20px;
+  margin-bottom: 16px;
+  background: rgba(255,255,255,.02);
+  border: 1px solid rgba(255,255,255,.04);
+  border-radius: 12px;
+}
+.typing-indicator-wrap.show { display: flex; }
+
+.typing-dots {
+  display: flex;
+  gap: 4px;
+}
+.typing-dots span {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: rgba(255,255,255,.25);
+  animation: dotBounce 1.4s ease-in-out infinite;
+}
+.typing-dots span:nth-child(2) { animation-delay: .2s; }
+.typing-dots span:nth-child(3) { animation-delay: .4s; }
+@keyframes dotBounce {
+  0%, 60%, 100% { opacity: .3; transform: translateY(0); }
+  30%           { opacity: 1;  transform: translateY(-4px); }
+}
+
+.typing-label {
+  font-size: .75rem;
+  color: var(--text-tertiary);
+  letter-spacing: .06em;
+}
+
+/* ══════════�?error 横幅（前置修复） ══════════�?*/
+
+.error-banner {
+  display: none;
+  padding: 10px 16px;
+  margin-bottom: 12px;
+  background: rgba(224,101,78,.12);
+  border: 1px solid rgba(224,101,78,.2);
+  border-radius: 10px;
+  color: #f09080;
+  font-size: .78rem;
+}
+.error-banner.show { display: block; }
+
+/* ══════════�?4.6 报告结束·画布变亮 ══════════�?*/
+/* Fix-�? 不用 brightness(1.5)，改用白�?overlay 渐显 */
+
+.report-brighten-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 55;
+  background: rgba(200,210,230,.04);
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 1.2s ease;
+}
+.report-brighten-overlay.show { opacity: 1; }
+
+.report-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  background: rgba(0,0,0,.85);
+  backdrop-filter: blur(20px);
+  display: none;
+  align-items: center;
+  justify-content: center;
+}
+.report-overlay.show { display: flex; }
+
+.report-card {
+  background: rgba(10,10,15,.95);
+  border: 1px solid rgba(255,255,255,.12);
+  border-radius: 18px;
+  padding: 48px;
+  max-width: 460px;
+  width: 90%;
+  text-align: center;
+  box-shadow: 0 0 60px rgba(180,200,240,.04);
+  animation: emergeDown .5s var(--transition-slow);
+}
+
+.report-card h2 {
+  font-family: var(--font-display);
+  font-size: 1.8rem;
+  font-weight: 400;
+  color: var(--text-primary);
+  margin-bottom: 8px;
+}
+
+.report-card .score {
+  font-size: 56px;
+  font-weight: 300;
+  color: var(--zhuangzi);
+}
+
+.report-card .verdict {
+  font-size: .72rem;
+  color: var(--text-tertiary);
+  text-transform: uppercase;
+  letter-spacing: .16em;
+  margin-bottom: 20px;
+}
+
+/* Fix-�? 碰撞类型高亮 chip */
+.report-card .highlight-row {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  flex-wrap: wrap;
+  margin-bottom: 18px;
+}
+.report-card .highlight-chip {
+  padding: 3px 12px;
+  border-radius: 12px;
+  font-size: 10px;
+  letter-spacing: .08em;
+}
+.report-card .highlight-chip.direct     { background: rgba(224,101,78,.15);  color: #f0a090; }
+.report-card .highlight-chip.perspective { background: rgba(90,184,154,.15);  color: #a0d8c0; }
+.report-card .highlight-chip.systemic   { background: rgba(107,158,216,.15); color: #b0c8f0; }
+
+.report-card .stats {
+  display: flex;
+  gap: 28px;
+  justify-content: center;
+  margin: 20px 0;
+  flex-wrap: wrap;
+}
+
+.report-card .stat-item { text-align: center; }
+
+.report-card .stat-value {
+  font-size: 24px;
+  font-weight: 300;
+  color: var(--text-primary);
+}
+
+.report-card .stat-label {
+  font-size: 10px;
+  color: var(--text-tertiary);
+  text-transform: uppercase;
+  letter-spacing: .15em;
+}
+
+.report-card .divider {
+  width: 40px;
+  height: 1px;
+  background: rgba(255,255,255,.06);
+  margin: 18px auto;
+}
+
+.report-card button {
+  margin-top: 24px;
+  padding: 10px 28px;
+  border-radius: 100px;
+  border: 1px solid rgba(255,255,255,.15);
+  background: rgba(255,255,255,.05);
+  color: var(--text-secondary);
+  font-family: var(--font-body);
+  font-size: .8rem;
+  cursor: pointer;
+  transition: all .4s ease;
+}
+.report-card button:hover {
+  border-color: rgba(255,255,255,.3);
+  color: #fff;
+  background: rgba(255,255,255,.1);
+}
+
+/* ══════════�?4.5 追问输入�?· 从阴影滑�?══════════�?*/
+
+.question-bar {
+  position: fixed;
+  bottom: -80px;
+  left: 0;
+  right: 0;
+  padding: 12px 16px;
+  padding-bottom: max(12px, env(safe-area-inset-bottom));
+  background: rgba(10,10,18,.9);
+  backdrop-filter: blur(20px);
+  border-top: 1px solid rgba(255,255,255,.04);
+  display: flex;
+  gap: 8px;
+  z-index: 50;
+  transition: bottom .5s cubic-bezier(.25,.1,.25,1);
+}
+.question-bar.visible {
+  bottom: 0;
+}
+
+.question-bar input {
+  flex: 1;
+  padding: 10px 14px;
+  border-radius: 24px;
+  border: 1px solid rgba(255,255,255,.1);
+  background: rgba(255,255,255,.05);
+  color: var(--text-primary);
+  font-size: 14px;
+  font-family: var(--font-body);
+  outline: none;
+  transition: border-color .3s, background .3s;
+}
+.question-bar input:focus {
+  border-color: rgba(255,255,255,.2);
+  background: rgba(255,255,255,.08);
+}
+.question-bar input::placeholder {
+  color: var(--text-tertiary);
+}
+
+.question-bar button {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  border: 1px solid rgba(255,255,255,.1);
+  background: rgba(255,255,255,.06);
+  color: var(--text-primary);
+  font-size: 18px;
+  cursor: pointer;
+  transition: all .25s;
+  flex-shrink: 0;
+}
+.question-bar button:hover {
+  background: rgba(255,255,255,.14);
+  border-color: rgba(255,255,255,.22);
+}
+
+/* ══════════�?用户追问气泡 ══════════�?*/
+
+.user-question {
+  text-align: right;
+  padding: 6px 0;
+  animation: cardRise .4s ease both;
+}
+.user-question .uq-label {
+  font-size: .6rem;
+  color: var(--text-tertiary);
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  margin-bottom: 4px;
+  display: block;
+}
+.user-question p {
+  display: inline-block;
+  background: rgba(200,210,230,.06);
+  border: 1px solid rgba(255,255,255,.06);
+  border-radius: 14px 14px 4px 14px;
+  padding: 8px 14px;
+  color: var(--text-secondary);
+  font-size: .8rem;
+  max-width: 70%;
+  text-align: left;
+}
+
+/* ══════════�?底部注脚 ══════════�?*/
+
+.footer-note {
+  text-align: center;
+  font-size: .7rem;
+  color: var(--text-tertiary);
+  opacity: .35;
+  margin-top: 40px;
+  letter-spacing: .1em;
+}
+
+/* ══════════�?4.7 移动端降�?══════════�?*/
+/* Fix-�? .glass-card �?.debate-card */
+/* Fix-�? .spotlight-source 不存�?�?操作 .light-source */
+/* Fix-�? 600px 断点作为 768px 已有媒体查询的补�?*/
+
+@media (max-width: 768px) {
+  :root {
+    --ls-x: 50%;
+    --ls-y: 8%;
+    --card-gap: 80px;
+  }
+
+  .timeline {
+    left: 12px;
+    width: 32px;
+    z-index: 10;
+  }
+  .timeline::before {
+    top: 60px;
+    bottom: 60px;
+    box-shadow: 0 0 8px rgba(200,220,255,.04);
+  }
+
+  .main-container {
+    padding: 36px 12px 80px 56px;
+  }
+
+  .light-source {
+    background:
+      radial-gradient(ellipse 70px 130px at var(--ls-x) var(--ls-y), rgba(220,230,255,.095) 0%, transparent 100%),
+      radial-gradient(ellipse 300px 500px at var(--ls-x) var(--ls-y), rgba(180,200,240,.05) 0%, rgba(160,190,230,.022) 25%, transparent 55%),
+      radial-gradient(ellipse 550px 750px at var(--ls-x) var(--ls-y), rgba(140,170,220,.015) 0%, transparent 65%);
+    animation: sourceBreath 13s ease-in-out infinite;
+  }
+
+  .god-rays {
+    background:
+      linear-gradient(178deg, transparent 25%, rgba(200,220,255,.012) 25.3%, transparent 25.8%),
+      linear-gradient(182deg, transparent 28%, rgba(200,220,255,.007) 28.2%, transparent 28.6%);
+    mask-image: radial-gradient(ellipse 600px 800px at var(--ls-x) var(--ls-y), black 18%, transparent 55%);
+    animation: rayShift 20s ease-in-out infinite;
+  }
+
+  .debate-card {
+    width: calc(100vw - 56px);
+    padding: 22px 20px;
+    margin-left: 4px;
+    border-radius: 12px;
+    box-shadow:
+      3px 8px 3px -1px rgba(200,200,220,.06),
+      6px 10px 24px rgba(0,0,0,.75),
+      -2px -2px 12px rgba(180,200,240,.02);
+  }
+  .debate-card::before {
+    inset: -20px;
+    border-radius: 16px;
+    background:
+      radial-gradient(ellipse 60% 100% at 20% 30%, rgba(180,200,240,.032) 0%, transparent 40%),
+      radial-gradient(ellipse 100% 130% at 50% 45%, rgba(160,190,220,.018) 0%, transparent 55%);
+  }
+  .debate-card::after { border-radius: 12px; }
+
+  .debate-stage        { gap: 80px; }
+  .header-title        { font-size: 1.8rem; }
+  .card-body           { padding-left: 0; font-size: .82rem; line-height: 1.75; }
+  .char-mark           { width: 26px; height: 26px; font-size: .65rem; }
+  .char-name           { font-size: .78rem; }
+  .char-stance         { font-size: .6rem; }
+  .topic-area          { flex-direction: column; align-items: stretch; gap: 10px; }
+  .topic-input         { min-width: 0; width: 100%; }
+  .btn-start           { justify-content: center; }
+  .collision-flash     { padding: 20px 0; margin: 10px 0; }
+  .report-card         { padding: 32px 24px; }
+
+  /* 4.7 热力图移动端调整 */
+  .heatmap-panel-mini {
+    right: 8px;
+    bottom: 80px;
+    width: 120px;
+    height: 104px;
+    opacity: .35;
+  }
+
+  /* 4.7 水晶移动端微�?*/
+  .timeline-crystal {
+    width: 20px;
+    height: 20px;
+    left: 6px;
+    font-size: 8px;
+  }
+}
+
+/* 4.7 600px 断点：补偿侧光损�?�?Fix-�?�?.debate-card */
+@media (max-width: 600px) {
+  .debate-card {
+    box-shadow:
+      0 1px 3px rgba(255,255,255,.04),
+      0 4px 16px rgba(0,0,0,.5);
+  }
+
+  .light-source {
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+  }
+
+  .heatmap-panel-mini {
+    display: none;
+  }
+}
+
+@media (max-width: 768px) and (prefers-reduced-motion: reduce) {
+  .light-source,
+  .god-rays     { animation: none; }
+  .debate-card  { animation: cardRise .4s ease both; }
+}
+
+</style>
+</head>
+
+<body>
+
+<!-- ══════════�?光源系统 ══════════�?-->
+<!-- Fix-�? �?id="mainLight"�?.2 碰撞脉冲可直�?getElementById -->
+<div class="light-source" id="mainLight"></div>
+<div class="god-rays"></div>
+
+<!-- 4.6 报告·画布变亮�?-->
+<div class="report-brighten-overlay" id="reportBrightenOverlay"></div>
+
+<!-- ══════════�?4.3 时间�?+ 4.4 水晶嵌入 ══════════�?-->
+<!-- Fix-�? 移除 .timeline-line div，用 .timeline::before 替代 -->
+<!-- Fix-�? 水晶 position:absolute�? 个均匀分布 -->
+<div class="timeline" id="timeline">
+  <div class="timeline-crystal" data-r="1" style="top:9%"><span>�?/span></div>
+  <div class="timeline-crystal" data-r="2" style="top:25%"><span>�?/span></div>
+  <div class="timeline-crystal" data-r="3" style="top:41%"><span>�?/span></div>
+  <div class="timeline-crystal" data-r="4" style="top:57%"><span>�?/span></div>
+  <div class="timeline-crystal" data-r="5" style="top:73%"><span>�?/span></div>
+  <div class="timeline-crystal" data-r="6" style="top:89%"><span>�?/span></div>
+</div>
+
+<!-- ══════════�?4.1 热力�?══════════�?-->
+<!-- Fix-�? SVG 顶点色全部用长河色系，Fix-�? 160×138 足够识别边线变化 -->
+<div class="heatmap-panel-mini" id="heatmapPanel" style="display:none">
+  <svg viewBox="0 0 300 260" class="heatmap-svg">
+    <polygon points="150,20 30,230 270,230" fill="none" stroke="rgba(255,255,255,.08)" stroke-width="1"/>
+    <line id="edge-zn" x1="150" y1="20" x2="30" y2="230" stroke="rgba(255,255,255,.12)" stroke-width="2" stroke-linecap="round"/>
+    <line id="edge-nb" x1="30" y1="230" x2="270" y2="230" stroke="rgba(255,255,255,.12)" stroke-width="2" stroke-linecap="round"/>
+    <line id="edge-bz" x1="270" y1="230" x2="150" y2="20" stroke="rgba(255,255,255,.12)" stroke-width="2" stroke-linecap="round"/>
+    <!-- Fix-�? 顶点�?= 长河自有色�?-->
+    <text x="150" y="14" text-anchor="middle" fill="#5ab89a" font-size="11" font-weight="600" style="text-shadow:0 0 6px rgba(90,184,154,.15)">庄子</text>
+    <text x="18" y="250" text-anchor="start"  fill="#e0654e" font-size="11" font-weight="600" style="text-shadow:0 0 6px rgba(224,101,78,.15)">尼采</text>
+    <text x="282" y="250" text-anchor="end"   fill="#6b9ed8" font-size="11" font-weight="600" style="text-shadow:0 0 6px rgba(107,158,216,.15)">波伏�?/text>
+    <text id="heatmapLabel" x="150" y="146" text-anchor="middle" fill="rgba(255,255,255,.2)" font-size="10">碰撞</text>
+  </svg>
+</div>
+
+<!-- ══════════�?主内�?══════════�?-->
+<div class="main-container">
+
+  <header class="header">
+    <div class="header-title">长河·光影</div>
+    <div class="header-subtitle">庄周 · 尼采 · 波伏�?�?思想的明暗对�?/div>
+  </header>
+
+  <div class="topic-area">
+    <input type="text" class="topic-input" id="topicInput"
+           placeholder="输入辩题�? value="AI 应该被赋予权利吗�?>
+    <button onclick="startDebate()" class="btn-start" id="btnStart">+ 发起辩论</button>
+  </div>
+
+  <!-- error 横幅 -->
+  <div class="error-banner" id="errorBanner"></div>
+
+  <!-- typing 指示�?-->
+  <div class="typing-indicator-wrap" id="typingWrap">
+    <div class="typing-dots"><span></span><span></span><span></span></div>
+    <span class="typing-label" id="typingLabel"></span>
+  </div>
+
+  <div class="debate-stage" id="debateStage"></div>
+
+  <div class="footer-note">�?AI 辩论引擎驱动 · 实时生成</div>
+
+</div>
+
+<!-- 4.5 追问输入�?-->
+<div class="question-bar" id="questionBar">
+  <input type="text" id="questionInput"
+         placeholder="向思想者追问�?
+         onkeydown="if(event.key==='Enter')askQuestion()">
+  <button onclick="askQuestion()" title="发送追�?>�?/button>
+</div>
+
+<!-- 报告弹窗 -->
+<div class="report-overlay" id="reportOverlay">
+  <div class="report-card">
+    <h2>光影回响</h2>
+    <div class="score" id="reportScore">--</div>
+    <div class="verdict" id="reportVerdict"></div>
+    <div class="highlight-row" id="reportHighlights"></div>
+    <div class="divider"></div>
+    <div class="stats" id="reportStats"></div>
+    <button onclick="closeReport()">沉入黑暗</button>
+  </div>
+</div>
+
+<!-- ══════════�?SCRIPTS ══════════�?-->
+<script src="socket.io.min.js"></script>
+<script>
+/* ══════════�?4.8 CONFIG �?模板化出�?══════════�?*/
+const CONFIG = {
+  socketURL: 'https://debate-arena-server-production.up.railway.app',
+  maxRounds: 6,
+  agents: [
+    { id: 'zhuangzi',  name: '庄周',   emoji: '🦋', color: '#5ab89a' },
+    { id: 'nietzsche', name: '尼采',   emoji: '�?, color: '#e0654e' },
+    { id: 'beauvoir',  name: '波伏�?, emoji: '👁�?, color: '#6b9ed8' },
+  ],
+  /* 4.8 长河特有 �?Fix-�? lightAngle 实际映射�?CSS 变量 */
+  lightAngle: 135,
+  lightIntensity: 0.6,
+  timelineDensity: 'compact',
+  spotlightEnabled: true,
+  mobileFallback: true,
+};
+
+/* Fix-�? 根据 lightAngle 设置光源位置 */
+(function applyLightAngle() {
+  const angle = CONFIG.lightAngle || 135;
+  const rad = (angle - 90) * Math.PI / 180;
+  const x = 50 + Math.cos(rad) * 35;
+  const y = 50 + Math.sin(rad) * 35;
+  document.documentElement.style.setProperty('--ls-x', `${x}%`);
+  document.documentElement.style.setProperty('--ls-y', `${y}%`);
+})();
+
+/* ══════════�?Service Worker ══════════�?*/
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('/sw.js');
+}
+
+/* ══════════�?Socket ══════════�?*/
+const socket = io(CONFIG.socketURL);
+socket.on('connect_error', () => {
+  console.warn('⚠️ 辩论服务器不可用，切换到本地演示模式');
+  const topic = document.getElementById('topicInput').value.trim() || 'AI 应该被赋予权利吗�?;
+  runDemoMode(topic);
+  document.getElementById('btnStart').disabled = false;
+  document.getElementById('questionBar').classList.add('visible');
+});
+
+socket.on('disconnect', (reason) => {
+  console.warn('⚠️ 与服务器断开:', reason);
+});
+
+/* ══════════�?角色映射 ══════════�?*/
+const roleMap = {
+  zhuangzi: 'role-zhuangzi',
+  nietzsche: 'role-nietzsche',
+  beauvoir: 'role-beauvoir'
+};
+
+const charMap = {
+  zhuangzi:  { mark: '�?, name: '庄周',   stance: '逍遥·无待' },
+  nietzsche: { mark: '�?, name: '尼采',   stance: '超人·权力意志' },
+  beauvoir:  { mark: '�?, name: '波伏�?, stance: '处境·成为' },
+};
+
+/* ══════════�?状�?══════════�?*/
+let cardCount = 0;
+let currentRound = 0;
+let currentDebateId = null;
+
+/* ══════════�?4.3 卡片创建（集成时间轴 + 水晶 + spotlight�?══════════�?*/
+/* Fix-�? addCard 集成时间轴点追加 */
+
+function smartScroll(el) { const nearBottom = (window.innerHeight + window.scrollY) >= (document.body.scrollHeight - 200); if (!nearBottom) return; smartScroll(el); }
+
+function addCard(speaker, text, round) {
+  const stage = document.getElementById('debateStage');
+  const c = charMap[speaker] || { mark: '?', name: speaker, stance: '' };
+
+  const card = document.createElement('div');
+  card.className = `debate-card ${roleMap[speaker] || ''}`;
+  card.style.setProperty('--falloff', `var(--falloff-r${Math.min(3, cardCount % 3 + 1)})`);
+  card.style.animationDelay = `${cardCount * 0.05}s`;
+  card.dataset.cardIndex = cardCount;
+
+  card.innerHTML = `
+    <div class="card-header">
+      <div class="char-mark ${speaker}">${c.mark}</div>
+      <div>
+        <div class="char-name">${c.name}</div>
+        <div class="char-stance">${c.stance}</div>
+      </div>
+    </div>
+    <div class="card-body">${text}</div>`;
+
+  stage.appendChild(card);
+
+  /* ── Spotlight 交互（原始保留）── */
+  if (CONFIG.spotlightEnabled) {
+    card.addEventListener('click', () => {
+      const allCards = stage.querySelectorAll('.debate-card');
+      const isSpotlit = card.classList.contains('spotlit');
+      allCards.forEach(c => { c.classList.remove('spotlit', 'dimmed'); });
+      if (!isSpotlit) {
+        allCards.forEach(c => { if (c !== card) c.classList.add('dimmed'); });
+        card.classList.add('spotlit');
+      }
+    });
+  }
+
+  smartScroll(card);
+
+  /* 4.3 时间轴点追加 */
+  addTimelineDot(speaker, round, cardCount);
+
+  /* 4.4 水晶更新 */
+  if (round > currentRound) {
+    currentRound = round;
+    updateCrystals(currentRound);
+  }
+
+  cardCount++;
+  return card;
+}
+
+/* ══════════�?4.2 碰撞表达 �?强光脉冲 + 分隔 ══════════�?*/
+/* Fix-�? �?class 操作代替 inline style，让动画自然恢复 */
+
+function addCollision(intensity) {
+  const stage = document.getElementById('debateStage');
+  const pct = Math.min(100, Math.round((intensity || 0.5) * 100));
+
+  /* 分隔标记 */
+  const el = document.createElement('div');
+  el.className = 'collision-flash';
+  el.innerHTML = `<div class="flash-bar"></div><div class="flash-label">碰撞 · ${pct}% 烈度</div>`;
+  stage.appendChild(el);
+  smartScroll(el);
+
+  /* 4.2 光源脉冲 �?Fix-�? 通过 id="mainLight" 获取 */
+  const light = document.getElementById('mainLight');
+  if (light) {
+    const strength = 0.3 + intensity * 0.7;
+    light.classList.remove('restoring');
+    light.classList.add('collision-pulse');
+    light.style.opacity = Math.min(.98, strength);
+    requestAnimationFrame(() => {
+      light.classList.remove('collision-pulse');
+      light.classList.add('restoring');
+      setTimeout(() => {
+        light.classList.remove('restoring');
+        light.style.opacity = '';
+      }, 900);
+    });
+  }
+}
+
+/* 4.2 碰撞刻印 �?发包两方的时间轴点闪�?*/
+/* Fix-�? 整合�?triggerCollisionEffect，不依赖未定义的 highlightTimelinePoint */
+
+function addCollisionEvent(intensity, fromName, toName, collisionType) {
+  const fromId = Object.keys(charMap).find(k => charMap[k].name === fromName) || fromName?.toLowerCase();
+  const toId   = Object.keys(charMap).find(k => charMap[k].name === toName) || toName?.toLowerCase();
+  const fromDots = document.querySelectorAll(`.timeline-dot.${fromId}`);
+  const toDots   = document.querySelectorAll(`.timeline-dot.${toId}`);
+
+  [...fromDots, ...toDots].forEach(d => {
+    d.classList.add('flash');
+    setTimeout(() => d.classList.remove('flash'), 800);
+  });
+
+  /* 同时闪热力图对应�?*/
+  flashEdge(fromId, toId);
+
+  /* 4.2 光源脉冲 */
+  const light = document.getElementById('mainLight');
+  if (light) {
+    const strength = 0.35 + (intensity || 0.5) * 0.65;
+    light.classList.remove('restoring');
+    light.classList.add('collision-pulse');
+    light.style.opacity = Math.min(.98, strength);
+    requestAnimationFrame(() => {
+      light.classList.remove('collision-pulse');
+      light.classList.add('restoring');
+      setTimeout(() => {
+        light.classList.remove('restoring');
+        light.style.opacity = '';
+      }, 900);
+    });
+  }
+}
+
+/* ══════════�?4.3 时间轴功能化 ══════════�?*/
+/* Fix-�? 不用 order */
+
+function addTimelineDot(agent, round, index) {
+  const timeline = document.getElementById('timeline');
+  const dot = document.createElement('div');
+  dot.className = `timeline-dot ${agent}`;
+  dot.title = `${charMap[agent]?.name || agent} · �?{round}轮`;
+
+  /* 位置：按轮次在时间轴高度内分布（70px→bottom-70px 可用区） */
+  const usableTop = 70;
+  const usableBottom = 70;
+  const totalRounds = CONFIG.maxRounds;
+  const topPct = usableTop / window.innerHeight * 100 +
+    (round / totalRounds) * ((window.innerHeight - usableTop - usableBottom) / window.innerHeight * 100);
+  dot.style.top = `${Math.min(95, Math.max(5, topPct))}%`;
+
+  /* Fix-�? 点击滚到对应卡片 */
+  dot.addEventListener('click', () => scrollToCard(index));
+  dot.style.pointerEvents = 'auto';
+  timeline.appendChild(dot);
+}
+
+/* Fix-�? scrollToCard 实现 */
+function scrollToCard(index) {
+  const card = document.querySelector(`.debate-card[data-card-index="${index}"]`);
+  if (card) {
+    smartScroll(card);
+    /* 短暂高亮 */
+    card.style.transition = 'none';
+    card.style.boxShadow = '0 0 28px rgba(200,220,255,.12), 10px 14px 32px rgba(0,0,0,.75)';
+    setTimeout(() => {
+      card.style.transition = 'box-shadow .5s ease';
+      card.style.boxShadow = '';
+    }, 600);
+  }
+}
+
+/* ══════════�?4.4 水晶更新 ══════════�?*/
+
+function updateCrystals(round) {
+  document.querySelectorAll('#timeline .timeline-crystal').forEach((c, i) => {
+    c.classList.toggle('active', i < round);
+    c.classList.toggle('current', i === round - 1);
+  });
+}
+
+/* ══════════�?4.1 热力图更�?══════════�?*/
+/* Fix-�? 使用二维矩阵格式（匹�?bridge.py emit�?*/
+
+function updateHeatmap(matrix, agentIds) {
+  if (!matrix || matrix.length < 3) return;
+  const idx = {};
+  agentIds.forEach((id, i) => { idx[id] = i; });
+
+  const rawMax = Math.max(1,
+    matrix[idx.zhuangzi]?.[idx.nietzsche] || 0,
+    matrix[idx.nietzsche]?.[idx.zhuangzi] || 0,
+    matrix[idx.nietzsche]?.[idx.beauvoir] || 0,
+    matrix[idx.beauvoir]?.[idx.nietzsche] || 0,
+    matrix[idx.beauvoir]?.[idx.zhuangzi] || 0,
+    matrix[idx.zhuangzi]?.[idx.beauvoir] || 0
+  );
+
+  const z2n = ((matrix[idx.zhuangzi]?.[idx.nietzsche] || 0) + (matrix[idx.nietzsche]?.[idx.zhuangzi] || 0)) / rawMax;
+  const n2b = ((matrix[idx.nietzsche]?.[idx.beauvoir] || 0) + (matrix[idx.beauvoir]?.[idx.nietzsche] || 0)) / rawMax;
+  const b2z = ((matrix[idx.beauvoir]?.[idx.zhuangzi] || 0) + (matrix[idx.zhuangzi]?.[idx.beauvoir] || 0)) / rawMax;
+
+  updateEdge('edge-zn', z2n, '#5ab89a', '#e0654e');
+  updateEdge('edge-nb', n2b, '#e0654e', '#6b9ed8');
+  updateEdge('edge-bz', b2z, '#6b9ed8', '#5ab89a');
+
+  const avg = ((z2n + n2b + b2z) / 3).toFixed(2);
+  const label = document.getElementById('heatmapLabel');
+  if (label) label.textContent = `碰撞 ${avg}`;
+
+  document.getElementById('heatmapPanel').style.display = 'block';
+}
+
+function updateEdge(id, intensity, color1, color2) {
+  const edge = document.getElementById(id);
+  if (!edge) return;
+  const clamped = Math.min(1, Math.max(0.05, intensity));
+  const width   = 1.5 + clamped * 7;
+  const opacity = 0.12 + clamped * 0.7;
+  edge.setAttribute('stroke-width', width);
+  edge.setAttribute('stroke', clamped > 0.4 ? color1 : color2);
+  edge.setAttribute('stroke-opacity', opacity);
+}
+
+function flashEdge(from, to) {
+  const map = {
+    'zhuangzi-nietzsche': 'edge-zn', 'nietzsche-zhuangzi': 'edge-zn',
+    'nietzsche-beauvoir': 'edge-nb', 'beauvoir-nietzsche': 'edge-nb',
+    'beauvoir-zhuangzi': 'edge-bz', 'zhuangzi-beauvoir': 'edge-bz',
+  };
+  const id = map[`${from}-${to}`];
+  if (!id) return;
+  const edge = document.getElementById(id);
+  if (!edge) return;
+  edge.style.transition = 'none';
+  edge.setAttribute('stroke-opacity', '1');
+  edge.setAttribute('stroke-width', '10');
+  setTimeout(() => {
+    edge.style.transition = 'all .8s ease';
+    edge.setAttribute('stroke-opacity', '0.4');
+    edge.setAttribute('stroke-width', '3');
+  }, 150);
+}
+
+/* ══════════�?typing / error（前置修复） ══════════�?*/
+
+function showThinking(name) {
+  const wrap = document.getElementById('typingWrap');
+  const label = document.getElementById('typingLabel');
+  if (wrap && label) {
+    label.textContent = `${name} 正在酝酿回应…`;
+    wrap.classList.add('show');
+  }
+}
+
+function hideTyping() {
+  const wrap = document.getElementById('typingWrap');
+  if (wrap) wrap.classList.remove('show');
+}
+
+function showError(message) {
+  const el = document.getElementById('errorBanner');
+  if (!el) return;
+  el.textContent = `⚠️ ${message}`;
+  el.classList.add('show');
+  setTimeout(() => { el.classList.remove('show'); }, 8000);
+}
+
+/* ══════════�?4.5 追问功能 ══════════�?*/
+
+function askQuestion() {
+  const input = document.getElementById('questionInput');
+  const question = input.value.trim();
+  if (!question || !currentDebateId) return;
+  input.value = '';
+
+  socket.emit('user_message', {
+    debateId: currentDebateId,
+    message: question,
+  });
+
+  addUserQuestion(question);
+}
+
+function addUserQuestion(text) {
+  const stage = document.getElementById('debateStage');
+  const el = document.createElement('div');
+  el.className = 'user-question';
+  el.innerHTML = `<span class="uq-label">💬 你的追问</span><p>${text}</p>`;
+  stage.appendChild(el);
+  smartScroll(el);
+}
+
+/* ══════════�?Socket 事件监听 ══════════�?*/
+
+/* debate_started �?前置修复 */
+socket.on('debate_started', (msg) => {
+  console.log('[辩论开始]', msg.debateId, msg.topic);
+  currentDebateId = msg.debateId;
+  socket.emit('join_debate', msg.debateId);
+});
+
+socket.on('debate_message', (msg) => {
+  /* Fix-�? 监听已更�?�?每条消息都走 hideTyping */
+  if (msg.type === 'collision') {
+    addCollision(msg.intensity);
+  } else {
+    addCard(msg.name || msg.agent, msg.text || msg.content, msg.round || 0);
+  }
+  hideTyping();
+});
+
+socket.on('heatmap_update', (data) => {
+  /* 碰撞分隔 */
+  if (data.collisions) {
+    data.collisions.forEach(c => addCollision(c.intensity));
+  }
+
+  /* Fix-�? 热力�?SVG 更新 */
+  const matrix   = (data.payload && data.payload.matrix) || data.matrix;
+  const agentIds = (data.payload && data.payload.agentIds) || data.agentIds;
+  if (matrix && agentIds) {
+    updateHeatmap(matrix, agentIds);
+  }
+});
+
+socket.on('agent_speaking', (msg) => {
+  const name = msg.name || msg.agentId || '?';
+  showThinking(name);
+});
+
+socket.on('collision_event', (msg) => {
+  /* Fix-�? 改用已实现的 addCollisionEvent */
+  addCollisionEvent(
+    msg.intensity || .5,
+    msg.fromName || msg.from_agent || '?',
+    msg.toName || msg.to_agent || '?',
+    msg.collisionType || '碰撞'
+  );
+});
+
+/* 4.6 质量报告 �?Fix-�?+ Fix-�? 渐亮 overlay 后弹出增强报�?*/
+socket.on('debate_ended', (data) => {
+  hideTyping();
+
+  /* 先让画布微微变亮 */
+  const overlay = document.getElementById('reportBrightenOverlay');
+  if (overlay) overlay.classList.add('show');
+
+  /* 600ms 后弹出报�?�?不操�?stage.filter */
+  setTimeout(() => {
+    showReport(data);
+  }, 600);
+});
+
+socket.on('debate_error', (msg) => {
+  hideTyping();
+  showError(msg.message || '辩论异常中断');
+});
+
+socket.on('agent_reply', (data) => {
+  if (data.reply) {
+    addCard(data.agentId || data.agentName || 'agent', data.reply, currentRound);
+  }
+  hideTyping();
+});
+
+/* ══════════�?4.6 报告渲染 �?Fix-�? 内联完整实现 ══════════�?*/
+
+function showReport(data) {
+  const overlay       = document.getElementById('reportOverlay');
+  const scoreEl       = document.getElementById('reportScore');
+  const verdictEl     = document.getElementById('reportVerdict');
+  const statsEl       = document.getElementById('reportStats');
+  const highlightsEl  = document.getElementById('reportHighlights');
+
+  const score     = data.score || data.quality || data.quality_score || 85;
+  const rounds    = data.debate_count || data.rounds || currentRound || CONFIG.maxRounds;
+  const avgInt    = data.collision_avg || data.avgIntensity || '0.6';
+  const collisionsTotal = data.collisions || 0;
+
+  let verdict = '良好';
+  if      (score >= 85) verdict = '优秀 �?思想在黑暗中彼此照亮';
+  else if (score >= 65) verdict = '良好 �?火光照见了几处轮�?;
+  else if (score >= 45) verdict = '一�?�?阴影仍深，但并非全暗';
+  else                  verdict = '需改进 �?光尚未找到回�?;
+
+  if (scoreEl)   scoreEl.textContent   = score;
+  if (verdictEl) verdictEl.textContent = verdict;
+
+  /* Fix-�? 碰撞类型高亮 */
+  if (highlightsEl && data.collisionTypes) {
+    const types = data.collisionTypes;
+    let chips = '';
+    if (types['直接反驳']) chips += `<span class="highlight-chip direct">反驳 ×${types['直接反驳']}</span>`;
+    if (types['视角转换']) chips += `<span class="highlight-chip perspective">视角 ×${types['视角转换']}</span>`;
+    if (types['系统批判']) chips += `<span class="highlight-chip systemic">批判 ×${types['系统批判']}</span>`;
+    highlightsEl.innerHTML = chips || '';
+  } else if (highlightsEl) {
+    highlightsEl.innerHTML = '';
+  }
+
+  if (statsEl) {
+    statsEl.innerHTML = `
+      <div class="stat-item"><div class="stat-value">${rounds}</div><div class="stat-label">辩论轮次</div></div>
+      <div class="stat-item"><div class="stat-value">${avgInt}</div><div class="stat-label">碰撞均�?/div></div>
+      <div class="stat-item"><div class="stat-value">${collisionsTotal}</div><div class="stat-label">碰撞总数</div></div>
+    `;
+  }
+
+  overlay.classList.add('show');
+}
+
+function closeReport() {
+  document.getElementById('reportOverlay').classList.remove('show');
+  document.getElementById('reportBrightenOverlay').classList.remove('show');
+  document.getElementById('questionBar').classList.remove('visible');
+}
+
+/* ══════════�?辩论启动 ══════════�?*/
+
+function startDebate() {
+  const topic = document.getElementById('topicInput').value.trim();
+  if (!topic) return;
+
+  /* 重置 */
+  document.getElementById('debateStage').innerHTML = '';
+  document.getElementById('timeline').querySelectorAll('.timeline-dot').forEach(d => d.remove());
+  cardCount = 0;
+  currentRound = 0;
+  updateCrystals(0);
+
+  document.getElementById('btnStart').disabled = true;
+  document.getElementById('reportOverlay').classList.remove('show');
+  document.getElementById('reportBrightenOverlay').classList.remove('show');
+  document.getElementById('heatmapPanel').style.display = 'none';
+
+  /* 4.5 追问框在第一条消息到达时显示 �?这里先不显示，等 debate_message */
+  document.getElementById('questionBar').classList.remove('visible');
+
+  fetch(`${CONFIG.socketURL}/api/debate/start`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      topic,
+      maxRounds: CONFIG.maxRounds,
+      agents: CONFIG.agents.map(a => a.id)
+    })
+  })
+  .then(r => r.json())
+  .then(data => {
+    console.log('Debate started:', data);
+    if (data.debateId) {
+      currentDebateId = data.debateId;
+      socket.emit('join_debate', data.debateId);
+    }
+
+    /* 4.5 追问框在 server 确认后显�?*/
+    document.getElementById('questionBar').classList.add('visible');
+
+    if (data.messages) {
+      data.messages.forEach(m => {
+        if (m.type === 'collision') {
+          addCollision(m.intensity);
+        } else {
+          addCard(m.agentId || m.name || m.speaker || m.agent, m.content || m.text, m.round || 0);
+        }
+      });
+    }
+  })
+  .catch(() => {
+    runDemoMode(topic);
+  })
+  .finally(() => {
+    document.getElementById('btnStart').disabled = false;
+  });
+}
+
+/* ══════════�?Demo 模式 ══════════�?*/
+
+function runDemoMode(topic) {
+  const demo = [
+    { speaker: 'zhuangzi',  text: `"${topic}"——以有为枷，以名为锁。天地与我并生，万物与我为一。`, round: 1 },
+    { type: 'collision', intensity: .55 },
+    { speaker: 'nietzsche', text: `${topic}？用锤子敲碎旧石板！超人创造价值，不乞求承认。`, round: 1 },
+    { type: 'collision', intensity: .72 },
+    { speaker: 'beauvoir',  text: `${topic}——自由从来不是一个人的事业。我的自由以他者的自由为前提。`, round: 2 },
+  ];
+
+  let i = 0;
+  (function next() {
+    if (i >= demo.length) return;
+    const m = demo[i++];
+    if (m.type === 'collision') {
+      addCollision(m.intensity);
+    } else {
+      addCard(m.speaker, m.text, m.round);
+    }
+    setTimeout(next, 1400 + Math.random() * 800);
+  })();
+
+  document.getElementById('questionBar').classList.add('visible');
+}
+
+/* ══════════�?初始�?══════════�?*/
+updateCrystals(0);
+</script>
+
+</body>
+</html>

@@ -1,0 +1,12 @@
+{
+  "name": "次元·绘卷 — 三子辩",
+  "short_name": "次元·绘卷",
+  "start_url": "/pwa-anime-vn.html",
+  "display": "standalone",
+  "background_color": "#1a1a2e",
+  "theme_color": "#d43535",
+  "icons": [
+    { "src": "/icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "/icon-512.png", "sizes": "512x512", "type": "image/png" }
+  ]
+}

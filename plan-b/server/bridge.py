@@ -32,14 +32,36 @@ from agents.prompts import AGENT_PROMPTS
 import requests
 
 # ═══════════════════════════════════════════════════════════
-# 知识库检索（可选增强）
+# 知识库检索（可选增强 — 优先加载 Qdrant 云版）
 # ═══════════════════════════════════════════════════════════
+HAS_SEARCH = False
+rag_search = None
 try:
-    from search import search as rag_search
+    import importlib
+    spec = importlib.util.spec_from_file_location(
+        "search_qdrant",
+        os.path.join(os.path.dirname(os.path.abspath(__file__)), "search.py")
+    )
+    search_qdrant = importlib.util.module_from_spec(spec)
+    sys.modules["search_qdrant"] = search_qdrant
+    spec.loader.exec_module(search_qdrant)
+    rag_search = search_qdrant.search
     HAS_SEARCH = True
-except (ImportError, ModuleNotFoundError):
-    HAS_SEARCH = False
-    rag_search = None
+except Exception:
+    # 降级：尝试本地 FAISS 版
+    try:
+        from search import search as rag_search
+        HAS_SEARCH = True
+    except Exception:
+        pass
+
+# 确保 SILICONFLOW_API_KEY 已设置（Qdrant 嵌入需要）
+if HAS_SEARCH and not os.environ.get("SILICONFLOW_API_KEY"):
+    try:
+        from embed import SILICONFLOW_API_KEY as _sk
+        os.environ["SILICONFLOW_API_KEY"] = _sk
+    except Exception:
+        pass
 
 # ═══════════════════════════════════════════════════════════
 # 配置
@@ -166,6 +188,11 @@ def run_debate(debate_id, topic, max_rounds=6, first_speaker=None):
         # 初始化引擎
         engine = DebateEngine(save_dir=os.path.join(os.path.dirname(os.path.abspath(__file__)), "sessions"))
         engine.start(topic=topic, max_rounds=max_rounds, first_speaker=first_speaker)
+
+        save_path = os.path.join(
+            os.path.dirname(os.path.abspath(__file__)), "sessions",
+            f"crash_{time.strftime('%Y%m%d_%H%M%S')}.json"
+        )
 
         output({
             "type": "log",
@@ -328,6 +355,20 @@ def run_debate(debate_id, topic, max_rounds=6, first_speaker=None):
             "message": f"辩论执行失败: {str(e)}\n{traceback.format_exc()}",
             "debateId": debate_id,
         })
+    finally:
+        # 无论正常结束还是崩溃，都保存已完成的发言
+        try:
+            os.makedirs(os.path.dirname(save_path), exist_ok=True)
+            with open(save_path, 'w', encoding='utf-8') as f:
+                json.dump({
+                    "topic": topic,
+                    "max_rounds": max_rounds,
+                    "phase": getattr(engine.state, 'phase', 'crashed'),
+                    "history": [{"round": h.round, "speaker": h.speaker, "text": h.text} for h in engine.state.history],
+                }, f, ensure_ascii=False, indent=2)
+            output({"type": "log", "message": f"📁 已存档: {save_path}"})
+        except Exception as _e:
+            output({"type": "log", "message": f"存档失败: {_e}"})
 
 # ═══════════════════════════════════════════════════════════
 # 入口: 从命令行参数启动

@@ -295,7 +295,14 @@ class DebateEngine:
         if len(self.state.history) < 1:
             return
 
-        last = self.state.history[-1]
+        # 取最近一个不是自己的发言（而非物理上一条）
+        last = None
+        for past in reversed(self.state.history):
+            if past.speaker != agent:
+                last = past
+                break
+        if last is None:
+            return  # 没有对手发言，跳过本轮碰撞检测
 
         # 分歧度: 检测反驳信号
         rebuttal_signals = ["你说","你忽略","你回避","不对","不是","错","你这条","你的","你忘了","你在","你当然","你用什么"]

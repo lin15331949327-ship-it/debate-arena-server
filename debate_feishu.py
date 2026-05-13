@@ -8,9 +8,9 @@ from engine.debate import DebateEngine
 from search import enrich_context
 from feishu_handler import format_agent_message, AGENT_EMOJI, AGENT_NAMES
 
-API_KEY = os.environ.get("DEEPSEEK_API_KEY", "")
-API_URL = "https://api.deepseek.com/chat/completions"
-MODEL = "deepseek-chat"
+API_KEY = ***"MIMO_API_KEY", "tp-ce42vsljarxkusirgqby5cilp7knjnwiqciq3gjdeon3edvl")
+API_URL = "https://token-plan-cn.xiaomimimo.com/v1/chat/completions"
+MODEL = "mimo-v2.5-pro"
 
 def agent_speak(agent, topic, history):
     """Direct API agent call"""
@@ -22,7 +22,7 @@ def agent_speak(agent, topic, history):
         json={"model": MODEL,
               "messages": [{"role": "system", "content": prompt},
                            {"role": "user", "content": context}],
-              "max_tokens": 500, "temperature": 0.8},
+              "max_tokens": 1500, "temperature": 0.8},
         timeout=90)
     if r.status_code == 200:
         return r.json()["choices"][0]["message"]["content"].strip()

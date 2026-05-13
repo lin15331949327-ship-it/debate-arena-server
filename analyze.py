@@ -10,12 +10,14 @@ SESSION_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "sessions
 
 def load_sessions():
     sessions = []
-    for f in sorted(glob.glob(os.path.join(SESSION_DIR, "*.json"))):
+    for f in sorted(glob.glob(os.path.join(SESSION_DIR, "*.json")),
+                    key=os.path.getmtime, reverse=True):
         try:
             with open(f, 'r', encoding='utf-8') as fh:
                 data = json.load(fh)
             # 只处理有碰撞日志的完整辩论会话
             if data.get("collision_log") and data.get("topic"):
+                data["_file"] = f
                 sessions.append(data)
         except Exception:
             pass
@@ -112,5 +114,13 @@ def analyze(sessions):
 
 
 if __name__ == "__main__":
-    sessions = load_sessions()
+    import argparse
+    parser = argparse.ArgumentParser(description="辩论质量分析")
+    parser.add_argument("--recent", type=int, default=0, help="只看最近N场")
+    args = parser.parse_args()
+
+    sessions = load_sessions()  # 已按文件时间倒序排列
+    if args.recent > 0:
+        sessions = sessions[:args.recent]
+        print(f"[仅显示最近 {len(sessions)} 场]\n")
     analyze(sessions)

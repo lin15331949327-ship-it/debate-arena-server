@@ -36,7 +36,7 @@ const activeDebates = new Map(); // debateId → { topic, agents, status, client
 // ─── 简易限流（防重复提交）──────────────────────────────────
 const lastStartTime = new Map(); // ip → timestamp
 const RATE_LIMIT_MS = 5000; // 5秒内同一IP只能开一场
-const MAX_CONCURRENT = 3;    // 最多同时3场辩论
+const MAX_CONCURRENT = 10;   // 最多同时10场辩论
 
 // ─── Python 桥接路径 ────────────────────────────────────────
 const BRIDGE_SCRIPT = join(__dirname, 'bridge.py');

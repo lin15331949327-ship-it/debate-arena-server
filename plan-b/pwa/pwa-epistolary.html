@@ -681,7 +681,7 @@ if ('serviceWorker' in navigator) {
 }
 
 // ─── Socket ──────────────────────────────────
-const socket = io(CONFIG.socketURL);
+const socket = io(CONFIG.socketURL, {transports: ['polling']});
 socket.on('connect', () => { console.log('?? �����ӱ��۷�����'); });
 socket.on('connect_error', () => {
   console.warn('?? ���۷�����������');

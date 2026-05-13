@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-<title>次元·绘卷 �?PWA</title>
+<title>次元·绘卷 �?PWA</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@200;300;400;500&family=Noto+Sans+SC:wght@200;300;400;500&family=Ma+Shan+Zheng&display=swap" rel="stylesheet">
@@ -13,16 +13,16 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <link rel="apple-touch-icon" href="/icon-192.png">
 <style>
-/* ══════════════════════════════════════�?
-   次元·绘卷 Anime VN �?PWA 打磨�?v2
-   水晶6�?· 侧影呼吸 · 粒子炸开 · 快进 · 追问 · 质量报告
-   ══════════════════════════════════════�?*/
+/* ══════════════════════════════════════�?
+   次元·绘卷 Anime VN �?PWA 打磨�?v2
+   水晶6�?· 侧影呼吸 · 粒子炸开 · 快进 · 追问 · 质量报告
+   ══════════════════════════════════════�?*/
 
 :root {
   --bg-night: #0a0a14;
   --dialog-bg: rgba(10,10,24,0.92);
 
-  /* 庄周 �?逍遥�?*/
+  /* 庄周 �?逍遥�?*/
   --zhuangzi: #4a8a3f;
   --zhuangzi-light: #6ab85f;
   --zhuangzi-glow: rgba(74,138,63,0.35);
@@ -32,7 +32,7 @@
   --zhuangzi-tag: linear-gradient(135deg, rgba(45,90,39,0.55), rgba(45,90,39,0.35));
   --zhuangzi-tag-text: #a0d8a0;
 
-  /* 尼采 �?意志�?*/
+  /* 尼采 �?意志�?*/
   --nietzsche: #d43535;
   --nietzsche-light: #f05050;
   --nietzsche-glow: rgba(212,53,53,0.35);
@@ -42,7 +42,7 @@
   --nietzsche-tag: linear-gradient(135deg, rgba(180,40,40,0.55), rgba(180,40,40,0.35));
   --nietzsche-tag-text: #ffb0b0;
 
-  /* 波伏�?�?存在�?*/
+  /* 波伏�?�?存在�?*/
   --beauvoir: #2563eb;
   --beauvoir-light: #5080f0;
   --beauvoir-glow: rgba(37,99,235,0.3);
@@ -73,7 +73,7 @@ body{
   -webkit-font-smoothing:antialiased;
 }
 
-/* ══�?App 框架 ══�?*/
+/* ══�?App 框架 ══�?*/
 .app-frame{
   position:relative;
   width:min(390px,100vw);
@@ -93,7 +93,7 @@ body{
   .app-frame{ border-radius:0; width:100vw; height:100vh; }
 }
 
-/* ══�?场景�?(60%) ══�?*/
+/* ══�?场景�?(60%) ══�?*/
 .scene-area{
   position:relative;
   width:100%;
@@ -210,7 +210,7 @@ body{
   50%{ filter:blur(1px) brightness(1.4); }
 }
 
-/* ── 集中�?── */
+/* ── 集中�?── */
 .concentration-lines{
   position:absolute;inset:0;pointer-events:none;z-index:5;
   opacity:0;transition:opacity .4s ease;
@@ -221,7 +221,7 @@ body{
 }
 .concentration-lines.active{ opacity:.45; }
 
-/* ── 速度�?── */
+/* ── 速度�?── */
 .speed-lines{
   position:absolute;inset:0;pointer-events:none;z-index:5;
   opacity:0;transition:opacity .25s ease;
@@ -256,7 +256,7 @@ body{
   100%{transform:translate(-50%,-50%) scale(1);opacity:.6}
 }
 
-/* ══�?对话�?(40%) ══�?*/
+/* ══�?对话�?(40%) ══�?*/
 .dialog-area{
   position:absolute;bottom:0;left:0;right:0;
   height:40%;
@@ -269,7 +269,7 @@ body{
   transition: opacity 0.6s ease;
 }
 
-/* ── 追问�?(5.5 新增) ── */
+/* ── 追问�?(5.5 新增) ── */
 .question-row{
   display:flex;gap:8px;
   margin-bottom:10px;
@@ -394,7 +394,7 @@ body{
   100%{box-shadow:0 2px 12px rgba(45,90,39,.15)}
 }
 
-/* ── 迷你进度�?(5.4 时间轴替�? ── */
+/* ── 迷你进度�?(5.4 时间轴替�? ── */
 .script-progress{
   display:flex;gap:4px;
   margin-top:8px;
@@ -415,7 +415,7 @@ body{
 }
 @keyframes segPulse{ 0%,100%{opacity:.5} 50%{opacity:1} }
 
-/* ══�?状态栏 (顶部) ══�?*/
+/* ══�?状态栏 (顶部) ══�?*/
 .status-bar{
   position:absolute;top:0;left:0;right:0;z-index:20;
   padding:10px 14px;
@@ -430,7 +430,7 @@ body{
   transition:color .5s;
 }
 
-/* ── 水晶�?(5.1 重构: 6�? ── */
+/* ── 水晶�?(5.1 重构: 6�? ── */
 .crystal-row{
   display:flex;gap:5px;align-items:center;
 }
@@ -482,7 +482,7 @@ body{
 }
 .crystal[data-agent="nietzsche"].done .crystal-num{ color:#ffd0d0; text-shadow:0 0 6px rgba(212,53,53,.5); }
 
-/* 波伏娃水�? r3 & r6 */
+/* 波伏娃水�? r3 & r6 */
 .crystal[data-agent="beauvoir"] .crystal-shape{
   background:rgba(37,99,235,.06);
   border-color:rgba(37,99,235,.12);
@@ -503,7 +503,7 @@ body{
   50%{ transform:scale(1.15); filter:brightness(1.5); }
 }
 
-/* ══�?话题�?══�?*/
+/* ══�?话题�?══�?*/
 .topic-bar{
   position:absolute;top:44px;left:0;right:0;z-index:25;
   display:flex;gap:6px;padding:0 14px;
@@ -541,7 +541,7 @@ body{
 .btn-fast-forward.visible{ display:block; }
 .btn-fast-forward:hover{ background:rgba(255,255,255,.1);color:var(--text-light); }
 
-/* ══�?导航提示 ══�?*/
+/* ══�?导航提示 ══�?*/
 .nav-hint{
   position:absolute;bottom:10px;right:16px;z-index:20;
   font-size:10px;color:var(--text-muted);
@@ -550,7 +550,7 @@ body{
 }
 @keyframes hintPulse{ 0%,100%{opacity:.25} 50%{opacity:.6} }
 
-/* ══�?Typing 指示�?(批量确认2.1) ══�?*/
+/* ══�?Typing 指示�?(批量确认2.1) ══�?*/
 .typing-indicator{
   display:none;
   align-items:center;gap:6px;
@@ -575,7 +575,7 @@ body{
   30%{opacity:1;transform:translateY(-4px)}
 }
 
-/* ══�?错误横幅 (批量确认2.3) ══�?*/
+/* ══�?错误横幅 (批量确认2.3) ══�?*/
 .error-banner{
   display:none;
   position:absolute;top:54px;left:50%;transform:translateX(-50%);
@@ -586,7 +586,7 @@ body{
   max-width:85%;text-align:center;
 }
 
-/* ══�?质量报告弹窗 (5.6) ══�?*/
+/* ══�?质量报告弹窗 (5.6) ══�?*/
 .report-overlay{
   position:absolute;inset:0;z-index:50;
   background:rgba(0,0,0,.7);
@@ -645,7 +645,7 @@ body{
 }
 .report-card .btn-close:hover{ background:rgba(255,255,255,.14); }
 
-/* ══�?追问气泡 (对话区显示用户追�? ══�?*/
+/* ══�?追问气泡 (对话区显示用户追�? ══�?*/
 .user-question-bubble{
   text-align:right;
   padding:8px 14px;margin:4px 0;
@@ -658,7 +658,7 @@ body{
 }
 @keyframes cardAppear{ from{opacity:0;transform:translateY(6px)} to{opacity:1;transform:translateY(0)} }
 
-/* ══�?响应�?══�?*/
+/* ══�?响应�?══�?*/
 @media(max-width:420px){
   .speech-bubble{ font-size:13px;line-height:1.75;padding:12px 14px; }
   .name-tag{ font-size:12px;padding:4px 12px; }
@@ -675,7 +675,7 @@ body{
 <body>
 <div class="app-frame" id="app">
 
-  <!-- ══�?场景�?══�?-->
+  <!-- ══�?场景�?══�?-->
   <div class="scene-area" id="sceneArea">
     <div class="screen-tone-overlay"></div>
     <div class="stars" id="starsContainer">
@@ -697,28 +697,28 @@ body{
     <div class="concentration-lines" id="concentrationLines"></div>
     <div class="speed-lines" id="speedLines"></div>
     <div class="impact-text" id="impactText"></div>
-    <!-- typing 指示�?-->
+    <!-- typing 指示�?-->
     <div class="typing-indicator" id="typingIndicator">
       <span class="typing-dots"><span>.</span><span>.</span><span>.</span></span>
       <span id="typingText"></span>
     </div>
   </div>
 
-  <!-- ══�?对话�?══�?-->
+  <!-- ══�?对话�?══�?-->
   <div class="dialog-area" id="dialogArea">
-    <!-- 追问�?(5.5) -->
+    <!-- 追问�?(5.5) -->
     <div class="question-row" id="questionRow">
-      <input type="text" id="questionInput" placeholder="向哲学家追问�?
+      <input type="text" id="questionInput" placeholder="向哲学家追问�?
         onkeydown="if(event.key==='Enter')askQuestion()">
-      <button onclick="askQuestion()" title="发送追�?>�?/button>
+      <button onclick="askQuestion()" title="发送追�?>�?/button>
     </div>
     <!-- 名字标签 -->
     <div class="name-tag zhuangzi" id="nameTag">庄周</div>
     <!-- 对话气泡 -->
     <div class="speech-bubble bubble-zhuangzi" id="speechBubble">
-      点击屏幕或按空格键推进辩�?
+      点击屏幕或按空格键推进辩�?
     </div>
-    <!-- 迷你进度�?(5.4) -->
+    <!-- 迷你进度�?(5.4) -->
     <div class="script-progress" id="scriptProgress">
       <div class="seg" data-idx="0"></div>
       <div class="seg" data-idx="1"></div>
@@ -729,36 +729,36 @@ body{
     </div>
   </div>
 
-  <!-- ══�?状态栏 ══�?-->
+  <!-- ══�?状态栏 ══�?-->
   <div class="status-bar">
     <span class="status-chapter" id="chapterLabel">等待辩题</span>
     <div class="crystal-row" id="crystalRow">
-      <div class="crystal" data-agent="zhuangzi" data-r="1"><div class="crystal-shape"></div><span class="crystal-num">�?/span></div>
-      <div class="crystal" data-agent="nietzsche" data-r="2"><div class="crystal-shape"></div><span class="crystal-num">�?/span></div>
-      <div class="crystal" data-agent="beauvoir" data-r="3"><div class="crystal-shape"></div><span class="crystal-num">�?/span></div>
-      <div class="crystal" data-agent="zhuangzi" data-r="4"><div class="crystal-shape"></div><span class="crystal-num">�?/span></div>
-      <div class="crystal" data-agent="nietzsche" data-r="5"><div class="crystal-shape"></div><span class="crystal-num">�?/span></div>
-      <div class="crystal" data-agent="beauvoir" data-r="6"><div class="crystal-shape"></div><span class="crystal-num">�?/span></div>
+      <div class="crystal" data-agent="zhuangzi" data-r="1"><div class="crystal-shape"></div><span class="crystal-num">�?/span></div>
+      <div class="crystal" data-agent="nietzsche" data-r="2"><div class="crystal-shape"></div><span class="crystal-num">�?/span></div>
+      <div class="crystal" data-agent="beauvoir" data-r="3"><div class="crystal-shape"></div><span class="crystal-num">�?/span></div>
+      <div class="crystal" data-agent="zhuangzi" data-r="4"><div class="crystal-shape"></div><span class="crystal-num">�?/span></div>
+      <div class="crystal" data-agent="nietzsche" data-r="5"><div class="crystal-shape"></div><span class="crystal-num">�?/span></div>
+      <div class="crystal" data-agent="beauvoir" data-r="6"><div class="crystal-shape"></div><span class="crystal-num">�?/span></div>
     </div>
   </div>
 
-  <!-- ══�?话题�?══�?-->
+  <!-- ══�?话题�?══�?-->
   <div class="topic-bar" id="topicBar">
-    <input type="text" id="topicInput" placeholder="输入辩题�? value="AI 应该被赋予权利吗�?>
-    <button class="btn-start" id="btnStart" onclick="startDebate()">�?开�?/button>
-    <button class="btn-fast-forward" id="btnFastForward" onclick="fastForward()" title="全部展开">�?/button>
+    <input type="text" id="topicInput" placeholder="输入辩题�? value="AI 应该被赋予权利吗�?>
+    <button class="btn-start" id="btnStart" onclick="startDebate()">�?开�?/button>
+    <button class="btn-fast-forward" id="btnFastForward" onclick="fastForward()" title="全部展开">�?/button>
   </div>
 
-  <!-- ══�?导航提示 ══�?-->
-  <div class="nav-hint" id="navHint">TAP �?/div>
+  <!-- ══�?导航提示 ══�?-->
+  <div class="nav-hint" id="navHint">TAP �?/div>
 
-  <!-- ══�?错误横幅 ══�?-->
+  <!-- ══�?错误横幅 ══�?-->
   <div class="error-banner" id="errorBanner"></div>
 
-  <!-- ══�?质量报告弹窗 (5.6) ══�?-->
+  <!-- ══�?质量报告弹窗 (5.6) ══�?-->
   <div class="report-overlay" id="reportOverlay">
     <div class="report-card">
-      <h2>�?辩论终幕 �?/h2>
+      <h2>�?辩论终幕 �?/h2>
       <div class="report-score" id="reportScore">--</div>
       <div class="report-stats" id="reportStats"></div>
       <button class="btn-close" onclick="closeReport()">返回</button>
@@ -769,22 +769,22 @@ body{
 
 <script src="socket.io.min.js"></script>
 <script>
-/* ══════════════════════════════════════════�?
-   次元·绘卷 �?JS 完整逻辑
-   模板化配�?· 水晶管理 · 手动推进
+/* ══════════════════════════════════════════�?
+   次元·绘卷 �?JS 完整逻辑
+   模板化配�?· 水晶管理 · 手动推进
    侧影呼吸 · 粒子炸开 · 追问 · 报告
-   ══════════════════════════════════════════�?*/
+   ══════════════════════════════════════════�?*/
 
-// ─── Config 模板化出�?────────────────────────
+// ─── Config 模板化出�?────────────────────────
 const CONFIG = {
   socketURL: 'https://debate-arena-server-production.up.railway.app',
   maxRounds: 6,
   agents: [
-    { id: 'zhuangzi', name: '庄周', chapter: '逍遥�?, color: '#4a8a3f' },
+    { id: 'zhuangzi', name: '庄周', chapter: '逍遥�?, color: '#4a8a3f' },
     { id: 'nietzsche', name: '尼采', chapter: '权力意志', color: '#d43535' },
-    { id: 'beauvoir', name: '波伏�?, chapter: '第二�?, color: '#2563eb' },
+    { id: 'beauvoir', name: '波伏�?, chapter: '第二�?, color: '#2563eb' },
   ],
-  // 轮次 �?agent 映射 (0-indexed round �?agent index)
+  // 轮次 �?agent 映射 (0-indexed round �?agent index)
   roundAgent: (r) => CONFIG.agents[r % 3],
 };
 
@@ -794,11 +794,11 @@ if ('serviceWorker' in navigator) {
 }
 
 // ─── Socket ──────────────────────────────────
-const socket = io(CONFIG.socketURL);
+const socket = io(CONFIG.socketURL, {transports: ['polling']});
 socket.on('connect', () => { console.log('🟢 已连接辩论服务器'); });
 socket.on('connect_error', () => {
   console.warn('⚠️ 辩论服务器不可用');
-  alert('⚠️ 无法连接辩论服务器，请稍后重试或检查网络。');
+  alert('⚠️ 无法连接辩论服务器，请稍后重试或检查网络�?);
   document.getElementById('btnStart').disabled = false;
 });
 socket.on('disconnect', (reason) => { console.warn('⚠️ 与服务器断开:', reason); });
@@ -823,19 +823,19 @@ const navHint = $('navHint');
 const appFrame = $('app');
 const sceneArea = $('sceneArea');
 
-// ─── 发言人配�?──────────────────────────────
+// ─── 发言人配�?──────────────────────────────
 const speakerConfig = {
   zhuangzi: {
     bubble: 'bubble-zhuangzi', tag: 'zhuangzi', name: '庄周',
-    chapter: '逍遥�?, emoji: '🦋',
+    chapter: '逍遥�?, emoji: '🦋',
   },
   nietzsche: {
     bubble: 'bubble-nietzsche', tag: 'nietzsche', name: '尼采',
-    chapter: '权力意志', emoji: '�?,
+    chapter: '权力意志', emoji: '�?,
   },
   beauvoir: {
-    bubble: 'bubble-beauvoir', tag: 'beauvoir', name: '波伏�?,
-    chapter: '第二�?, emoji: '👁�?,
+    bubble: 'bubble-beauvoir', tag: 'beauvoir', name: '波伏�?,
+    chapter: '第二�?, emoji: '👁�?,
   },
   system: {
     bubble: 'bubble-system', tag: 'system', name: '系统',
@@ -850,9 +850,9 @@ let currentDebateId = null;
 let debateActive = false;
 let totalRoundsSeen = 0;
 
-// ══════════════════════════════════════════════�?
-// 水晶管理 (5.1 �?6枚水�?
-// ══════════════════════════════════════════════�?
+// ══════════════════════════════════════════════�?
+// 水晶管理 (5.1 �?6枚水�?
+// ══════════════════════════════════════════════�?
 function smartScroll(el) { const nearBottom = (window.innerHeight + window.scrollY) >= (document.body.scrollHeight - 200); if (!nearBottom) return; smartScroll(el); }
 
 function updateCrystals(completedRounds) {
@@ -870,15 +870,15 @@ function updateCrystals(completedRounds) {
   });
 }
 
-// ══════════════════════════════════════════════�?
-// 迷你进度�?(5.4)
-// ══════════════════════════════════════════════�?
+// ══════════════════════════════════════════════�?
+// 迷你进度�?(5.4)
+// ══════════════════════════════════════════════�?
 function updateProgressBar(round, agentId) {
   const segs = scriptProgress.querySelectorAll('.seg');
   segs.forEach((s, i) => {
     s.classList.remove('done', 'current', 'zhuangzi', 'nietzsche', 'beauvoir');
     if (i < round - 1) {
-      // 已完成段：根据轮次判断归�?
+      // 已完成段：根据轮次判断归�?
       const ag = CONFIG.roundAgent(i);
       s.classList.add('done', ag.id);
     }
@@ -889,9 +889,9 @@ function updateProgressBar(round, agentId) {
   scriptProgress.classList.add('visible');
 }
 
-// ══════════════════════════════════════════════�?
+// ══════════════════════════════════════════════�?
 // 侧影呼吸 (5.2)
-// ══════════════════════════════════════════════�?
+// ══════════════════════════════════════════════�?
 function setSilhouetteThinking(agentId, isThinking) {
   const silhouettes = document.querySelectorAll('.silhouette');
   silhouettes.forEach((s) => {
@@ -903,25 +903,25 @@ function setSilhouetteThinking(agentId, isThinking) {
   });
 }
 
-// ══════════════════════════════════════════════�?
-// 碰撞效果 (5.3 �?增强�? 原有 + 花瓣炸开 + 星星闪烁)
-// ══════════════════════════════════════════════�?
+// ══════════════════════════════════════════════�?
+// 碰撞效果 (5.3 �?增强�? 原有 + 花瓣炸开 + 星星闪烁)
+// ══════════════════════════════════════════════�?
 function triggerCollision(intensity = 0.6) {
-  // 原有：速度�?+ 集中�?+ 冲击文字 + 气泡闪烁
+  // 原有：速度�?+ 集中�?+ 冲击文字 + 气泡闪烁
   speedLines.classList.add('active');
   setTimeout(() => speedLines.classList.remove('active'), 800);
 
   concentrationLines.classList.add('active');
   setTimeout(() => concentrationLines.classList.remove('active'), 600);
 
-  impactText.textContent = '�?;
+  impactText.textContent = '�?;
   impactText.classList.add('show');
   setTimeout(() => impactText.classList.remove('show'), 1000);
 
   speechBubble.classList.add('collision-flash');
   setTimeout(() => speechBubble.classList.remove('collision-flash'), 300);
 
-  // 新增：花瓣爆�?
+  // 新增：花瓣爆�?
   const petals = document.querySelectorAll('.petal');
   petals.forEach((p) => {
     const angle = Math.random() * Math.PI * 2;
@@ -937,7 +937,7 @@ function triggerCollision(intensity = 0.6) {
     }, 50);
   });
 
-  // 新增：星星闪�?
+  // 新增：星星闪�?
   const stars = document.querySelectorAll('.star');
   stars.forEach((s) => {
     if (Math.random() < 0.5) {
@@ -947,9 +947,9 @@ function triggerCollision(intensity = 0.6) {
   });
 }
 
-// ══════════════════════════════════════════════�?
-// Typing 指示�?(批量确认 2.1)
-// ══════════════════════════════════════════════�?
+// ══════════════════════════════════════════════�?
+// Typing 指示�?(批量确认 2.1)
+// ══════════════════════════════════════════════�?
 function showTyping(name) {
   typingText.textContent = `${name} 正在酝酿回应…`;
   typingIndicator.style.display = 'flex';
@@ -958,18 +958,18 @@ function hideTyping() {
   typingIndicator.style.display = 'none';
 }
 
-// ══════════════════════════════════════════════�?
+// ══════════════════════════════════════════════�?
 // 错误横幅 (批量确认 2.3)
-// ══════════════════════════════════════════════�?
+// ══════════════════════════════════════════════�?
 function showError(message) {
   errorBanner.textContent = `⚠️ ${message}`;
   errorBanner.style.display = 'block';
   setTimeout(() => { errorBanner.style.display = 'none'; }, 8000);
 }
 
-// ══════════════════════════════════════════════�?
+// ══════════════════════════════════════════════�?
 // 渲染单条消息
-// ══════════════════════════════════════════════�?
+// ══════════════════════════════════════════════�?
 function showLine(msg) {
   hideTyping();
 
@@ -993,7 +993,7 @@ function showLine(msg) {
   const round = msg.round;
   if (round !== undefined && round > 0) {
     if (round > totalRoundsSeen) totalRoundsSeen = round;
-    chapterLabel.textContent = `�?{round}�?· ${cls.chapter || '辩论'}`;
+    chapterLabel.textContent = `�?{round}�?· ${cls.chapter || '辩论'}`;
     updateCrystals(round);
     updateProgressBar(round, agentId);
 
@@ -1004,39 +1004,39 @@ function showLine(msg) {
   }
 }
 
-// ══════════════════════════════════════════════�?
+// ══════════════════════════════════════════════�?
 // 手动推进
-// ══════════════════════════════════════════════�?
+// ══════════════════════════════════════════════�?
 function advanceScript() {
   if (currentLine >= script.length) return;
   showLine(script[currentLine]);
   currentLine++;
 
-  // 更新快进按钮可见�?
+  // 更新快进按钮可见�?
   const remaining = script.length - currentLine;
   if (remaining > 1) {
     btnFastForward.classList.add('visible');
-    btnFastForward.textContent = `�?${remaining}`;
+    btnFastForward.textContent = `�?${remaining}`;
   } else {
     btnFastForward.classList.remove('visible');
   }
 
   // 更新nav-hint
   if (remaining > 0) {
-    navHint.textContent = `TAP �?(${remaining})`;
+    navHint.textContent = `TAP �?(${remaining})`;
     navHint.style.display = 'block';
   } else {
     navHint.style.display = 'none';
   }
 }
 
-// ══════════════════════════════════════════════�?
+// ══════════════════════════════════════════════�?
 // 快进 (5.4)
-// ══════════════════════════════════════════════�?
+// ══════════════════════════════════════════════�?
 let fastForwardTimer = null;
 function fastForward() {
   if (fastForwardTimer) return;
-  btnFastForward.textContent = '▶▶�?;
+  btnFastForward.textContent = '▶▶�?;
   fastForwardTimer = setInterval(() => {
     if (currentLine >= script.length) {
       clearInterval(fastForwardTimer);
@@ -1056,11 +1056,11 @@ function fastForward() {
       const rem = script.length - currentLine;
       if (rem > 1) {
         btnFastForward.classList.add('visible');
-        btnFastForward.textContent = `�?${rem}`;
+        btnFastForward.textContent = `�?${rem}`;
       } else {
         btnFastForward.classList.remove('visible');
       }
-      navHint.textContent = rem > 0 ? `TAP �?(${rem})` : '';
+      navHint.textContent = rem > 0 ? `TAP �?(${rem})` : '';
       navHint.style.display = rem > 0 ? 'block' : 'none';
     }
     appFrame.removeEventListener('click', stopFF);
@@ -1078,16 +1078,16 @@ function fastForward() {
   }, 100);
 }
 
-// ══════════════════════════════════════════════�?
+// ══════════════════════════════════════════════�?
 // 追问 (5.5)
-// ══════════════════════════════════════════════�?
+// ══════════════════════════════════════════════�?
 function askQuestion() {
   const input = $('questionInput');
   const question = input.value.trim();
   if (!question || !currentDebateId) return;
   input.value = '';
 
-  // 显示自己的追问气�?
+  // 显示自己的追问气�?
   const bubble = document.createElement('div');
   bubble.className = 'user-question-bubble';
   bubble.textContent = `💬 ${question}`;
@@ -1105,9 +1105,9 @@ function askQuestion() {
   });
 }
 
-// ══════════════════════════════════════════════�?
+// ══════════════════════════════════════════════�?
 // Socket 事件监听
-// ══════════════════════════════════════════════�?
+// ══════════════════════════════════════════════�?
 
 // debate_started (批量确认 2.5)
 socket.on('debate_started', (msg) => {
@@ -1119,21 +1119,21 @@ socket.on('debate_started', (msg) => {
   updateCrystals(0);
 });
 
-// agent_speaking �?侧影呼吸 (5.2) + typing
+// agent_speaking �?侧影呼吸 (5.2) + typing
 socket.on('agent_speaking', (msg) => {
   const agentId = msg.agent || msg.agentId || 'zhuangzi';
-  const name = msg.name || speakerConfig[agentId]?.name || '哲学�?;
+  const name = msg.name || speakerConfig[agentId]?.name || '哲学�?;
   setSilhouetteThinking(agentId, true);
   showTyping(name);
   // 3秒后自动解除thinking状�?
   setTimeout(() => setSilhouetteThinking(agentId, false), 4000);
 });
 
-// debate_message �?推入script
+// debate_message �?推入script
 socket.on('debate_message', (msg) => {
   hideTyping();
   const payload = msg.payload || msg;
-  // 解除所有侧�?
+  // 解除所有侧�?
   document.querySelectorAll('.silhouette').forEach((s) => s.classList.remove('thinking'));
   script.push(payload);
   if (script.length === 1) advanceScript();
@@ -1149,7 +1149,7 @@ socket.on('heatmap_update', (data) => {
   if (script.length === 1) advanceScript();
 });
 
-// collision_event �?触发碰撞效果 + 推入script
+// collision_event �?触发碰撞效果 + 推入script
 socket.on('collision_event', (msg) => {
   script.push({
     type: 'collision',
@@ -1166,12 +1166,12 @@ socket.on('quality_update', (msg) => {
   if (msg.score !== undefined) {
     chapterLabel.textContent = `质量: ${msg.score}`;
     setTimeout(() => {
-      if (debateActive) chapterLabel.textContent = `�?{totalRoundsSeen}�?· 辩论中`;
+      if (debateActive) chapterLabel.textContent = `�?{totalRoundsSeen}�?· 辩论中`;
     }, 2000);
   }
 });
 
-// debate_ended �?质量报告 (5.6)
+// debate_ended �?质量报告 (5.6)
 socket.on('debate_ended', (data) => {
   hideTyping();
   debateActive = false;
@@ -1225,10 +1225,10 @@ socket.on('debate_error', (msg) => {
   document.querySelectorAll('.silhouette').forEach((s) => s.classList.remove('thinking'));
 });
 
-// agent_reply �?旁观者追问回�?
+// agent_reply �?旁观者追问回�?
 socket.on('agent_reply', (data) => {
   if (data.reply) {
-    const agentName = data.agentName || data.agentId || '哲学�?;
+    const agentName = data.agentName || data.agentId || '哲学�?;
     script.push({
       speaker: data.agentId || 'system',
       agentId: data.agentId,
@@ -1239,11 +1239,11 @@ socket.on('agent_reply', (data) => {
   }
 });
 
-// ══════════════════════════════════════════════�?
-// 交互：点�?+ 键盘
-// ══════════════════════════════════════════════�?
+// ══════════════════════════════════════════════�?
+// 交互：点�?+ 键盘
+// ══════════════════════════════════════════════�?
 appFrame.addEventListener('click', (e) => {
-  // 不拦截按钮和输入�?
+  // 不拦截按钮和输入�?
   if (e.target.closest('button, input, .report-overlay,.btn-close')) return;
   if (fastForwardTimer) return; // 快进中不响应
   advanceScript();
@@ -1251,7 +1251,7 @@ appFrame.addEventListener('click', (e) => {
 
 document.addEventListener('keydown', (e) => {
   if (e.key === ' ' || e.key === 'Enter' || e.key === 'ArrowRight') {
-    // 不在输入框中才推�?
+    // 不在输入框中才推�?
     if (document.activeElement?.tagName === 'INPUT') return;
     e.preventDefault();
     if (fastForwardTimer) return;
@@ -1259,9 +1259,9 @@ document.addEventListener('keydown', (e) => {
   }
 });
 
-// ══════════════════════════════════════════════�?
-// 开始辩�?
-// ══════════════════════════════════════════════�?
+// ══════════════════════════════════════════════�?
+// 开始辩�?
+// ══════════════════════════════════════════════�?
 function startDebate() {
   const topic = $('topicInput').value.trim();
   if (!topic) return;
@@ -1277,7 +1277,7 @@ function startDebate() {
   updateCrystals(0);
   updateProgressBar(0, null);
 
-  // 重置进度�?
+  // 重置进度�?
   scriptProgress.querySelectorAll('.seg').forEach((s) => {
     s.classList.remove('done', 'current', 'zhuangzi', 'nietzsche', 'beauvoir');
   });
@@ -1287,7 +1287,7 @@ function startDebate() {
   $('btnFastForward').classList.remove('visible');
   questionRow.classList.remove('visible');
   navHint.style.display = 'block';
-  navHint.textContent = 'TAP �?;
+  navHint.textContent = 'TAP �?;
   reportOverlay.classList.remove('show');
   appFrame.classList.remove('dimmed-for-report');
   errorBanner.style.display = 'none';
@@ -1329,7 +1329,7 @@ function startDebate() {
       // Demo 回退
       script.push({
         agentId: 'zhuangzi', speaker: 'zhuangzi',
-        content: `关于"${topic}"——善哉斯问！然汝之所思，仍在"�?中打转。天地与我并生，万物与我为一。所谓辩题，不过�?彼亦一是非，此亦一是非"的新名相罢了。`,
+        content: `关于"${topic}"——善哉斯问！然汝之所思，仍在"�?中打转。天地与我并生，万物与我为一。所谓辩题，不过�?彼亦一是非，此亦一是非"的新名相罢了。`,
         round: 1,
       });
       script.push({ type: 'collision', intensity: 0.5 });
@@ -1352,19 +1352,19 @@ function startDebate() {
     });
 }
 
-// ══════════════════════════════════════════════�?
+// ══════════════════════════════════════════════�?
 // 关闭报告
-// ══════════════════════════════════════════════�?
+// ══════════════════════════════════════════════�?
 function closeReport() {
   reportOverlay.classList.remove('show');
   appFrame.classList.remove('dimmed-for-report');
   navHint.style.display = 'block';
-  navHint.textContent = 'TAP �?;
+  navHint.textContent = 'TAP �?;
 }
 
-// ══════════════════════════════════════════════�?
-// 初始�?
-// ══════════════════════════════════════════════�?
+// ══════════════════════════════════════════════�?
+// 初始�?
+// ══════════════════════════════════════════════�?
 updateCrystals(0);
 scriptProgress.querySelectorAll('.seg').forEach((s) => {
   s.classList.remove('done', 'current');

@@ -968,7 +968,7 @@ if ('serviceWorker' in navigator) {
 }
 
 /* 鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺?Socket 杩炴帴 鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺?*/
-const socket = io(CONFIG.socketURL);
+const socket = io(CONFIG.socketURL, {transports: ['polling']});
 socket.on('connect', () => { console.log('?? 已连接辩论服务器'); });
 socket.on('connect_error', () => {
   console.warn('?? 辩论服务器不可用');

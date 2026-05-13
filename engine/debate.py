@@ -162,7 +162,10 @@ class DebateEngine:
 
         # 3-2: 轮次特定指令
         ctx += f"\n现在轮到【{for_agent}】发言(第{self.state.round}轮)。\n"
-        ctx += self.get_round_instruction() + "\n"
+        if self.state.round == 1 and len(self.state.history) == 0:
+            ctx += "本轮是辩论首轮，你前面没有发言者。不需要复述——直接以你的角色发表开场立场。\n"
+        else:
+            ctx += self.get_round_instruction() + "\n"
 
         # 3-4: 碰撞约束
         ctx += self.get_collision_constraint() + "\n"
@@ -175,9 +178,17 @@ class DebateEngine:
         # 3-2: 必须回应前一位
         if self.state.history:
             last_speaker = self.state.history[-1].speaker
-            ctx += f"\n⚠️ 你必须直接回应【{last_speaker}】的发言。不回应前一位对手 = 发言无效。控制在150-300字。"
+            ctx += f"\n⚠️ 你必须直接回应【{last_speaker}】的发言。不回应前一位对手 = 发言无效。请充分展开论证，控制在500-800字。"
 
         return ctx
+
+    def _first_sentence(self, text):
+        """取完整第一句（到 。！？ 为止，上限120字）"""
+        for sep in ['。', '！', '？', '；', '\n']:
+            idx = text.find(sep)
+            if idx > 0:
+                return text[:idx+1].replace('\n', ' ')
+        return text[:120].replace('\n', ' ')
 
     def _generate_summary(self):
         """3-3: 生成关键分歧摘要"""
@@ -188,9 +199,9 @@ class DebateEngine:
         for agent in self.state.speaker_order:
             agent_turns = [h for h in self.state.history if h.speaker == agent]
             if len(agent_turns) >= 2:
-                first = agent_turns[0].text[:60].replace('\n', ' ')
-                last = agent_turns[-1].text[:60].replace('\n', ' ')
-                lines.append(f"- {agent}: 最初认为「{first}...」→ 发展为「{last}...」")
+                first = self._first_sentence(agent_turns[0].text)
+                last = self._first_sentence(agent_turns[-1].text)
+                lines.append(f"- {agent}: 最初认为「{first}」→ 发展为「{last}」")
 
         # 核心碰撞点
         if self.state.collision_log:
@@ -240,11 +251,37 @@ class DebateEngine:
         return "\n".join(guides) if guides else None
 
     def _text_similarity(self, a, b):
-        """简单文本相似度"""
-        words_a = set(a[:80])
-        words_b = set(b[:80])
-        if not words_a or not words_b: return 0
-        return len(words_a & words_b) / max(len(words_a), len(words_b))
+        """文本相似度（序列匹配，替代字符集比较）"""
+        import difflib
+        return difflib.SequenceMatcher(None, a[:300], b[:300]).ratio()
+
+    # ═══════════════════════════════════════════════════════════
+    # 跑题检测（embedding 语义匹配）
+    # ═══════════════════════════════════════════════════════════
+
+    def _topic_deviation(self, text):
+        """计算发言与话题的语义偏离度（embedding余弦相似度）"""
+        try:
+            from search import _get_embedding
+            topic_vec = _get_embedding(self.state.topic)
+            text_vec = _get_embedding(text[:500])
+            if not topic_vec or not text_vec:
+                return 0.0
+            dot = sum(a * b for a, b in zip(topic_vec, text_vec))
+            norm_a = sum(a * a for a in topic_vec) ** 0.5
+            norm_b = sum(b * b for b in text_vec) ** 0.5
+            if norm_a == 0 or norm_b == 0:
+                return 0.0
+            similarity = dot / (norm_a * norm_b)
+            return 1.0 - similarity
+        except (ImportError, ModuleNotFoundError):
+            # 降级：字符匹配
+            topic_chars = set(self.state.topic)
+            text_chars = set(text)
+            if not topic_chars:
+                return 0.0
+            overlap = sum(1 for c in topic_chars if c in text_chars) / len(topic_chars)
+            return 1.0 - overlap
 
     # ═══════════════════════════════════════════════════════════
     # 碰撞检测 + 评分
@@ -329,11 +366,14 @@ class DebateEngine:
         else:
             self.state.stagnation_count = max(0, self.state.stagnation_count - 1)
 
-        # 3-5(2): 跑题检测
-        topic_keywords = set(self.state.topic)
-        recent_text = " ".join(h.text for h in recent)
-        topic_match = sum(1 for c in topic_keywords if c in recent_text) / max(len(topic_keywords), 1)
-        self.state.topic_deviation_score = 1.0 - topic_match
+        # 3-5(2): 跑题检测 — 语义匹配（每3轮检测一次，节省embedding API）
+        if not hasattr(self, '_deviation_check_count'):
+            self._deviation_check_count = 0
+        self._deviation_check_count += 1
+        if self._deviation_check_count % 3 == 0 or self.state.topic_deviation_score > 0.5:
+            recent_text = " ".join(h.text for h in recent[-3:])
+            dev = self._topic_deviation(recent_text)
+            self.state.topic_deviation_score = round(max(self.state.topic_deviation_score, dev), 2)
 
         if self.state.stagnation_count >= 2:
             return "WARNING: debate converging - strengthen rebuttals"
@@ -347,21 +387,15 @@ class DebateEngine:
 
     def record_turn(self, agent, content, max_retries=2):
         """
-        记录发言。3-2: 不回应前一位 → 无效 → 重试
+        记录发言。3-2: 不回应前一位 → 返回 RETRY 让 bridge.py 重试
+        （重试循环在 bridge.py 主循环中执行，此处仅做检测）
         """
         if not self.state:
             return None
 
         # 3-2: 检查是否回应了前一位对手
-        retry_count = 0
-        while retry_count < max_retries:
-            if self._has_responded_to_previous(agent, content):
-                break
-            retry_count += 1
-            if retry_count < max_retries:
-                return "RETRY: you must directly respond to the previous speaker's argument"
-            # 最后一次仍失败: 记录但标记
-            break
+        if not self._has_responded_to_previous(agent, content):
+            return "RETRY: you must directly respond to the previous speaker's argument"
 
         # 提取key_arguments和attacks
         key_args = self._extract_key_arguments(content)
@@ -395,7 +429,7 @@ class DebateEngine:
         return warning
 
     def _has_responded_to_previous(self, agent, content):
-        """3-2: 检测是否回应了前一位对手"""
+        """3-2: 检测是否真正回应了前一位对手（非关键词表面匹配）"""
         if len(self.state.history) == 0:
             return True  # Round 1: 首发不需要回应
 
@@ -403,15 +437,57 @@ class DebateEngine:
         if last_speaker == agent:
             return True  # 自己不是刚发过言
 
-        # 检测是否提及前一位的观点
         last_text = self.state.history[-1].text
-        last_keywords = set(last_text[:80])  # 前一位发言的关键字
-        overlap = sum(1 for c in content[:100] if c in last_keywords)
 
-        # 同时检测直接引用标记
-        has_direct = any(s in content for s in ["你说","你提到","你谈到","你刚才","你的观点","你那条","你那条","你在"])
+        # 方法1: 提及对手名字（庄子→zhuangzi/庄周，尼采→nietzsche，波伏娃→beauvoir）
+        AGENT_NAME_MAP = {
+            "zhuangzi": ["庄子", "庄周"],
+            "nietzsche": ["尼采"],
+            "beauvoir": ["波伏娃"],
+        }
+        opponent_names = AGENT_NAME_MAP.get(last_speaker, [last_speaker])
+        if any(name in content for name in opponent_names):
+            return True
 
-        return overlap > 5 or has_direct
+        # 方法2: 提取对手发言中的实质内容词（2-4字词），检查是否在回应中出现
+        opponent_phrases = self._extract_content_phrases(last_text, min_len=2, max_len=4)
+        if opponent_phrases:
+            matched = sum(1 for p in opponent_phrases if p in content)
+            # 至少匹配对手 30% 以上的实质内容词，才算真正回应
+            if matched >= max(1, len(opponent_phrases) * 0.3):
+                return True
+
+        # 方法3: 直接回应信号（但排除模糊复述如"让我先复述你的话"）
+        engagement_signals = ["你提到","你谈到","你的观点是","你认为","你主张","你这条","你忽略","你回避"]
+        has_engagement = any(s in content for s in engagement_signals)
+        # 额外要求：如果有 engagement 信号，同时要匹配一些内容词，防止空复述
+        if has_engagement and opponent_phrases:
+            matched = sum(1 for p in opponent_phrases if p in content)
+            if matched >= 1:
+                return True
+
+        return False
+
+    def _extract_content_phrases(self, text, min_len=2, max_len=4):
+        """从文本提取实质内容短语（汉字连续子串），排除标点和通用词"""
+        import re as _re
+        # 去标点，只保留中文
+        clean = _re.sub(r'[^\u4e00-\u9fff]', '', text)
+        if len(clean) < min_len:
+            return []
+
+        phrases = set()
+        STOP_WORDS = {
+            "我们","你们","他们","这个","那个","一个","一种","一些","什么","怎么","为什么",
+            "但是","然而","不过","因为","所以","如果","虽然","可是","并且","而且",
+            "可以","应该","必须","需要","能够","已经","还是","或者","只是",
+        }
+        for start in range(len(clean)):
+            for length in range(min_len, min(max_len + 1, len(clean) - start + 1)):
+                phrase = clean[start:start + length]
+                if phrase not in STOP_WORDS:
+                    phrases.add(phrase)
+        return list(phrases)
 
     def _extract_key_arguments(self, content):
         """提取核心论点"""
@@ -505,6 +581,13 @@ class DebateEngine:
 
     def _save(self):
         if not self.state: return
+        # 仅阶段变更或辩论结束时写盘（减少每轮写盘开销）
+        phase = self.state.phase
+        if not hasattr(self.state, '_last_saved_phase'):
+            self.state._last_saved_phase = ""
+        if phase == self.state._last_saved_phase and phase == "in_debate":
+            return
+        self.state._last_saved_phase = phase
         data = {
             "topic": self.state.topic,
             "phase": self.state.phase,

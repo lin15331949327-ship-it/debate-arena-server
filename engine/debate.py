@@ -76,7 +76,7 @@ class DebateState:
 ROUND_INSTRUCTIONS = {
     1: "这是你的首发立场声明。你不需要回应任何人--阐述你对这个话题的根本立场,用你的思想体系作为依据。",
     2: "请回应前一位发言者(A)的观点,同时提出你自己的立场。先精准复述A的核心主张,再从你的思想体系展开你的论证。",
-    3: "请回应前两位发言者(A和B)的观点,同时提出你自己的立场。先分别精准复述他们的核心主张,再从你的思想体系展开你的论证。",
+    3: "请回应前两位发言者(A和B)的观点,同时提出你自己的立场。先分别精准复述他们的核心主张,再从你的思想体系展开你的论证。⚠️ 本轮禁止重复你自己在前两轮已经说过的观点或比喻——必须提出新论证或推进到新深度。",
     4: "你现在有了全部三种视角。请综合回应前面所有观点--指出哪些被你最初忽略了,哪些在三个视角的交锋中变得更加清晰。不是总结,是深化。",
     5: "请进一步深化你的立场,或修正你之前的论述,或对对手的论证进行更强的攻击。不要重复之前说过的话--要推进辩论到新的深度。",
     6: "这是最后一轮。不是总结--是最后一击或提出一个开放的问题。让旁观者在你的发言中看到辩论后仍然悬而未决的、最值得思考的张力。",
@@ -401,6 +401,10 @@ class DebateEngine:
         key_args = self._extract_key_arguments(content)
         attacks = self._extract_attacks(content)
 
+        # 碰撞检测必须在 history.append 之前执行
+        # ——detect_collision 通过 history[-1] 获取上一个对手的发言
+        self.detect_collision(content, agent, self.state.round)
+
         entry = HistoryEntry(
             round=self.state.round,
             speaker=agent,
@@ -410,10 +414,7 @@ class DebateEngine:
         )
         self.state.history.append(entry)
 
-        # 碰撞检测
-        self.detect_collision(content, agent, self.state.round)
-
-        # 导演模块检测
+        # 导演模块检测（需要当前发言已在 history 中）
         warning = self.check_stagnation(content)
 
         # 推进回合
@@ -562,7 +563,7 @@ class DebateEngine:
         avg_intensity = sum(s["intensity"] for s in self.round_scores) / max(len(self.round_scores), 1)
 
         report["quality_score"] = round(
-            min(100, total_collisions * 10 + avg_intensity * 15 - self.state.stagnation_count * 5 - self.state.topic_deviation_score * 20),
+            min(100, total_collisions * 5 + avg_intensity * 5 - self.state.stagnation_count * 10 - self.state.topic_deviation_score * 30),
             0
         )
 

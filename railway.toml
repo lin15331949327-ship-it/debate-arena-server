@@ -1,4 +1,2 @@
 [build]
-buildCommand = "cd plan-b/server && npm install"
-startCommand = "cd plan-b/server && npm start"
-nixpacks = { configFile = "plan-b/server/package.json" }
+root = "plan-b/server/"

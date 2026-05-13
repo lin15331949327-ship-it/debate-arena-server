@@ -1,8 +1,8 @@
 """search.py - Phase 1-5: Qdrant Cloud vector retrieval"""
 import os, json, requests
 
-QDRANT_URL = os.environ.get("QDRANT_URL", "https://ddd9feb0-f54d-4371-ad4e-2ed38372f1c2.eu-west-1-0.aws.cloud.qdrant.io")
-QDRANT_KEY = os.environ.get("QDRANT_API_KEY", "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhY2Nlc3MiOiJtIiwic3ViamVjdCI6ImFwaS1rZXk6NTFiMGFlZjEtMWFiNS00MzI4LWEwYTktODNkYWYyNjg3ZmM5In0.R4axKbzpf5Vcjxr6iXUiLR-0u6UEH0VqAZ-phJJj-bw")
+QDRANT_URL = os.environ.get("QDRANT_URL", "")
+QDRANT_KEY = os.environ.get("QDRANT_API_KEY", "")
 EMBED_API_KEY = os.environ.get("SILICONFLOW_API_KEY")
 if not EMBED_API_KEY:
     import sys

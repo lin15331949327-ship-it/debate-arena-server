@@ -108,7 +108,7 @@ io.on('connection', (socket) => {
     const userPrompt = `${contextSection}一位旁观者向你——${fullName}——提问：${message}\n\n请以${fullName}的身份，基于你在辩论中的立场回答。`;
 
     try {
-      const MIMO_KEY = process.env.MIMO_API_KEY || 'tp-ce42vsljarxkusirgqby5cilp7knjnwiqciq3gjdeon3edvl';
+      const MIMO_KEY = process.env.MIMO_API_KEY || '';
       if (!MIMO_KEY) {
         socket.emit('agent_reply', { error: 'API key 未配置', reply: '(系统未配置 AI 回复)' });
         return;

@@ -5,7 +5,7 @@ import numpy as np
 import requests
 
 DOCS = Path("E:/debate-arena/knowledge/docs")
-API_KEY = "sk-ocjfppboknvlnnepxdpksdnlqpchhzmzhgojcijlcvilgoyt"
+API_KEY = os.environ.get("SILICONFLOW_API_KEY", "")
 API_URL = "https://api.siliconflow.cn/v1/embeddings"
 MODEL = "BAAI/bge-m3"
 BATCH = 32

@@ -64,7 +64,7 @@ if HAS_SEARCH and not os.environ.get("SILICONFLOW_API_KEY"):
 # ═══════════════════════════════════════════════════════════
 # 2. 配置
 # ═══════════════════════════════════════════════════════════
-API_KEY = os.environ.get("MIMO_API_KEY", "tp-ce42vsljarxkusirgqby5cilp7knjnwiqciq3gjdeon3edvl")
+API_KEY = os.environ.get("MIMO_API_KEY", "")
 API_URL = "https://token-plan-cn.xiaomimimo.com/v1/chat/completions"
 MODEL = "mimo-v2.5-pro"
 

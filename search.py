@@ -7,7 +7,7 @@ import jieba
 import requests
 
 DOCS = Path("E:/debate-arena/knowledge/docs")
-API_KEY = "sk-ocjfppboknvlnnepxdpksdnlqpchhzmzhgojcijlcvilgoyt"
+API_KEY = os.environ.get("SILICONFLOW_API_KEY", "")
 
 _faiss_idx = {}
 _texts = {}

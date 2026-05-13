@@ -1,0 +1,9 @@
+node_modules/
+__pycache__/
+*.pyc
+.env
+.knowledge/
+knowledge/
+sessions/
+engine/__pycache__/
+agents/__pycache__/

@@ -8,7 +8,7 @@ from engine.debate import DebateEngine
 from search import enrich_context
 from feishu_handler import format_agent_message, AGENT_EMOJI, AGENT_NAMES
 
-API_KEY = ***"MIMO_API_KEY", "tp-ce42vsljarxkusirgqby5cilp7knjnwiqciq3gjdeon3edvl")
+API_KEY = os.environ.get("MIMO_API_KEY", "")
 API_URL = "https://token-plan-cn.xiaomimimo.com/v1/chat/completions"
 MODEL = "mimo-v2.5-pro"
 
@@ -38,7 +38,7 @@ def run_debate_for_feishu(topic, max_rounds=3):
     
     emoji = AGENT_EMOJI.get(engine.state.speaker_order[0], "")
     name = AGENT_NAMES.get(engine.state.speaker_order[0], "?")
-    lines = [f"## {emoji} {topic}\n\n*{name} · {engine.state.speaker_order[1]} · {engine.state.speaker_order[2]} · {max_rounds}轮*\n"]
+    lines = [f"## {emoji} {topic}\n\n*{name} · {engine.state.speaker_order[1]} · {engine.state.speaker_order[2]} · {max_rounds}�?\n"]
     
     for r in range(1, max_rounds + 1):
         for agent in engine.state.speaker_order:
@@ -53,13 +53,12 @@ def run_debate_for_feishu(topic, max_rounds=3):
             
             engine.record_turn(speaker, content)
             
-            # 4-2: 格式化消息（颜色/标记/角色名/卡片样式）
-            formatted = format_agent_message(speaker, content, r)
+            # 4-2: 格式化消息（颜色/标记/角色�?卡片样式�?            formatted = format_agent_message(speaker, content, r)
             lines.append(formatted)
     
     # 碰撞报告 + 质量评估
     cr = engine.collision_report()
     qr = engine.quality_report()
-    lines.append(f"\n---\n⚔️ 碰撞: {cr['total']}次 | ⭐ 质量: {qr.get('verdict','?')} ({qr.get('quality_score',0)}分)")
+    lines.append(f"\n---\n⚔️ 碰撞: {cr['total']}�?| �?质量: {qr.get('verdict','?')} ({qr.get('quality_score',0)}�?")
     
     return "\n".join(lines)

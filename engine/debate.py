@@ -354,7 +354,7 @@ class DebateEngine:
             "agent": agent,
             "disagreement": disagreement,
             "depth": depth,
-            "creativity": round(creative, 2),
+            "creativity": round(creative * 10, 1),
             "intensity": intensity
         })
 
